@@ -8,10 +8,7 @@ type WordleBoxProps = {
   color: string;
 };
 
-const WordleBox: NextPage<WordleBoxProps> = ({
-  letter,
-  color,
-}: WordleBoxProps) => {
+const WordleBox: NextPage<WordleBoxProps> = ({ letter, color }) => {
   useEffect(() => {
     if (color == colors.blank) return;
   }, [color]);

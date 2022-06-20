@@ -46,7 +46,7 @@ const guessedCorrectly = (rowArray: Box[]) => {
   return correctBoxes.length == rowArray.length;
 };
 
-const Wordle: NextPage<WordleProps> = ({ word, rowAmount }: WordleProps) => {
+const Wordle: NextPage<WordleProps> = ({ word, rowAmount }) => {
   const [width, height] = [word.length, rowAmount];
   const [grid, setGrid] = useState(generateGrid(width, height));
   const [position, setPosition] = useState({ col: 0, row: 0 });

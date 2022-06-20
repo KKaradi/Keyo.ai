@@ -7,7 +7,7 @@ type WordleRowProps = {
   letters: Box[];
 };
 
-const WordleRow: NextPage<WordleRowProps> = ({ letters }: WordleRowProps) => {
+const WordleRow: NextPage<WordleRowProps> = ({ letters }) => {
   return (
     <div className={styles.container}>
       {letters.map((letter, key) => {

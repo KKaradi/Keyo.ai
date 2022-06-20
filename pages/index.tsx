@@ -1,9 +1,17 @@
 import type { NextPage } from "next";
 import Head from "next/head";
-import { useEffect, useLayoutEffect } from "react";
+import path from "path";
+import { useEffect } from "react";
+import ImageCarousel from "../components/ImageCarousel";
 import Wordle from "../components/Wordle/Wordle";
 import { colors } from "../constants/colors";
 import styles from "../styles/Home.module.css";
+
+const imagePaths = Array.from(Array(5).keys()).map((num) =>
+  path.join(__dirname, `/hints/${num + 1}.jpg`)
+);
+
+const word = "FRENCHMANWITHBAGUETTE";
 
 const Home: NextPage = () => {
   useEffect(() => {
@@ -19,7 +27,8 @@ const Home: NextPage = () => {
 
       <main className={styles.main}>
         <h1 className={styles.title}>WORDLE CLONE</h1>
-        <Wordle word={"HELLO"} rowAmount={5} />
+        <ImageCarousel paths={imagePaths} />
+        <Wordle word={word.toUpperCase()} rowAmount={5} />
       </main>
     </div>
   );
