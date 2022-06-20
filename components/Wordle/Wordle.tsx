@@ -4,19 +4,12 @@ import styles from "../../styles/Wordle/Wordle.module.css";
 import { useCallback, useEffect, useState } from "react";
 import { colors } from "../../constants/colors";
 
-type WordleProps = {
-  word: string;
-  rowAmount: number;
-};
-
 export type Box = { content: string; color: string };
 
-const generateGrid = (width: number, height: number): Box[][] => {
-  return Array.from(Array(height).keys()).map(() =>
-    Array.from(Array(width).keys()).map(() => {
-      return { content: "", color: colors.blank };
-    })
-  );
+const generateRow = (width: number): Box[] => {
+  return Array.from(Array(width).keys()).map(() => {
+    return { content: "", color: colors.blank };
+  });
 };
 
 const isCapitalLetter = (content: string) => {
@@ -46,15 +39,21 @@ const guessedCorrectly = (rowArray: Box[]) => {
   return correctBoxes.length == rowArray.length;
 };
 
-const Wordle: NextPage<WordleProps> = ({ word, rowAmount }) => {
-  const [width, height] = [word.length, rowAmount];
-  const [grid, setGrid] = useState(generateGrid(width, height));
+type WordleProps = {
+  word: string;
+  maxAttempts?: number;
+  isSelected: boolean;
+};
+
+const Wordle: NextPage<WordleProps> = ({ word, maxAttempts, isSelected }) => {
+  const [width, height] = [word.length, maxAttempts];
+  const [grid, setGrid] = useState([generateRow(width)]);
   const [position, setPosition] = useState({ col: 0, row: 0 });
   const [isPlaying, setIsPlaying] = useState(true);
 
   const keyPressHandler = useCallback(
     (event: KeyboardEvent) => {
-      if (!isPlaying) return;
+      if (!isSelected || !isPlaying) return;
 
       let { col, row } = position;
       const key = event.key.toUpperCase();
@@ -71,17 +70,17 @@ const Wordle: NextPage<WordleProps> = ({ word, rowAmount }) => {
 
       if (key == "ENTER" && col == width) {
         grid[row] = updateColors(grid[row], word);
-        if (guessedCorrectly(grid[row])) setIsPlaying(false);
+        if (guessedCorrectly(grid[row]) || (height && row == height - 1))
+          setIsPlaying(false);
+        else grid.push(generateRow(width));
         row += 1;
         col = 0;
       }
 
-      if (row == height) setIsPlaying(false);
-
       setPosition({ col, row });
       setGrid(grid);
     },
-    [grid, word, position, width, height, isPlaying]
+    [grid, word, position, width, height, isPlaying, isSelected]
   );
 
   useEffect(() => {

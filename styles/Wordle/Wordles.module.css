@@ -1,0 +1,9 @@
+.wordle {
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.wordleRow {
+  display: flex;
+  flex-direction: row;
+}
