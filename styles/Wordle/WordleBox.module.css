@@ -1,0 +1,15 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 15%;
+  height: 50px;
+  width: 50px;
+  margin: 5px;
+}
+
+.letter {
+  color: white;
+  font-size: 2rem;
+  font-family: Helvetica Neue;
+}

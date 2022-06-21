@@ -1,0 +1,16 @@
+.imageRowContainer {
+  display: flex;
+  flex-direction: row;
+  margin-top: 1.5%;
+  margin-bottom: 1.5%;
+}
+
+.imageContainer {
+  height: 100px;
+  width: 100px;
+  margin: 10px;
+}
+
+.image {
+  border-radius: 10%;
+}
