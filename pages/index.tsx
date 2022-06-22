@@ -3,7 +3,6 @@ import Head from "next/head";
 import path from "path";
 import { useEffect } from "react";
 import ImageCarousel from "../components/ImageCarousel";
-import Wordle from "../components/Wordle/Wordle";
 import Wordles from "../components/Wordle/Wordles";
 import { colors } from "../constants/colors";
 import styles from "../styles/Home.module.css";
