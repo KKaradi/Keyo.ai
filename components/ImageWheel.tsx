@@ -16,13 +16,15 @@ const ImageWheel: NextPage<ImageWheelProps> = ({ paths }) => {
 
   const images = paths.map((path, index) => (
     <li key={index}>
-      <div
-        onMouseEnter={() => setIsPaused(true)}
-        onMouseLeave={() => setIsPaused(false)}
-        className={styles.imageContainer}
-        style={style}
-      >
-        <Image src={path} layout="fill" alt="" />
+      <div className={styles.imageResize}>
+        <div
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
+          className={styles.imageContainer}
+          style={style}
+        >
+          <Image src={path} layout="fill" alt="" />
+        </div>
       </div>
     </li>
   ));

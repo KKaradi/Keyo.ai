@@ -15,12 +15,16 @@
   color: white;
 }
 
-.navBar {
+.iconContainer > * {
+  transition: all 1s ease-in-out;
+}
+
+.iconContainer > *:hover {
+  transform: scale(1.2);
+}
+
+.iconContainer {
   display: flex;
-  align-items: center;
-  justify-content: center;
   flex-direction: row;
-  padding: 0;
-  margin: 0;
-  list-style: none;
+  gap: 50px;
 }

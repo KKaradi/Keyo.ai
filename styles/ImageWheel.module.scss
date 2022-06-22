@@ -37,8 +37,9 @@
 }
 
 $circleSize: 400px;
-$itemSize: 150px;
+$itemSize: 125px;
 $spinTime: 30s;
+$scaleImage: 1.3;
 
 .circleContainer {
   @include on-circle(
@@ -50,18 +51,25 @@ $spinTime: 30s;
   margin: 5em auto 0;
   animation: spin $spinTime linear infinite;
 
-  div {
-    display: block;
-    max-width: 100%;
-    height: $itemSize;
-    width: $itemSize;
-    animation: counterspin $spinTime linear infinite;
-    transition: all 1s ease-in-out;
-  }
-
   img {
     border-radius: 20%;
   }
+}
+
+.imageContainer {
+  display: block;
+  max-width: 100%;
+  height: $itemSize;
+  width: $itemSize;
+  animation: counterspin $spinTime linear infinite;
+}
+
+.imageResize {
+  transition: all 1s ease-in-out;
+}
+
+.imageResize:hover {
+  transform: scale($scaleImage);
 }
 
 @keyframes spin {
