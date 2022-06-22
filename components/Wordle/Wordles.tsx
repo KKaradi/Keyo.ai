@@ -1,6 +1,6 @@
 import { NextPage } from "next";
-import Wordle from "./Wordle";
 import styles from "../../styles/Wordle/Wordles.module.css";
+import Wordle from "./Wordle";
 import { useState } from "react";
 
 type WordlesProps = {

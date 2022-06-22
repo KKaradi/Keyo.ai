@@ -15,16 +15,21 @@
   color: white;
 }
 
-.iconContainer > * {
-  transition: all 1s ease-in-out;
-}
-
-.iconContainer > *:hover {
-  transform: scale(1.2);
-}
-
 .iconContainer {
   display: flex;
   flex-direction: row;
   gap: 50px;
+}
+
+.info {
+  color: white;
+}
+
+.twitter {
+  color: white;
+  transition: color 1s ease-in-out;
+}
+
+.twitter:hover {
+  color: #1da1f2;
 }

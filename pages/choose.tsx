@@ -20,6 +20,14 @@ const GamePage: NextPage = () => {
         <div className={styles.wheel}>
           <ImageVote paths={imagePaths} />
         </div>
+        <div className={styles.textContainer}>
+          <h1> Choose an image. </h1>
+          <p>
+            Whichever you find most visually appealing, the coolest, the most
+            aesthetically pleasing, the most impressive, the weirdest, the most
+            detailed. Connecting your wallet would be even better.
+          </p>
+        </div>
       </main>
     </div>
   );
