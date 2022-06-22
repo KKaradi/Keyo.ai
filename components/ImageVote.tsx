@@ -2,6 +2,7 @@ import { NextPage } from "next";
 import Image from "next/image";
 import { useState } from "react";
 import styles from "../styles/components/ImageVote.module.css";
+import { useAccount } from "wagmi";
 
 type ImageVoteProps = {
   paths: [string, string];
@@ -10,6 +11,7 @@ type ImageVoteProps = {
 
 const ImageVote: NextPage<ImageVoteProps> = ({ paths }) => {
   const [hasPicked, setHasPicked] = useState(false);
+  const walletAddress = useAccount().data?.address ?? undefined;
 
   const onClick = async (index: number) => {
     if (hasPicked) return;
@@ -20,7 +22,7 @@ const ImageVote: NextPage<ImageVoteProps> = ({ paths }) => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ index }),
+      body: JSON.stringify({ index, walletAddress }),
     });
   };
 

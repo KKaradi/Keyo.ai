@@ -10,13 +10,17 @@ export default async function storeVote(
   req: NextApiRequest,
   res: NextApiResponse<Response>
 ) {
-  if (req.method != "POST")
-    return res.status(405).send({ message: "Only POST requests allowed" });
+  if (req.method != "POST") {
+    const message = "Only POST requests allowed";
+    return res.status(405).json({ message });
+  }
 
   const { index, walletAddress } = req.body;
 
-  if (index == undefined)
-    res.status(400).json({ message: "Incorrect parameters: supply index." });
+  if (index == undefined) {
+    const message = "Incorrect parameters: supply index.";
+    return res.status(400).json({ message });
+  }
 
   await prisma.vote.create({ data: { index, walletAddress } });
   res.status(200).json({ message: "Successfully added to DB" });

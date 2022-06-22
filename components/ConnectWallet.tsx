@@ -1,13 +1,8 @@
-import { Button } from "@mui/material";
 import { NextPage } from "next";
-import styles from "../styles/components/ConnectWallet.module.css";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 const ConnectWallet: NextPage = () => {
-  return (
-    <Button variant="contained" className={styles.button}>
-      CONNECT WALLET
-    </Button>
-  );
+  return <ConnectButton />;
 };
 
 export default ConnectWallet;
