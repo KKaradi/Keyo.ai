@@ -1,5 +1,5 @@
 import { NextPage } from "next";
-import styles from "../styles/Header.module.css";
+import styles from "../styles/components/Header.module.css";
 import InfoIcon from "@mui/icons-material/Info";
 import TwitterIcon from "@mui/icons-material/Twitter";
 

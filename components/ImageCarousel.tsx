@@ -1,6 +1,6 @@
 import { NextPage } from "next";
 import Image from "next/image";
-import styles from "../styles/ImageCarousel.module.css";
+import styles from "../styles/components/ImageCarousel.module.css";
 
 type ImageCarouselProps = {
   paths: string[];

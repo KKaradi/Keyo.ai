@@ -1,13 +1,10 @@
 import type { NextPage } from "next";
 import Head from "next/head";
-import path from "path";
-import ImageWheel from "../components/ImageWheel";
 import Header from "../components/Header";
-import styles from "../styles/Choose.module.css";
+import ImageVote from "../components/ImageVote";
+import styles from "../styles/pages/Choose.module.css";
 
-const imagePaths = Array.from(Array(5).keys()).map((num) =>
-  path.join(__dirname, `/hints/${num + 1}.jpg`)
-);
+const imagePaths = ["/hints/1.jpg", "/hints/2.jpg"] as [string, string];
 
 const GamePage: NextPage = () => {
   return (
@@ -21,7 +18,7 @@ const GamePage: NextPage = () => {
 
       <main className={styles.main}>
         <div className={styles.wheel}>
-          <ImageWheel paths={imagePaths} />
+          <ImageVote paths={imagePaths} />
         </div>
       </main>
     </div>
