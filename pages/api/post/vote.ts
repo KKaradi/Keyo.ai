@@ -17,8 +17,8 @@ export default async function storeVote(
 
   const { index, walletAddress } = req.body;
 
-  if (index == undefined) {
-    const message = "Incorrect parameters: supply index.";
+  if (index === undefined || walletAddress === undefined) {
+    const message = "Incorrect parameters: supply index and wallet address.";
     return res.status(400).json({ message });
   }
 

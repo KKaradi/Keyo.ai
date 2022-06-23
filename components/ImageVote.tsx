@@ -10,12 +10,10 @@ type ImageVoteProps = {
 };
 
 const ImageVote: NextPage<ImageVoteProps> = ({ paths }) => {
-  const [hasPicked, setHasPicked] = useState(false);
   const walletAddress = useAccount().data?.address ?? undefined;
 
   const onClick = async (index: number) => {
-    if (hasPicked) return;
-    setHasPicked(true);
+    if (!walletAddress) return;
 
     await fetch("/api/post/vote", {
       method: "POST",
