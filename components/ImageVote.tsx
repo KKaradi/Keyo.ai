@@ -5,7 +5,6 @@ import { useAccount } from "wagmi";
 
 type ImageVoteProps = {
   paths: [string, string];
-  walletAddress?: string;
 };
 
 const ImageVote: NextPage<ImageVoteProps> = ({ paths }) => {
