@@ -4,7 +4,7 @@ import path from "path";
 import Header from "../components/Header";
 import ImageCarousel from "../components/ImageCarousel";
 import Wordles from "../components/wordle/Wordles";
-import styles from "../styles/Home.module.css";
+import styles from "../styles/pages/Game.module.css";
 
 const imagePaths = Array.from(Array(5).keys()).map((num) =>
   path.join(__dirname, `/hints/${num + 1}.jpg`)
@@ -20,8 +20,9 @@ const Home: NextPage = () => {
         <link rel="icon" href="/icon.png" />
       </Head>
 
+      <Header />
+
       <main className={styles.main}>
-        <Header />
         <ImageCarousel paths={imagePaths} />
         <Wordles prompt={prompt} maxAttempts={undefined} />
       </main>

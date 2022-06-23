@@ -1,27 +1,15 @@
-import { Ref, forwardRef, useState, ReactElement } from "react";
+import { useState, ReactElement } from "react";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
-import Slide from "@mui/material/Slide";
-import { TransitionProps } from "@mui/material/transitions";
 import type { NextPage } from "next/types";
-
-const Transition = forwardRef(
-  (
-    props: TransitionProps & {
-      children: ReactElement;
-    },
-    ref: Ref<unknown>
-  ) => {
-    return <Slide direction="up" ref={ref} {...props} />;
-  }
-);
+import SlideTransition from "./SlideTransition";
 
 type InfoDialogProps = {
-  children: React.ReactElement;
+  children: ReactElement;
 };
 
 const InfoDialog: NextPage<InfoDialogProps> = ({ children }) => {
@@ -32,7 +20,7 @@ const InfoDialog: NextPage<InfoDialogProps> = ({ children }) => {
       <div onClick={() => setIsOpen(true)}>{children}</div>
       <Dialog
         open={isOpen}
-        TransitionComponent={Transition}
+        TransitionComponent={SlideTransition}
         keepMounted
         onClose={() => setIsOpen(false)}
       >

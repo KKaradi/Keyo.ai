@@ -1,7 +1,7 @@
 import { NextPage } from "next";
 import { useEffect } from "react";
 import { colors } from "../../constants/colors";
-import styles from "../../styles/Wordle/WordleBox.module.css";
+import styles from "../../styles/components/Wordle/WordleBox.module.css";
 
 type WordleBoxProps = {
   letter: string;

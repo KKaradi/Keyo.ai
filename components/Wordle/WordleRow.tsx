@@ -1,5 +1,5 @@
 import { NextPage } from "next";
-import styles from "../../styles/Wordle/WordleRow.module.css";
+import styles from "../../styles/components/Wordle/WordleRow.module.css";
 import { Box } from "./Wordle";
 import WordleBox from "./WordleBox";
 

@@ -1,5 +1,5 @@
 import { NextPage } from "next";
-import styles from "../../styles/Wordle/Wordles.module.css";
+import styles from "../../styles/components/Wordle/Wordles.module.css";
 import Wordle from "./Wordle";
 import { useState } from "react";
 

@@ -3,7 +3,7 @@ import styles from "../styles/components/Header.module.css";
 import InfoIcon from "@mui/icons-material/Info";
 import TwitterIcon from "@mui/icons-material/Twitter";
 import Link from "next/link";
-import InfoDialog from "./InfoDialog";
+import InfoDialog from "./dialogs/InfoDialog";
 import ConnectWallet from "./ConnectWallet";
 
 const Header: NextPage = () => {
