@@ -1,6 +1,5 @@
 import { NextPage } from "next";
 import Image from "next/image";
-import { useState } from "react";
 import styles from "../styles/components/ImageVote.module.css";
 import { useAccount } from "wagmi";
 
