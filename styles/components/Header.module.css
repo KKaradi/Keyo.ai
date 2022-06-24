@@ -1,0 +1,35 @@
+.container {
+  border-bottom: solid white 1px;
+  padding: 10px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.title {
+  margin: 0;
+  line-height: 1.15;
+  font-size: 4rem;
+  color: white;
+}
+
+.iconContainer {
+  display: flex;
+  flex-direction: row;
+  gap: 50px;
+}
+
+.info {
+  color: white;
+}
+
+.twitter {
+  color: white;
+  transition: color 1s ease-in-out;
+}
+
+.twitter:hover {
+  color: #1da1f2;
+}

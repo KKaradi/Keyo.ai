@@ -1,7 +1,7 @@
 import { NextPage } from "next";
-import WordleBox from "./WordleBox";
 import styles from "../../styles/Wordle/WordleRow.module.css";
 import { Box } from "./Wordle";
+import WordleBox from "./WordleBox";
 
 type WordleRowProps = {
   letters: Box[];
