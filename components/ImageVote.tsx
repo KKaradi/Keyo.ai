@@ -25,12 +25,13 @@ const ImageVote: NextPage<ImageVoteProps> = ({ paths }) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-      },
+        AUTH_KEY: process.env.AUTH_KEY,
+      } as HeadersInit,
       body: JSON.stringify({ index, walletAddress }),
     });
 
-    // 401 status signifies already voted
-    if (result.status == 401) setVotedDialogIsOpen(true);
+    // 460 status signifies already voted
+    if (result.status == 460) setVotedDialogIsOpen(true);
   };
 
   const images = paths.map((path, index) => {

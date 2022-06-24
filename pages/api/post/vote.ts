@@ -17,7 +17,10 @@ const getYesterday = () => {
 
 const messages: { [key: string]: Response } = {
   onlyPost: {
-    message: `Incorrect HTTP method: only use POST.`,
+    message: "Incorrect HTTP method: only use POST.",
+  },
+  authError: {
+    message: "You are not authenticated.",
   },
   incorrectParams: {
     message: "Incorrect parameters: supply index and wallet address.",
@@ -44,10 +47,21 @@ const hasVotedToday = async (walletAddress: string) => {
   return result != null;
 };
 
+const authenticate = (req: NextApiRequest) => {
+  const key = req.headers.auth_key;
+  if (!key) return false;
+
+  return process.env.AUTH_KEY == key;
+};
+
 export default async function storeVote(
   req: NextApiRequest,
   res: NextApiResponse<Response>
 ) {
+  if (!authenticate(req)) {
+    return res.status(403).json(messages.authError);
+  }
+
   if (req.method != "POST") {
     return res.status(405).json(messages.onlyPost);
   }
@@ -62,7 +76,7 @@ export default async function storeVote(
   }
 
   if (await hasVotedToday(walletAddress)) {
-    return res.status(401).json(messages.hasVotedToday);
+    return res.status(460).json(messages.hasVotedToday);
   }
 
   const result = await prisma.vote

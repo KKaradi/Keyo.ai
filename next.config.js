@@ -1,11 +1,10 @@
 /** @type {import('next').NextConfig} */
-const path = require("path");
 
 const nextConfig = {
   reactStrictMode: true,
-  sassOptions: {
-    includePaths: [path.join(__dirname, "styles")],
-  },
+  env: {
+    AUTH_KEY: process.env.AUTH_KEY
+  }
 };
 
 module.exports = nextConfig;
