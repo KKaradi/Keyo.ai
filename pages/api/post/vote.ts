@@ -1,58 +1,10 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-import { PrismaClient } from "@prisma/client";
 import type { NextApiRequest, NextApiResponse } from "next";
-
-const prisma = new PrismaClient();
+import { getImageSetIndex } from "../../../helpers";
+import prisma from "../../../lib/prisma";
+import { authenticate, messages, hasVotedToday } from "../helpers";
 
 type Response = { message: string };
-
-const getYesterday = () => {
-  const now = new Date(Date.now());
-  return new Date(
-    now.getUTCFullYear(),
-    now.getUTCMonth(),
-    now.getUTCDate() - 1
-  );
-};
-
-const messages: { [key: string]: Response } = {
-  onlyPost: {
-    message: "Incorrect HTTP method: only use POST.",
-  },
-  authError: {
-    message: "You are not authenticated.",
-  },
-  incorrectParams: {
-    message: "Incorrect parameters: supply index and wallet address.",
-  },
-  hasVotedToday: {
-    message: "User already voted today.",
-  },
-  DBError: {
-    message: "Database Insertion Error.",
-  },
-  success: {
-    message: "Succesfully added to database.",
-  },
-};
-
-const hasVotedToday = async (walletAddress: string) => {
-  const result = await prisma.vote.findFirst({
-    where: {
-      walletAddress: { equals: walletAddress },
-      createdAt: { gt: getYesterday() },
-    },
-  });
-
-  return result != null;
-};
-
-const authenticate = (req: NextApiRequest) => {
-  const key = req.headers.auth_key;
-  if (!key) return false;
-
-  return process.env.AUTH_KEY == key;
-};
 
 export default async function storeVote(
   req: NextApiRequest,
@@ -66,21 +18,30 @@ export default async function storeVote(
     return res.status(405).json(messages.onlyPost);
   }
 
-  const { index, walletAddress } = req.body as {
-    index: number;
+  const { choiceIndex, imageSetIndex, walletAddress } = req.body as {
+    choiceIndex: number;
+    imageSetIndex: number;
     walletAddress: string;
   };
 
-  if (index === undefined || walletAddress === undefined) {
+  if (
+    choiceIndex === undefined ||
+    walletAddress === undefined ||
+    imageSetIndex === undefined
+  ) {
     return res.status(400).json(messages.incorrectParams);
   }
 
   if (await hasVotedToday(walletAddress)) {
-    return res.status(460).json(messages.hasVotedToday);
+    return res.status(461).json(messages.hasVotedToday);
+  }
+
+  if (imageSetIndex != getImageSetIndex()) {
+    return res.status(462).json(messages.reloadPage);
   }
 
   const result = await prisma.vote
-    .create({ data: { index, walletAddress } })
+    .create({ data: { choiceIndex, walletAddress, imageSetIndex } })
     .catch(console.error);
 
   if (!result) return res.status(500).json(messages.DBError);

@@ -3,7 +3,8 @@ import Image from "next/image";
 import styles from "../styles/components/ImageVote.module.css";
 import { useAccount } from "wagmi";
 import ErrorDialog from "./dialogs/ErrorDialog";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { getImageSetIndex } from "../helpers";
 
 type ImageVoteProps = {
   paths: [string, string];
@@ -11,14 +12,30 @@ type ImageVoteProps = {
 
 const connectMessage = "Connect your wallet address before voting!";
 const votedMessage = "You already voted today!";
+const reloadMessage = "You are out of date! Please reload the page.";
 
-const ImageVote: NextPage<ImageVoteProps> = ({ paths }) => {
+const START_DATE = process.env.START_DATE;
+if (!START_DATE) throw new Error("START_DATE env var not present");
+
+const ImageVote: NextPage<ImageVoteProps> = () => {
+  const imageSetState = useState<number | undefined>(undefined);
+  const [imageSetIndex, setImageSetIndex] = imageSetState;
+
+  const [paths, setPaths] = useState<string[]>([]);
+
+  useEffect(() => {
+    const folder = getImageSetIndex();
+    setImageSetIndex(folder);
+    setPaths([1, 2].map((num) => `/choice/${folder}/${num}.jpg`));
+  }, []);
+
   const [connectDialogIsOpen, setConnectDialogIsOpen] = useState(false);
   const [votedDialogIsOpen, setVotedDialogIsOpen] = useState(false);
+  const [reloadDialogIsOpen, setReloadDialogIsOpen] = useState(false);
 
   const walletAddress = useAccount().data?.address ?? undefined;
 
-  const onClick = async (index: number) => {
+  const onClick = async (choiceIndex: number) => {
     if (!walletAddress) return setConnectDialogIsOpen(true);
 
     const result = await fetch("/api/post/vote", {
@@ -27,11 +44,12 @@ const ImageVote: NextPage<ImageVoteProps> = ({ paths }) => {
         "Content-Type": "application/json",
         AUTH_KEY: process.env.AUTH_KEY,
       } as HeadersInit,
-      body: JSON.stringify({ index, walletAddress }),
+      body: JSON.stringify({ choiceIndex, walletAddress, imageSetIndex }),
     });
 
-    // 460 status signifies already voted
-    if (result.status == 460) setVotedDialogIsOpen(true);
+    // 461 signifies already voted, 462 to reload page
+    if (result.status == 461) setVotedDialogIsOpen(true);
+    if (result.status == 462) setReloadDialogIsOpen(true);
   };
 
   const images = paths.map((path, index) => {
@@ -59,6 +77,11 @@ const ImageVote: NextPage<ImageVoteProps> = ({ paths }) => {
         text={votedMessage}
         isOpen={votedDialogIsOpen}
         setIsOpen={setVotedDialogIsOpen}
+      />
+      <ErrorDialog
+        text={reloadMessage}
+        isOpen={reloadDialogIsOpen}
+        setIsOpen={setReloadDialogIsOpen}
       />
       <div className={styles.imageRow}> {images} </div>
     </div>

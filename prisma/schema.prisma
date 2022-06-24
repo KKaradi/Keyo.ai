@@ -14,5 +14,6 @@ model Vote {
   id String @default(cuid()) @id
   createdAt DateTime @default(now())
   walletAddress String
-  index Int
+  choiceIndex Int
+  imageSetIndex Int
 }
