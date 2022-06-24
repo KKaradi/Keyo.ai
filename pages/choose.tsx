@@ -4,9 +4,22 @@ import Header from "../components/Header";
 import ImageVote from "../components/ImageVote";
 import styles from "../styles/pages/Choose.module.css";
 
-const imagePaths = ["/hints/1.jpg", "/hints/2.jpg"] as [string, string];
+const getImageFolder = () => {
+  const START_DATE = process.env.START_DATE;
+  if (!START_DATE) return 1;
+
+  const sinceStart = Date.now() - new Date(START_DATE).getTime();
+  return Math.floor(sinceStart / (1000 * 60 * 60 * 24)) + 1;
+};
 
 const GamePage: NextPage = () => {
+  const imageFolder = getImageFolder();
+  const imagePaths = [
+    `/hints/${imageFolder}/1.jpg`,
+    `/hints/${imageFolder}/2.jpg`,
+  ];
+  console.log(imagePaths);
+
   return (
     <div className={styles.container}>
       <Head>
@@ -18,7 +31,7 @@ const GamePage: NextPage = () => {
 
       <main className={styles.main}>
         <div className={styles.wheel}>
-          <ImageVote paths={imagePaths} />
+          <ImageVote paths={imagePaths as [string, string]} />
         </div>
         <div className={styles.textContainer}>
           <h1> Choose an image. </h1>

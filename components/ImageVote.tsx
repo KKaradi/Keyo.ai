@@ -29,21 +29,23 @@ const ImageVote: NextPage<ImageVoteProps> = ({ paths }) => {
       body: JSON.stringify({ index, walletAddress }),
     });
 
-    const { message } = await result.json();
-    if (message == "User already voted.") setVotedDialogIsOpen(true);
+    // 401 status signifies already voted
+    if (result.status == 401) setVotedDialogIsOpen(true);
   };
 
-  const images = paths.map((path, index) => (
-    <div className={styles.imageContainer} key={index}>
-      <Image
-        className={styles.image}
-        layout="fill"
-        src={path}
-        alt=""
-        onClick={() => onClick(index)}
-      />
-    </div>
-  ));
+  const images = paths.map((path, index) => {
+    return (
+      <div className={styles.imageContainer} key={index}>
+        <Image
+          className={styles.image}
+          layout="fill"
+          src={path}
+          alt=""
+          onClick={() => onClick(index)}
+        />
+      </div>
+    );
+  });
 
   return (
     <div>
