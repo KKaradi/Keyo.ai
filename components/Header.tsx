@@ -5,6 +5,7 @@ import TwitterIcon from "@mui/icons-material/Twitter";
 import Link from "next/link";
 import InfoDialog from "./dialogs/InfoDialog";
 import ConnectWallet from "./ConnectWallet";
+import TwitterShare from "./TwitterShare";
 
 const Header: NextPage = () => {
   return (
@@ -12,13 +13,14 @@ const Header: NextPage = () => {
       <h1 className={styles.title}>NON FUNGIBLE AI</h1>
       <div className={styles.iconContainer}>
         <ConnectWallet />
-
+        <TwitterShare text="hi" />
         <InfoDialog>
           <InfoIcon className={styles.info} sx={{ fontSize: 40 }} />
         </InfoDialog>
-
         <Link href={"https://twitter.com/nonfungedai"}>
-          <TwitterIcon className={styles.twitter} sx={{ fontSize: 40 }} />
+          <a target="_blank">
+            <TwitterIcon className={styles.twitter} sx={{ fontSize: 40 }} />
+          </a>
         </Link>
       </div>
     </header>

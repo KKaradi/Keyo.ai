@@ -4,13 +4,13 @@ import styles from "../styles/components/ImageVote.module.css";
 import { useAccount } from "wagmi";
 import ErrorDialog from "./dialogs/ErrorDialog";
 import { useEffect, useState } from "react";
-import { getImageSetIndex } from "../helpers";
+import { request, getImageSetIndex } from "../helpers";
 
 type ImageVoteProps = {
   paths: [string, string];
 };
 
-const connectMessage = "Connect your wallet address before voting!";
+const connectMessage = "Connect your wallet before voting!";
 const votedMessage = "You already voted today!";
 const reloadMessage = "You are out of date! Please reload the page.";
 
@@ -38,14 +38,8 @@ const ImageVote: NextPage<ImageVoteProps> = () => {
   const onClick = async (choiceIndex: number) => {
     if (!walletAddress) return setConnectDialogIsOpen(true);
 
-    const result = await fetch("/api/post/vote", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        AUTH_KEY: process.env.AUTH_KEY,
-      } as HeadersInit,
-      body: JSON.stringify({ choiceIndex, walletAddress, imageSetIndex }),
-    });
+    const body = { choiceIndex, walletAddress, imageSetIndex };
+    const result = await request("/api/post/vote", "POST", body);
 
     // 461 signifies already voted, 462 to reload page
     if (result.status == 461) setVotedDialogIsOpen(true);
