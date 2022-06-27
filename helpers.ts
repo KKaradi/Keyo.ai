@@ -6,13 +6,21 @@ export const getImageSetIndex = () => {
   return Math.floor(sinceStart / (1000 * 60 * 60 * 24)) + 1;
 };
 
-export const request = async (
-  url: string,
-  method: string,
-  body: { [key: string]: unknown } | undefined
-) => {
+type Body = { [key: string]: unknown };
+
+export const get = async (url: string) => {
   return await fetch(url, {
-    method,
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      AUTH_KEY: process.env.AUTH_KEY,
+    } as HeadersInit,
+  });
+};
+
+export const post = async (url: string, body?: Body) => {
+  return await fetch(url, {
+    method: "POST",
     headers: {
       "Content-Type": "application/json",
       AUTH_KEY: process.env.AUTH_KEY,

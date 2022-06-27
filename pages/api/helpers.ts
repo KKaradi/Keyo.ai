@@ -1,4 +1,4 @@
-import type { NextApiRequest } from "next/types";
+import type { NextApiResponse, NextApiRequest } from "next/types";
 import prisma from "../../lib/prisma";
 
 export const getYesterday = () => {
@@ -10,28 +10,22 @@ export const getYesterday = () => {
   );
 };
 
-export const messages: { [key: string]: { message: string } } = {
-  onlyPost: {
-    message: "Incorrect HTTP method: only use POST.",
-  },
-  onlyGet: {
-    message: "Incorrect HTTP method: only use GET.",
-  },
-  authError: {
-    message: "You are not authenticated.",
-  },
-  incorrectParams: {
-    message: "Incorrect parameters.",
-  },
-  hasVotedToday: {
-    message: "User already voted today.",
-  },
-  DBError: {
-    message: "Database Insertion Error.",
-  },
-  success: {
-    message: "Succesfully added to database.",
-  },
+export const responses = {
+  onlyGet: { message: "Incorrect HTTP method: only use GET.", code: 405 },
+  onlyPost: { message: "Incorrect HTTP method: only use POST", code: 405 },
+  authError: { message: "You are not authenticated.", code: 403 },
+  incorrectParams: { message: "Incorrect parameters.", code: 400 },
+  hasVotedToday: { message: "User already voted today.", code: 461 },
+  reloadPage: { message: "Please reoad the page.", code: 462 },
+  DBError: { message: "Database Insertion Error.", code: 500 },
+  DBSuccess: { message: "Succesfully added to database.", code: 200 },
+};
+
+type responseCategory = keyof typeof responses;
+
+export const response = (res: NextApiResponse, category: responseCategory) => {
+  const { message, code } = responses[category];
+  return res.status(code).json({ message });
 };
 
 export const hasVotedToday = async (walletAddress: string) => {

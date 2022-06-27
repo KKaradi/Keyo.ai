@@ -17,3 +17,9 @@ model Vote {
   choiceIndex Int
   imageSetIndex Int
 }
+
+model Prompt {
+  id String @default(cuid()) @id
+  createdAt DateTime @default(now())
+  prompt String @unique
+}

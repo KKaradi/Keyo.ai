@@ -1,12 +1,29 @@
 import type { NextPage } from "next";
 import Head from "next/head";
+import { useEffect, useState } from "react";
+import { useAccount } from "wagmi";
 import Header from "../components/Header";
 import ImageVote from "../components/ImageVote";
+import { get } from "../helpers";
 import styles from "../styles/pages/Choose.module.css";
 
-const imagePaths = [`/choice/2/1.jpg`, `/choice/2/2.jpg`];
-
 const GamePage: NextPage = () => {
+  const [choicesMade, setChoicesMade] = useState(0);
+
+  const { data } = useAccount();
+
+  useEffect(() => {
+    (async () => {
+      if (!data?.address) return setChoicesMade(0);
+      const { address } = data;
+      const result = await get(`/api/get/votes/${address}`);
+      const { votes } = await result.json();
+      if (votes) setChoicesMade(votes.length);
+    })();
+  }, [data]);
+
+  const incrementChoicesMade = () => setChoicesMade(choicesMade + 1);
+
   return (
     <div className={styles.container}>
       <Head>
@@ -18,15 +35,12 @@ const GamePage: NextPage = () => {
 
       <main className={styles.main}>
         <div className={styles.wheel}>
-          <ImageVote paths={imagePaths as [string, string]} />
+          <ImageVote incrementChoicesMade={incrementChoicesMade} />
         </div>
         <div className={styles.textContainer}>
-          <h1> Choose an image. </h1>
-          <p>
-            Whichever you find most visually appealing, the coolest, the most
-            aesthetically pleasing, the most impressive, the weirdest, the most
-            detailed. Connecting your wallet would be even better.
-          </p>
+          <h1>
+            {choicesMade} CHOICE{choicesMade == 1 ? "" : "S"} MADE
+          </h1>
         </div>
       </main>
     </div>

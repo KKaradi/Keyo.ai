@@ -6,7 +6,7 @@ import SlideTransition from "./SlideTransition";
 type ErrorDialogProps = {
   text: string;
   isOpen: boolean;
-  setIsOpen: (value: boolean) => unknown;
+  setIsOpen: (value: boolean) => void;
 };
 
 const ErrorDialog: NextPage<ErrorDialogProps> = ({

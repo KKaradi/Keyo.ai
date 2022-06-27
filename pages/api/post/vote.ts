@@ -2,21 +2,18 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getImageSetIndex } from "../../../helpers";
 import prisma from "../../../lib/prisma";
-import { authenticate, messages, hasVotedToday } from "../helpers";
+import { authenticate, hasVotedToday, response } from "../helpers";
 
-type Response = { message: string };
+type ChoiceCount = { [key: number]: number };
+
+type Response = { message: string; choiceCount: ChoiceCount };
 
 export default async function storeVote(
   req: NextApiRequest,
   res: NextApiResponse<Response>
 ) {
-  if (!authenticate(req)) {
-    return res.status(403).json(messages.authError);
-  }
-
-  if (req.method != "POST") {
-    return res.status(405).json(messages.onlyPost);
-  }
+  if (!authenticate(req)) return response(res, "authError");
+  if (req.method != "POST") return response(res, "onlyPost");
 
   const { choiceIndex, imageSetIndex, walletAddress } = req.body as {
     choiceIndex: number;
@@ -29,21 +26,29 @@ export default async function storeVote(
     walletAddress === undefined ||
     imageSetIndex === undefined
   ) {
-    return res.status(400).json(messages.incorrectParams);
+    return response(res, "incorrectParams");
   }
 
-  if (await hasVotedToday(walletAddress)) {
-    return res.status(461).json(messages.hasVotedToday);
-  }
+  if (await hasVotedToday(walletAddress)) return response(res, "hasVotedToday");
+  if (imageSetIndex != getImageSetIndex()) return response(res, "reloadPage");
 
-  if (imageSetIndex != getImageSetIndex()) {
-    return res.status(462).json(messages.reloadPage);
-  }
-
-  const result = await prisma.vote
+  const voted = await prisma.vote
     .create({ data: { choiceIndex, walletAddress, imageSetIndex } })
     .catch(console.error);
 
-  if (!result) return res.status(500).json(messages.DBError);
-  res.status(200).json(messages.success);
+  if (!voted) return response(res, "DBError");
+
+  const groupedByChoice = await prisma.vote.groupBy({
+    by: ["choiceIndex"],
+    where: { imageSetIndex: { equals: imageSetIndex } },
+    _count: { _all: true },
+  });
+
+  const choiceCount: ChoiceCount = {};
+
+  groupedByChoice.forEach((choice) => {
+    choiceCount[choice.choiceIndex] = choice._count._all;
+  });
+
+  return res.status(200).json({ message: "DB Pull Success", choiceCount });
 }
