@@ -16,6 +16,7 @@ model Vote {
   walletAddress String
   choiceIndex Int
   imageSetIndex Int
+  dayIndex Int
 }
 
 model Prompt {

@@ -1,34 +1,9 @@
-.container {
-  padding: 0 2rem;
-}
-
 .main {
-  padding: 2rem 0;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  height: 100%;
+  width: 100%;
   gap: 50px;
-}
-
-.textContainer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 20px;
-}
-
-.textContainer h1 {
-  margin: 0;
-}
-
-.textContainer p {
-  margin: 0;
-  max-width: 500px;
-  text-align: center;
-}
-
-.textContainer > * {
-  color: white;
 }

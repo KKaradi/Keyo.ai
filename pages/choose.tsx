@@ -34,14 +34,7 @@ const GamePage: NextPage = () => {
       <Header />
 
       <main className={styles.main}>
-        <div className={styles.wheel}>
-          <ImageVote incrementChoicesMade={incrementChoicesMade} />
-        </div>
-        <div className={styles.textContainer}>
-          <h1>
-            {choicesMade} CHOICE{choicesMade == 1 ? "" : "S"} MADE
-          </h1>
-        </div>
+        <ImageVote incrementChoicesMade={incrementChoicesMade} />
       </main>
     </div>
   );

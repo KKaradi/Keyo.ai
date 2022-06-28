@@ -4,7 +4,8 @@ import styles from "../styles/components/ImageVote.module.css";
 import { useAccount } from "wagmi";
 import ErrorDialog from "./dialogs/ErrorDialog";
 import { useEffect, useState } from "react";
-import { post, getImageSetIndex } from "../helpers";
+import { post, getDayIndex } from "../helpers";
+import Button from "@mui/material/Button";
 
 type ChoiceCount = { [key: number]: number };
 
@@ -20,13 +21,14 @@ type ImageVoteProps = {
 };
 
 const ImageVote: NextPage<ImageVoteProps> = ({ incrementChoicesMade }) => {
-  const [imageSetIndex, setImageSetIndex] = useState<number | undefined>();
+  const [dayIndex, setDayIndex] = useState<number | undefined>();
+  const [imageSetIndex, setImageSetIndex] = useState(1);
   const [choiceCount, setChoiceCount] = useState<ChoiceCount | undefined>();
   const [paths, setPaths] = useState<string[]>([]);
 
   useEffect(() => {
-    const folder = getImageSetIndex();
-    setImageSetIndex(folder);
+    const folder = getDayIndex();
+    setDayIndex(folder);
     setPaths([1, 2].map((num) => `/choice/${folder}/${num}.jpg`));
   }, []);
 
@@ -43,7 +45,7 @@ const ImageVote: NextPage<ImageVoteProps> = ({ incrementChoicesMade }) => {
   const onClick = async (choiceIndex: number) => {
     if (!walletAddress) return setConnectDialogIsOpen(true);
 
-    const body = { choiceIndex, walletAddress, imageSetIndex };
+    const body = { choiceIndex, imageSetIndex, dayIndex, walletAddress };
     const response = await post("/api/post/vote", body);
 
     // 461 signifies already voted, 462 to reload page
@@ -53,32 +55,42 @@ const ImageVote: NextPage<ImageVoteProps> = ({ incrementChoicesMade }) => {
     if (response.status == 200) {
       const { choiceCount: count } = await response.json();
       if (count) setChoiceCount(count);
+      console.log(count);
 
       if (incrementChoicesMade) incrementChoicesMade();
     }
   };
 
   const images = paths.map((path, index) => {
-    const percentage = choiceCount ? choiceCount[index] ?? 0 : null;
+    let percentage = "";
+    if (choiceCount) {
+      const count = choiceCount[index] ?? 0;
+      const sum = Object.values(choiceCount).reduce(
+        (prev, curr) => prev + curr
+      );
+      percentage = `${((count / sum) * 100).toFixed(0)}%`;
+    }
 
     return (
-      <div className={styles.choiceContainer} key={index}>
-        <div className={styles.imageContainer}>
+      <div key={index} className={styles.imageContainer} tabIndex={-1}>
+        <div className={styles.imageEffects}>
           <Image
             className={styles.image}
             layout="fill"
+            objectFit="cover"
             src={path}
-            alt=""
-            onClick={() => onClick(index)}
+            alt={`Image Choice ${index + 1}`}
           />
+          <div onClick={() => onClick(index)} className={styles.overlay}>
+            <h1 className={styles.percentage}> {percentage} </h1>
+          </div>
         </div>
-        <h1 className={styles.percentage}> VOTES: {percentage} </h1>
       </div>
     );
   });
 
   return (
-    <div>
+    <div className={styles.imageRowContainer}>
       <ErrorDialog
         text={connectMessage}
         isOpen={connectDialogIsOpen}

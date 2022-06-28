@@ -1,4 +1,4 @@
-export const getImageSetIndex = () => {
+export const getDayIndex = () => {
   const { START_DATE } = process.env;
   if (!START_DATE) throw new Error("START_DATE not initialized");
 
