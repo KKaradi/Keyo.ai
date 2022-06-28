@@ -1,3 +1,5 @@
+import { useRef } from "react";
+
 export const getDayIndex = () => {
   const { START_DATE } = process.env;
   if (!START_DATE) throw new Error("START_DATE not initialized");
@@ -27,4 +29,11 @@ export const post = async (url: string, body?: Body) => {
     } as HeadersInit,
     body: JSON.stringify(body),
   });
+};
+
+export const useScroll = () => {
+  const scrollRef = useRef<null | HTMLDivElement>(null);
+  const executeScroll = () =>
+    scrollRef?.current?.scrollIntoView({ block: "end", behavior: "smooth" });
+  return [executeScroll, scrollRef] as const;
 };

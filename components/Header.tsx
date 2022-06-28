@@ -2,10 +2,10 @@ import { NextPage } from "next";
 import styles from "../styles/components/Header.module.css";
 import InfoIcon from "@mui/icons-material/Info";
 import TwitterIcon from "@mui/icons-material/Twitter";
+import LeaderboardIcon from "@mui/icons-material/Leaderboard";
 import Link from "next/link";
 import InfoDialog from "./dialogs/InfoDialog";
 import ConnectWallet from "./ConnectWallet";
-import TwitterShare from "./TwitterShare";
 
 const Header: NextPage = () => {
   return (
@@ -13,7 +13,7 @@ const Header: NextPage = () => {
       <h1 className={styles.title}>NON FUNGIBLE AI</h1>
       <div className={styles.iconContainer}>
         <ConnectWallet />
-        <TwitterShare text="hi" />
+        <LeaderboardIcon className={styles.info} sx={{ fontSize: 40 }} />
         <InfoDialog>
           <InfoIcon className={styles.info} sx={{ fontSize: 40 }} />
         </InfoDialog>
