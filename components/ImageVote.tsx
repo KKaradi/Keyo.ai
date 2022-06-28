@@ -5,34 +5,32 @@ import ErrorDialog from "./dialogs/ErrorDialog";
 import { useEffect, useState } from "react";
 import { post, getDayIndex } from "../helpers";
 import ImageChoice from "./ImageChoice";
+import Button from "@mui/material/Button";
 
 export type ChoiceCount = { [key: number]: number };
 
 const connectMessage = "Connect your wallet before voting!";
-const votedMessage = "You already voted today!";
 const reloadMessage = "You are out of date! Please reload the page.";
 
 const START_DATE = process.env.START_DATE;
 if (!START_DATE) throw new Error("START_DATE env var not present");
 
 type ImageVoteProps = {
+  endVote: () => void;
   incrementChoicesMade?: () => void;
 };
 
-const ImageVote: NextPage<ImageVoteProps> = ({ incrementChoicesMade }) => {
+const ImageVote: NextPage<ImageVoteProps> = ({
+  incrementChoicesMade,
+  endVote,
+}) => {
   const [dayIndex, setDayIndex] = useState<number | undefined>();
   const [imageSetIndex, setImageSetIndex] = useState(1);
   const [choiceCount, setChoiceCount] = useState<ChoiceCount | undefined>();
-  const [paths, setPaths] = useState<string[]>([]);
 
-  useEffect(() => {
-    const folder = getDayIndex();
-    setDayIndex(folder);
-    setPaths([1, 2].map((num) => `/choice/${folder}/${num}.jpg`));
-  }, []);
+  useEffect(() => setDayIndex(getDayIndex()), []);
 
   const [connectDialogIsOpen, setConnectDialogIsOpen] = useState(false);
-  const [votedDialogIsOpen, setVotedDialogIsOpen] = useState(false);
   const [reloadDialogIsOpen, setReloadDialogIsOpen] = useState(false);
 
   const walletAddress = useAccount().data?.address;
@@ -47,9 +45,7 @@ const ImageVote: NextPage<ImageVoteProps> = ({ incrementChoicesMade }) => {
     const body = { choiceIndex, imageSetIndex, dayIndex, walletAddress };
     const response = await post("/api/post/vote", body);
 
-    // 461 signifies already voted, 462 to reload page
-    if (response.status == 461) setVotedDialogIsOpen(true);
-    if (response.status == 462) setReloadDialogIsOpen(true);
+    if (response.status == 461) setReloadDialogIsOpen(true);
 
     if (response.status == 200) {
       const { choiceCount: count } = await response.json();
@@ -59,15 +55,27 @@ const ImageVote: NextPage<ImageVoteProps> = ({ incrementChoicesMade }) => {
     }
   };
 
-  const images = paths.map((path, index) => (
+  const nextImageSet = () => {
+    setImageSetIndex(imageSetIndex + 1);
+    setChoiceCount(undefined);
+  };
+
+  const images = [1, 2].map((index) => (
     <ImageChoice
       choiceCount={choiceCount}
       index={index}
       onSubmit={onSubmit}
-      path={path}
+      path={`/choice/${dayIndex}/${imageSetIndex}/${index}.jpg`}
+      endVote={endVote}
       key={index}
     />
   ));
+
+  const continueButton = choiceCount ? (
+    <Button variant="contained" size="large" onClick={() => nextImageSet()}>
+      CONTINUE
+    </Button>
+  ) : null;
 
   return (
     <div className={styles.imageRowContainer}>
@@ -77,16 +85,13 @@ const ImageVote: NextPage<ImageVoteProps> = ({ incrementChoicesMade }) => {
         setIsOpen={setConnectDialogIsOpen}
       />
       <ErrorDialog
-        text={votedMessage}
-        isOpen={votedDialogIsOpen}
-        setIsOpen={setVotedDialogIsOpen}
-      />
-      <ErrorDialog
         text={reloadMessage}
         isOpen={reloadDialogIsOpen}
         setIsOpen={setReloadDialogIsOpen}
       />
       <div className={styles.imageRow}> {images}</div>
+
+      <div className={styles.continueButtonContainer}> {continueButton} </div>
     </div>
   );
 };

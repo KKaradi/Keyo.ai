@@ -1,0 +1,54 @@
+.imageContainer {
+  position: relative;
+  width: 50%;
+  height: 100vh;
+  transition: all 2s ease-in-out;
+  filter: none;
+}
+
+.imageContainer:focus {
+  width: 75%;
+}
+
+.imageContainer .submitButton {
+  opacity: 0;
+  transition: opacity 2s ease-in-out;
+}
+
+.imageContainer:focus .submitButton {
+  opacity: 1;
+}
+
+.imageContainer:nth-child(1) {
+  border-right: solid 3px gray;
+}
+
+.imageContainer:nth-child(2) {
+  border-left: solid 3px gray;
+}
+
+.choiceContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.overlay {
+  position: absolute;
+  height: 95%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  isolation: isolate;
+}
+
+.percentage {
+  color: white;
+  font-size: 3rem;
+  user-select: none;
+  -webkit-text-stroke-width: 1px;
+  -webkit-text-stroke-color: black;
+}

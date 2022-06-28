@@ -2,7 +2,7 @@ import { Button } from "@mui/material";
 import { NextPage } from "next/types";
 import Image from "next/image";
 import { ChoiceCount } from "./ImageVote";
-import styles from "../styles/components/ImageVote.module.css";
+import styles from "../styles/components/ImageChoice.module.css";
 import { useScroll } from "../helpers";
 
 type ImageChoiceProps = {
@@ -10,6 +10,7 @@ type ImageChoiceProps = {
   index: number;
   onSubmit: (index: number) => void;
   choiceCount: ChoiceCount | undefined;
+  endVote: () => void;
 };
 
 const ImageChoice: NextPage<ImageChoiceProps> = ({
@@ -17,6 +18,7 @@ const ImageChoice: NextPage<ImageChoiceProps> = ({
   index,
   onSubmit,
   choiceCount,
+  endVote,
 }) => {
   let percentage = null;
   if (choiceCount) {
@@ -41,7 +43,8 @@ const ImageChoice: NextPage<ImageChoiceProps> = ({
           layout="fill"
           objectFit="cover"
           src={path}
-          alt={`Image Choice ${index + 1}`}
+          alt={`Image Choice ${index}`}
+          onError={endVote}
         />
         <div className={styles.overlay}>
           <div> </div>

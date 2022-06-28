@@ -41,7 +41,10 @@ export default async function storeVote(
 
   const groupedByChoice = await prisma.vote.groupBy({
     by: ["choiceIndex"],
-    where: { dayIndex: { equals: dayIndex } },
+    where: {
+      imageSetIndex: { equals: imageSetIndex },
+      dayIndex: { equals: dayIndex },
+    },
     _count: { _all: true },
   });
 

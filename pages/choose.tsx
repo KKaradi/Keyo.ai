@@ -9,6 +9,7 @@ import styles from "../styles/pages/Choose.module.css";
 
 const GamePage: NextPage = () => {
   const [choicesMade, setChoicesMade] = useState(0);
+  const [isVoting, setIsVoting] = useState(true);
 
   const { data } = useAccount();
 
@@ -34,7 +35,14 @@ const GamePage: NextPage = () => {
       <Header />
 
       <main className={styles.main}>
-        <ImageVote incrementChoicesMade={incrementChoicesMade} />
+        {isVoting ? (
+          <ImageVote
+            endVote={() => setIsVoting(false)}
+            incrementChoicesMade={incrementChoicesMade}
+          />
+        ) : (
+          <h1 className={styles.endText}> THAT'S ALL FOLKS</h1>
+        )}
       </main>
     </div>
   );
