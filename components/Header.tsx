@@ -6,17 +6,29 @@ import LeaderboardIcon from "@mui/icons-material/Leaderboard";
 import Link from "next/link";
 import InfoDialog from "./dialogs/InfoDialog";
 import ConnectWallet from "./ConnectWallet";
+import LeaderboardDialog from "./dialogs/LeaderboardDialog";
 
-const Header: NextPage = () => {
+type HeaderProps = {
+  votes?: number;
+};
+
+const Header: NextPage<HeaderProps> = ({ votes }) => {
   return (
     <header className={styles.container}>
       <h1 className={styles.title}>NON FUNGIBLE AI</h1>
       <div className={styles.iconContainer}>
         <ConnectWallet />
-        <LeaderboardIcon className={styles.info} sx={{ fontSize: 40 }} />
+
+        {votes ? <h1 className={styles.votes}> {votes} </h1> : null}
+
+        <LeaderboardDialog>
+          <LeaderboardIcon className={styles.info} sx={{ fontSize: 40 }} />
+        </LeaderboardDialog>
+
         <InfoDialog>
           <InfoIcon className={styles.info} sx={{ fontSize: 40 }} />
         </InfoDialog>
+
         <Link href={"https://twitter.com/nonfungedai"}>
           <a target="_blank">
             <TwitterIcon className={styles.twitter} sx={{ fontSize: 40 }} />

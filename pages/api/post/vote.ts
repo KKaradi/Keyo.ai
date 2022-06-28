@@ -1,4 +1,3 @@
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getDayIndex } from "../../../helpers";
 import prisma from "../../../lib/prisma";
@@ -12,7 +11,26 @@ type Body = {
   walletAddress?: string;
 };
 
-type Response = { message: string; choiceCount: ChoiceCount };
+export type Response = { message: string; choiceCount: ChoiceCount };
+
+const getChoiceCount = async (imageSetIndex: number, dayIndex: number) => {
+  const groupedByChoice = await prisma.vote.groupBy({
+    by: ["choiceIndex"],
+    where: {
+      imageSetIndex: { equals: imageSetIndex },
+      dayIndex: { equals: dayIndex },
+    },
+    _count: { _all: true },
+  });
+
+  const choiceCount: ChoiceCount = {};
+
+  groupedByChoice.forEach((choice) => {
+    choiceCount[choice.choiceIndex] = choice._count._all;
+  });
+
+  return choiceCount;
+};
 
 export default async function storeVote(
   req: NextApiRequest,
@@ -37,22 +55,12 @@ export default async function storeVote(
 
   const data = { choiceIndex, walletAddress, dayIndex, imageSetIndex };
   const voted = await prisma.vote.create({ data }).catch(console.error);
-  if (!voted) return response(res, "DBError");
 
-  const groupedByChoice = await prisma.vote.groupBy({
-    by: ["choiceIndex"],
-    where: {
-      imageSetIndex: { equals: imageSetIndex },
-      dayIndex: { equals: dayIndex },
-    },
-    _count: { _all: true },
-  });
+  const choiceCount = await getChoiceCount(imageSetIndex, dayIndex).catch(
+    console.error
+  );
 
-  const choiceCount: ChoiceCount = {};
-
-  groupedByChoice.forEach((choice) => {
-    choiceCount[choice.choiceIndex] = choice._count._all;
-  });
+  if (!voted || !choiceCount) return response(res, "DBError");
 
   return res.status(200).json({ message: "DB Pull Success", choiceCount });
 }

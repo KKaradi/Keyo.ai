@@ -6,6 +6,7 @@ import Header from "../components/Header";
 import ImageVote from "../components/ImageVote";
 import { get } from "../helpers";
 import styles from "../styles/pages/Choose.module.css";
+import type { Response } from "./api/get/votes/[walletAddress]";
 
 const GamePage: NextPage = () => {
   const [choicesMade, setChoicesMade] = useState(0);
@@ -16,34 +17,36 @@ const GamePage: NextPage = () => {
   useEffect(() => {
     (async () => {
       if (!data?.address) return setChoicesMade(0);
+
       const { address } = data;
       const result = await get(`/api/get/votes/${address}`);
-      const { votes } = await result.json();
+
+      const { votes } = (await result.json()) as Response;
       if (votes) setChoicesMade(votes.length);
     })();
   }, [data]);
 
   const incrementChoicesMade = () => setChoicesMade(choicesMade + 1);
 
+  const content = isVoting ? (
+    <ImageVote
+      endVote={() => setIsVoting(false)}
+      incrementChoicesMade={incrementChoicesMade}
+    />
+  ) : (
+    <h1 className={styles.endText}> THAT'S ALL FOLKS</h1>
+  );
+
   return (
     <div className={styles.container}>
       <Head>
         <title>CHOOSE</title>
-        <link rel="icon" href="/icon.png" />
+        <link rel="icon" href="/icon.jpeg" />
       </Head>
 
-      <Header />
+      <Header votes={choicesMade} />
 
-      <main className={styles.main}>
-        {isVoting ? (
-          <ImageVote
-            endVote={() => setIsVoting(false)}
-            incrementChoicesMade={incrementChoicesMade}
-          />
-        ) : (
-          <h1 className={styles.endText}> THAT'S ALL FOLKS</h1>
-        )}
-      </main>
+      <main className={styles.main}> {content} </main>
     </div>
   );
 };

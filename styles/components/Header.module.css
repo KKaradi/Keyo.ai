@@ -14,12 +14,27 @@
   line-height: 1.15;
   font-size: 4rem;
   color: white;
+  user-select: none;
 }
 
 .iconContainer {
   display: flex;
   flex-direction: row;
+  justify-content: center;
+  align-items: center;
   gap: 50px;
+}
+
+.iconContainer > * {
+  cursor: pointer;
+}
+
+.votes {
+  color: white;
+  padding: 0;
+  margin: 0;
+  user-select: none;
+  cursor: auto;
 }
 
 .info {

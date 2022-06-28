@@ -4,6 +4,7 @@
   height: 100vh;
   transition: all 2s ease-in-out;
   filter: none;
+  cursor: pointer;
 }
 
 .imageContainer:focus {

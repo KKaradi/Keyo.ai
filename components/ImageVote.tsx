@@ -6,8 +6,9 @@ import { useEffect, useState } from "react";
 import { post, getDayIndex } from "../helpers";
 import ImageChoice from "./ImageChoice";
 import Button from "@mui/material/Button";
+import type { Response } from "../pages/api/post/vote";
 
-export type ChoiceCount = { [key: number]: number };
+export type ChoiceCount = Response["choiceCount"];
 
 const connectMessage = "Connect your wallet before voting!";
 const reloadMessage = "You are out of date! Please reload the page.";
@@ -48,7 +49,7 @@ const ImageVote: NextPage<ImageVoteProps> = ({
     if (response.status == 461) setReloadDialogIsOpen(true);
 
     if (response.status == 200) {
-      const { choiceCount: count } = await response.json();
+      const { choiceCount: count } = (await response.json()) as Response;
       if (count) setChoiceCount(count);
 
       if (incrementChoicesMade) incrementChoicesMade();
