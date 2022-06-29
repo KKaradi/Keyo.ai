@@ -4,7 +4,8 @@ const nextConfig = {
   reactStrictMode: true,
   env: {
     AUTH_KEY: process.env.AUTH_KEY,
-    START_DATE: process.env.START_DATE
+    START_DATE: process.env.START_DATE,
+    IMAGESETS_PER_DAY: process.env.IMAGESETS_PER_DAY
   }
 };
 

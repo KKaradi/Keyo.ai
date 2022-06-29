@@ -10,7 +10,6 @@ type ImageChoiceProps = {
   index: number;
   onSubmit: (index: number) => void;
   choiceCount: ChoiceCount | undefined;
-  endVote: () => void;
 };
 
 const ImageChoice: NextPage<ImageChoiceProps> = ({
@@ -18,7 +17,6 @@ const ImageChoice: NextPage<ImageChoiceProps> = ({
   index,
   onSubmit,
   choiceCount,
-  endVote,
 }) => {
   let percentage = null;
   if (choiceCount) {
@@ -44,7 +42,6 @@ const ImageChoice: NextPage<ImageChoiceProps> = ({
           objectFit="cover"
           src={path}
           alt={`Image Choice ${index}`}
-          onError={endVote}
         />
         <div className={styles.overlay}>
           <div> </div>

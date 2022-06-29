@@ -2,7 +2,7 @@ import { NextPage } from "next";
 import styles from "../styles/components/ImageVote.module.css";
 import { useAccount } from "wagmi";
 import ErrorDialog from "./dialogs/ErrorDialog";
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { post, getDayIndex } from "../helpers";
 import ImageChoice from "./ImageChoice";
 import Button from "@mui/material/Button";
@@ -17,16 +17,16 @@ const START_DATE = process.env.START_DATE;
 if (!START_DATE) throw new Error("START_DATE env var not present");
 
 type ImageVoteProps = {
-  endVote: () => void;
+  imageIndexState: [number, Dispatch<SetStateAction<number>>];
   incrementChoicesMade?: () => void;
 };
 
 const ImageVote: NextPage<ImageVoteProps> = ({
   incrementChoicesMade,
-  endVote,
+  imageIndexState,
 }) => {
   const [dayIndex, setDayIndex] = useState<number | undefined>();
-  const [imageSetIndex, setImageSetIndex] = useState(1);
+  const [imageSetIndex, setImageSetIndex] = imageIndexState;
   const [choiceCount, setChoiceCount] = useState<ChoiceCount | undefined>();
 
   useEffect(() => setDayIndex(getDayIndex()), []);
@@ -67,7 +67,6 @@ const ImageVote: NextPage<ImageVoteProps> = ({
       index={index}
       onSubmit={onSubmit}
       path={`/choice/${dayIndex}/${imageSetIndex}/${index}.jpg`}
-      endVote={endVote}
       key={index}
     />
   ));

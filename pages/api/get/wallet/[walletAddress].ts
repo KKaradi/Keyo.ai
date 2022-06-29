@@ -17,6 +17,7 @@ export default async function storeVote(
 
   const votes = await prisma.vote.findMany({
     where: { walletAddress: { equals: walletAddress } },
+    orderBy: { imageSetIndex: "desc" },
   });
 
   if (!votes) return response(res, "DBError");
