@@ -27,6 +27,8 @@ const ImageChoice: NextPage<ImageChoiceProps> = ({
 
   const [executeScroll, scrollRef] = useScroll();
 
+  if (path.includes("undefined")) return <div />;
+
   return (
     <div
       key={index}
@@ -35,26 +37,25 @@ const ImageChoice: NextPage<ImageChoiceProps> = ({
       ref={scrollRef}
       onClick={executeScroll}
     >
-      <div className={styles.imageEffects}>
-        <Image
-          className={styles.image}
-          layout="fill"
-          objectFit="cover"
-          src={path}
-          alt={`Image Choice ${index}`}
-        />
-        <div className={styles.overlay}>
-          <div> </div>
-          <h1 className={styles.percentage}> {percentage} </h1>
-          <Button
-            onClick={() => onSubmit(index)}
-            className={styles.submitButton}
-            variant="contained"
-            size="large"
-          >
-            SUBMIT
-          </Button>
-        </div>
+      <Image
+        className={styles.image}
+        layout="fill"
+        objectFit="cover"
+        src={path}
+        priority
+        alt={`Image Choice ${index}`}
+      />
+      <div className={styles.overlay}>
+        <div> </div>
+        <h1 className={styles.percentage}> {percentage} </h1>
+        <Button
+          onClick={() => onSubmit(index)}
+          className={styles.submitButton}
+          variant="contained"
+          size="large"
+        >
+          SUBMIT
+        </Button>
       </div>
     </div>
   );

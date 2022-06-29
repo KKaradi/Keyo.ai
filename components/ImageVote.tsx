@@ -7,6 +7,9 @@ import { post, getDayIndex } from "../helpers";
 import ImageChoice from "./ImageChoice";
 import Button from "@mui/material/Button";
 import type { Response } from "../pages/api/post/vote";
+import TwitterShare from "./TwitterShare";
+import ShareIcon from "@mui/icons-material/Share";
+import imageData from "../public/choice/data.json";
 
 export type ChoiceCount = Response["choiceCount"];
 
@@ -61,20 +64,32 @@ const ImageVote: NextPage<ImageVoteProps> = ({
     setChoiceCount(undefined);
   };
 
-  const images = [1, 2].map((index) => (
-    <ImageChoice
-      choiceCount={choiceCount}
-      index={index}
-      onSubmit={onSubmit}
-      path={`/choice/${dayIndex}/${imageSetIndex}/${index}.jpg`}
-      key={index}
-    />
-  ));
+  const images = [1, 2].map((index) => {
+    if (dayIndex && imageSetIndex > imageData[dayIndex - 1]?.length)
+      return <div />;
+
+    return (
+      <ImageChoice
+        choiceCount={choiceCount}
+        index={index}
+        onSubmit={onSubmit}
+        path={`/choice/${dayIndex}/${imageSetIndex}/${index}.jpg`}
+        key={index}
+      />
+    );
+  });
 
   const continueButton = choiceCount ? (
-    <Button variant="contained" size="large" onClick={() => nextImageSet()}>
-      CONTINUE
-    </Button>
+    <div className={styles.continueButtonContainer}>
+      <Button variant="contained" size="large" onClick={() => nextImageSet()}>
+        CONTINUE
+      </Button>
+      <TwitterShare
+        text={dayIndex ? imageData[dayIndex - 1][imageSetIndex - 1] : ""}
+      >
+        <ShareIcon sx={{ color: "white" }} />
+      </TwitterShare>
+    </div>
   ) : null;
 
   return (
@@ -91,7 +106,7 @@ const ImageVote: NextPage<ImageVoteProps> = ({
       />
       <div className={styles.imageRow}> {images}</div>
 
-      <div className={styles.continueButtonContainer}> {continueButton} </div>
+      {continueButton}
     </div>
   );
 };
