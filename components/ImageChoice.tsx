@@ -4,6 +4,8 @@ import Image from "next/image";
 import { ChoiceCount } from "./ImageVote";
 import styles from "../styles/components/ImageChoice.module.css";
 import { useScroll } from "../helpers";
+import { useRef } from "react";
+import AnimatedPercentage from "./AnimatedPercentage";
 
 type ImageChoiceProps = {
   path: string;
@@ -18,22 +20,29 @@ const ImageChoice: NextPage<ImageChoiceProps> = ({
   onSubmit,
   choiceCount,
 }) => {
-  let percentage = null;
+  let percentageText = null;
   if (choiceCount) {
     const count = choiceCount[index] ?? 0;
     const sum = Object.values(choiceCount).reduce((prev, curr) => prev + curr);
-    percentage = `${((count / sum) * 100).toFixed(0)}%`;
+    const percentage = Number(((count / sum) * 100).toFixed(0));
+    percentageText = <AnimatedPercentage end={percentage} />;
   }
 
   const [executeScroll, scrollRef] = useScroll();
+  const buttonRef = useRef(null);
 
   if (path.includes("undefined")) return <div />;
+
+  const submitImage = () => {
+    if (document.activeElement === buttonRef?.current) onSubmit(index);
+    else scrollRef?.current?.focus();
+  };
 
   return (
     <div
       key={index}
       className={styles.imageContainer}
-      tabIndex={percentage ? undefined : -1}
+      tabIndex={choiceCount ? undefined : -1}
       ref={scrollRef}
       onClick={executeScroll}
     >
@@ -47,12 +56,13 @@ const ImageChoice: NextPage<ImageChoiceProps> = ({
       />
       <div className={styles.overlay}>
         <div> </div>
-        <h1 className={styles.percentage}> {percentage} </h1>
+        <div> {percentageText} </div>
         <Button
-          onClick={() => onSubmit(index)}
+          onClick={submitImage}
           className={styles.submitButton}
           variant="contained"
           size="large"
+          ref={buttonRef}
         >
           SUBMIT
         </Button>

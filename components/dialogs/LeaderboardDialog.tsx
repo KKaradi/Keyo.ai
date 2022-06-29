@@ -23,6 +23,18 @@ const LeaderboardDialog: NextPage<LeaderboardDialogProps> = ({ children }) => {
     setIsOpen(true);
   };
 
+  let placement = 1;
+  const rows = addresses.map(({ walletAddress, votes }, index) => {
+    if (index > 0 && votes < addresses[index - 1].votes) {
+      placement++;
+    }
+    return (
+      <p>
+        {placement}) {walletAddress} ({votes})
+      </p>
+    );
+  });
+
   return (
     <div>
       <div onClick={openLeaderboard}>{children}</div>
@@ -32,14 +44,8 @@ const LeaderboardDialog: NextPage<LeaderboardDialogProps> = ({ children }) => {
         keepMounted
         onClose={() => setIsOpen(false)}
       >
-        <DialogTitle>Vote Leaderboard</DialogTitle>
-        <DialogContent>
-          {addresses.map(({ walletAddress, votes }, index) => (
-            <p>
-              {index + 1}) {walletAddress}: {votes}
-            </p>
-          ))}
-        </DialogContent>
+        <DialogTitle>Voting Leaderboard</DialogTitle>
+        <DialogContent>{rows}</DialogContent>
       </Dialog>
     </div>
   );

@@ -7,6 +7,7 @@ import Link from "next/link";
 import InfoDialog from "./dialogs/InfoDialog";
 import ConnectWallet from "./ConnectWallet";
 import LeaderboardDialog from "./dialogs/LeaderboardDialog";
+import ToolTip from "./ToolTip";
 
 type HeaderProps = {
   votes?: number;
@@ -19,19 +20,29 @@ const Header: NextPage<HeaderProps> = ({ votes }) => {
       <div className={styles.iconContainer}>
         <ConnectWallet />
 
-        {votes ? <h1 className={styles.votes}> {votes} </h1> : null}
+        {votes ? (
+          <ToolTip title="My Votes">
+            <h1 className={styles.votes}> {votes} </h1>
+          </ToolTip>
+        ) : null}
 
         <LeaderboardDialog>
-          <LeaderboardIcon className={styles.info} sx={{ fontSize: 40 }} />
+          <ToolTip title="Voting Leaderboard">
+            <LeaderboardIcon className={styles.info} sx={{ fontSize: 40 }} />
+          </ToolTip>
         </LeaderboardDialog>
 
         <InfoDialog>
-          <InfoIcon className={styles.info} sx={{ fontSize: 40 }} />
+          <ToolTip title="More Info">
+            <InfoIcon className={styles.info} sx={{ fontSize: 40 }} />
+          </ToolTip>
         </InfoDialog>
 
         <Link href={"https://twitter.com/nonfungedai"}>
           <a target="_blank">
-            <TwitterIcon className={styles.twitter} sx={{ fontSize: 40 }} />
+            <ToolTip title="Our Twitter">
+              <TwitterIcon className={styles.twitter} sx={{ fontSize: 40 }} />
+            </ToolTip>
           </a>
         </Link>
       </div>
