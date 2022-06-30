@@ -8,21 +8,31 @@ import InfoDialog from "./dialogs/InfoDialog";
 import ConnectWallet from "./ConnectWallet";
 import LeaderboardDialog from "./dialogs/LeaderboardDialog";
 import ToolTip from "./ToolTip";
+import VoteGauge from "./VoteGauge";
 
 type HeaderProps = {
   votes?: number;
+  percentiles?: number[];
 };
 
-const Header: NextPage<HeaderProps> = ({ votes }) => {
+const Header: NextPage<HeaderProps> = ({ votes, percentiles }) => {
   return (
     <header className={styles.container}>
       <h1 className={styles.title}>NON FUNGIBLE AI</h1>
       <div className={styles.iconContainer}>
         <ConnectWallet />
 
-        {votes ? (
+        {votes !== undefined ? (
           <ToolTip title="My Votes">
             <h1 className={styles.votes}> {votes} </h1>
+          </ToolTip>
+        ) : null}
+
+        {percentiles && votes !== undefined ? (
+          <ToolTip title="Your Voting Percentile" offset={-15}>
+            <div>
+              <VoteGauge votes={votes} percentiles={percentiles} />
+            </div>
           </ToolTip>
         ) : null}
 

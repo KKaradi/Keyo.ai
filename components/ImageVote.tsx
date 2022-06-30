@@ -66,7 +66,7 @@ const ImageVote: NextPage<ImageVoteProps> = ({
 
   const images = [1, 2].map((index) => {
     if (dayIndex && imageSetIndex > imageData[dayIndex - 1]?.length)
-      return <div />;
+      return <div key={index} />;
 
     return (
       <ImageChoice

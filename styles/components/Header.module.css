@@ -6,7 +6,7 @@
   align-items: center;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem;
+  padding: 1rem 1.5rem;
 }
 
 .title {
@@ -22,7 +22,7 @@
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  gap: 50px;
+  gap: 40px;
 }
 
 .iconContainer > * {
@@ -52,4 +52,19 @@
 
 .toolTip {
   padding: 5px 0;
+}
+
+.chartContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  margin-top: 10px;
+  width: 75px;
+  height: auto;
+}
+
+.chart {
+  height: 100%;
+  width: 100%;
 }

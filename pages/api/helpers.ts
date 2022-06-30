@@ -1,4 +1,5 @@
 import type { NextApiResponse, NextApiRequest } from "next/types";
+import prisma from "../../lib/prisma";
 
 export const getYesterday = () => {
   const now = new Date(Date.now());
@@ -31,4 +32,15 @@ export const authenticate = (req: NextApiRequest) => {
   if (!key) return false;
 
   return process.env.AUTH_KEY == key;
+};
+
+export const getWallet = (address: string) => {
+  return prisma.wallet.findUnique({
+    where: { address },
+    include: { votes: true },
+  });
+};
+
+export const createWallet = (address: string) => {
+  return prisma.wallet.create({ data: { address } });
 };

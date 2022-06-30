@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getDayIndex } from "../../../helpers";
 import prisma from "../../../lib/prisma";
-import { authenticate, response } from "../helpers";
+import { authenticate, createWallet, getWallet, response } from "../helpers";
 
 type ChoiceCount = { [key: number]: number };
 type Body = {
@@ -12,6 +12,16 @@ type Body = {
 };
 
 export type Response = { message: string; choiceCount: ChoiceCount };
+
+const upsertWallet = async (address: string) => {
+  const wallet = await getWallet(address);
+  if (!wallet) return await createWallet(address);
+
+  return prisma.wallet.update({
+    data: { address, voteCount: wallet.voteCount + 1 },
+    where: { address },
+  });
+};
 
 const getChoiceCount = async (imageSetIndex: number, dayIndex: number) => {
   const groupedByChoice = await prisma.vote.groupBy({
@@ -53,14 +63,17 @@ export default async function storeVote(
 
   if (dayIndex != getDayIndex()) return response(res, "reloadPage");
 
-  const data = { choiceIndex, walletAddress, dayIndex, imageSetIndex };
-  const voted = await prisma.vote.create({ data }).catch(console.error);
+  const voteData = { choiceIndex, walletAddress, dayIndex, imageSetIndex };
 
-  const choiceCount = await getChoiceCount(imageSetIndex, dayIndex).catch(
-    console.error
-  );
+  let choiceCount: ChoiceCount;
 
-  if (!voted || !choiceCount) return response(res, "DBError");
+  try {
+    await upsertWallet(walletAddress);
+    await prisma.vote.create({ data: voteData });
+    choiceCount = await getChoiceCount(imageSetIndex, dayIndex);
+  } catch (error) {
+    return response(res, "DBError");
+  }
 
   return res.status(200).json({ message: "DB Pull Success", choiceCount });
 }

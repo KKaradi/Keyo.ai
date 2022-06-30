@@ -14,14 +14,14 @@ export default async function storeVote(
   if (!authenticate(req)) return response(res, "authError");
   if (req.method != "GET") return response(res, "onlyGet");
 
-  const result = await prisma.vote.groupBy({
-    by: ["walletAddress"],
-    _count: { _all: true },
-    orderBy: { _count: { id: "desc" } },
+  const result = await prisma.wallet.findMany({
+    take: 10,
+    orderBy: { voteCount: "desc" },
+    include: { votes: true },
   });
 
-  const addresses = result.map(({ walletAddress, _count }) => {
-    return { walletAddress, votes: _count._all };
+  const addresses = result.map(({ address, votes }) => {
+    return { walletAddress: address, votes: votes.length };
   });
 
   if (!addresses) return response(res, "DBError");

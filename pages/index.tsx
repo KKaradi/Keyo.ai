@@ -12,6 +12,7 @@ const GamePage: NextPage = () => {
   const [choicesMade, setChoicesMade] = useState(0);
   const [isVoting, setIsVoting] = useState(true);
   const [imageSetIndex, setImageSetIndex] = useState(1);
+  const [percentiles, setPercentiles] = useState<number[]>([]);
 
   const { data } = useAccount();
 
@@ -22,12 +23,15 @@ const GamePage: NextPage = () => {
       const { address } = data;
       const result = await get(`/api/get/wallet/${address}`);
 
-      const { votes } = (await result.json()) as Response;
-      if (votes) {
-        setChoicesMade(votes.length);
-        if (votes.length > 0) {
-          setImageSetIndex(votes[0]?.imageSetIndex + 1);
-        }
+      const { votes, percentileArray } = (await result.json()) as Response;
+
+      if (!votes || !percentileArray) return;
+
+      setPercentiles(percentileArray);
+      setChoicesMade(votes.length);
+
+      if (votes.length > 0) {
+        setImageSetIndex(votes[votes.length - 1]?.imageSetIndex + 1);
       }
     })();
   }, [data]);
@@ -56,7 +60,7 @@ const GamePage: NextPage = () => {
         <link rel="icon" href="/icon.jpeg" />
       </Head>
 
-      <Header votes={choicesMade} />
+      <Header votes={choicesMade} percentiles={percentiles} />
 
       <main className={styles.main}> {content} </main>
     </div>
