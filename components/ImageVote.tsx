@@ -10,6 +10,7 @@ import type { Response } from "../pages/api/post/vote";
 import TwitterShare from "./TwitterShare";
 import ShareIcon from "@mui/icons-material/Share";
 import imageData from "../public/choice/data.json";
+import { Vote } from "@prisma/client";
 
 export type ChoiceCount = Response["choiceCount"];
 
@@ -21,13 +22,10 @@ if (!START_DATE) throw new Error("START_DATE env var not present");
 
 type ImageVoteProps = {
   imageIndexState: [number, Dispatch<SetStateAction<number>>];
-  incrementChoicesMade?: () => void;
+  addVote?: (vote: Vote) => void;
 };
 
-const ImageVote: NextPage<ImageVoteProps> = ({
-  incrementChoicesMade,
-  imageIndexState,
-}) => {
+const ImageVote: NextPage<ImageVoteProps> = ({ addVote, imageIndexState }) => {
   const [dayIndex, setDayIndex] = useState<number | undefined>();
   const [imageSetIndex, setImageSetIndex] = imageIndexState;
   const [choiceCount, setChoiceCount] = useState<ChoiceCount | undefined>();
@@ -45,6 +43,7 @@ const ImageVote: NextPage<ImageVoteProps> = ({
 
   const onSubmit = async (choiceIndex: number) => {
     if (!walletAddress) return setConnectDialogIsOpen(true);
+    if (!dayIndex) return;
 
     const body = { choiceIndex, imageSetIndex, dayIndex, walletAddress };
     const response = await post("/api/post/vote", body);
@@ -55,7 +54,8 @@ const ImageVote: NextPage<ImageVoteProps> = ({
       const { choiceCount: count } = (await response.json()) as Response;
       if (count) setChoiceCount(count);
 
-      if (incrementChoicesMade) incrementChoicesMade();
+      const vote = { ...body, createdAt: new Date(Date.now()), id: "" };
+      if (addVote) addVote(vote);
     }
   };
 

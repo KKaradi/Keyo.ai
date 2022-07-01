@@ -1,0 +1,13 @@
+.dialogContainer * {
+  background-color: transparent;
+  box-shadow: none;
+}
+
+.imageContainer {
+  width: calc(100vh * 0.8);
+  height: calc(100vh * 0.8);
+}
+
+.image {
+  border-radius: 5%;
+}

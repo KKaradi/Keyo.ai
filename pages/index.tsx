@@ -8,19 +8,30 @@ import { get } from "../helpers";
 import styles from "../styles/pages/Choose.module.css";
 import type { Response } from "./api/get/wallet/[walletAddress]";
 
+export type Vote = {
+  choiceIndex: number;
+  imageSetIndex: number;
+  dayIndex: number;
+  createdAt?: Date;
+  id?: string;
+};
+
 const GamePage: NextPage = () => {
-  const [choicesMade, setChoicesMade] = useState(0);
+  const [voteArray, setVotes] = useState<Vote[] | undefined>();
+  const [percentiles, setPercentiles] = useState<number[] | undefined>();
   const [isVoting, setIsVoting] = useState(true);
   const [imageSetIndex, setImageSetIndex] = useState(1);
-  const [percentiles, setPercentiles] = useState<number[]>([]);
 
-  const { data } = useAccount();
+  const address = useAccount().data?.address;
 
   useEffect(() => {
     (async () => {
-      if (!data?.address) return setChoicesMade(0);
+      if (!address) {
+        console.log("wallet disconnected");
+        setVotes(undefined);
+        return setImageSetIndex(1);
+      }
 
-      const { address } = data;
       const result = await get(`/api/get/wallet/${address}`);
 
       const { votes, percentileArray } = (await result.json()) as Response;
@@ -28,13 +39,13 @@ const GamePage: NextPage = () => {
       if (!votes || !percentileArray) return;
 
       setPercentiles(percentileArray);
-      setChoicesMade(votes.length);
+      setVotes(votes);
 
       if (votes.length > 0) {
         setImageSetIndex(votes[votes.length - 1]?.imageSetIndex + 1);
       }
     })();
-  }, [data]);
+  }, [address]);
 
   useEffect(() => {
     if (imageSetIndex > Number(process.env.IMAGESETS_PER_DAY)) {
@@ -42,12 +53,14 @@ const GamePage: NextPage = () => {
     }
   }, [imageSetIndex]);
 
-  const incrementChoicesMade = () => setChoicesMade(choicesMade + 1);
+  const addVote = (vote: Vote) => {
+    if (voteArray) setVotes([...voteArray, vote]);
+  };
 
   const content = isVoting ? (
     <ImageVote
       imageIndexState={[imageSetIndex, setImageSetIndex]}
-      incrementChoicesMade={incrementChoicesMade}
+      addVote={addVote}
     />
   ) : (
     <h1 className={styles.endText}> THAT'S ALL FOLKS</h1>
@@ -60,7 +73,7 @@ const GamePage: NextPage = () => {
         <link rel="icon" href="/icon.jpeg" />
       </Head>
 
-      <Header votes={choicesMade} percentiles={percentiles} />
+      <Header votes={voteArray} percentiles={percentiles} addVote={addVote} />
 
       <main className={styles.main}> {content} </main>
     </div>

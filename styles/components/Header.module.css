@@ -3,21 +3,27 @@
   padding: 10px;
   width: 100%;
   display: flex;
+  flex-direction: column;
+}
+
+.header {
+  display: flex;
   align-items: center;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 1.5rem;
+  padding: 0.5rem 1.5rem;
 }
 
 .title {
   margin: 0;
+  padding: 0;
   line-height: 1.15;
   font-size: 4rem;
   color: white;
   user-select: none;
 }
 
-.iconContainer {
+.iconsContainer {
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -25,8 +31,14 @@
   gap: 40px;
 }
 
-.iconContainer > * {
+.iconsContainer > * {
   cursor: pointer;
+}
+
+.iconContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .votes {

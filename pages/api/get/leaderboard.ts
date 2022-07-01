@@ -20,8 +20,8 @@ export default async function storeVote(
     include: { votes: true },
   });
 
-  const addresses = result.map(({ address, votes }) => {
-    return { walletAddress: address, votes: votes.length };
+  const addresses = result.map(({ address, voteCount }) => {
+    return { walletAddress: address, votes: voteCount };
   });
 
   if (!addresses) return response(res, "DBError");
