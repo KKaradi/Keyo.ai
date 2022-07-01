@@ -12,7 +12,7 @@ import ToolTip from "./ToolTip";
 import VoteGauge from "./VoteGauge";
 import History from "./History";
 import { useState } from "react";
-import { Vote } from "../pages/index";
+import { Vote } from "../helpers";
 
 type HeaderProps = {
   votes?: Vote[];
@@ -20,10 +20,12 @@ type HeaderProps = {
   addVote?: (vote: Vote) => void;
 };
 
-const vote = {
-  choiceIndex: 1,
-  imageSetIndex: 1,
-  dayIndex: 1,
+const vote: Vote = {
+  imageset: 1,
+  day: 1,
+  chosen: "corn/1",
+  denied: "corn/2",
+  walletAddress: "me",
 };
 
 const Header: NextPage<HeaderProps> = ({ votes, percentiles, addVote }) => {

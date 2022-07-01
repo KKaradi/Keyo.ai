@@ -3,14 +3,13 @@ import styles from "../styles/components/ImageVote.module.css";
 import { useAccount } from "wagmi";
 import ErrorDialog from "./dialogs/ErrorDialog";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { post, getDayIndex } from "../helpers";
+import { Vote, post, getDay } from "../helpers";
 import ImageChoice from "./ImageChoice";
 import Button from "@mui/material/Button";
 import type { Response } from "../pages/api/post/vote";
 import TwitterShare from "./TwitterShare";
 import ShareIcon from "@mui/icons-material/Share";
-import imageData from "../public/choice/data.json";
-import { Vote } from "@prisma/client";
+import imageData from "../data.json";
 
 export type ChoiceCount = Response["choiceCount"];
 
@@ -26,11 +25,11 @@ type ImageVoteProps = {
 };
 
 const ImageVote: NextPage<ImageVoteProps> = ({ addVote, imageIndexState }) => {
-  const [dayIndex, setDayIndex] = useState<number | undefined>();
-  const [imageSetIndex, setImageSetIndex] = imageIndexState;
+  const [day, setDay] = useState<number | undefined>();
+  const [imageset, setImageset] = imageIndexState;
   const [choiceCount, setChoiceCount] = useState<ChoiceCount | undefined>();
 
-  useEffect(() => setDayIndex(getDayIndex()), []);
+  useEffect(() => setDay(getDay()), []);
 
   const [connectDialogIsOpen, setConnectDialogIsOpen] = useState(false);
   const [reloadDialogIsOpen, setReloadDialogIsOpen] = useState(false);
@@ -41,12 +40,16 @@ const ImageVote: NextPage<ImageVoteProps> = ({ addVote, imageIndexState }) => {
     if (!walletAddress) setChoiceCount(undefined);
   }, [walletAddress]);
 
-  const onSubmit = async (choiceIndex: number) => {
+  const onSubmit = async (chosen: string) => {
     if (!walletAddress) return setConnectDialogIsOpen(true);
-    if (!dayIndex) return;
+    if (!day) return;
 
-    const body = { choiceIndex, imageSetIndex, dayIndex, walletAddress };
-    const response = await post("/api/post/vote", body);
+    const ids = imageData.schedule[day - 1][imageset - 1];
+
+    const denied = ids[1 - ids.indexOf(chosen)];
+
+    const body = { imageset, day, walletAddress, chosen, denied };
+    const response = await post<Vote>("/api/post/vote", body);
 
     if (response.status == 461) setReloadDialogIsOpen(true);
 
@@ -54,26 +57,27 @@ const ImageVote: NextPage<ImageVoteProps> = ({ addVote, imageIndexState }) => {
       const { choiceCount: count } = (await response.json()) as Response;
       if (count) setChoiceCount(count);
 
-      const vote = { ...body, createdAt: new Date(Date.now()), id: "" };
-      if (addVote) addVote(vote);
+      if (addVote) addVote(body);
     }
   };
 
   const nextImageSet = () => {
-    setImageSetIndex(imageSetIndex + 1);
+    setImageset(imageset + 1);
     setChoiceCount(undefined);
   };
 
   const images = [1, 2].map((index) => {
-    if (dayIndex && imageSetIndex > imageData[dayIndex - 1]?.length)
-      return <div key={index} />;
+    const daySchedule = imageData.schedule[(day ?? 0) - 1];
+    if (!day || imageset > daySchedule.length) return <div key={index} />;
+
+    const imageId = daySchedule[imageset - 1][index - 1];
 
     return (
       <ImageChoice
         choiceCount={choiceCount}
         index={index}
         onSubmit={onSubmit}
-        path={`/choice/${dayIndex}/${imageSetIndex}/${index}.jpg`}
+        imageId={imageId}
         key={index}
       />
     );
@@ -84,9 +88,7 @@ const ImageVote: NextPage<ImageVoteProps> = ({ addVote, imageIndexState }) => {
       <Button variant="contained" size="large" onClick={() => nextImageSet()}>
         CONTINUE
       </Button>
-      <TwitterShare
-        text={dayIndex ? imageData[dayIndex - 1][imageSetIndex - 1] : ""}
-      >
+      <TwitterShare text={""}>
         <ShareIcon sx={{ color: "white" }} />
       </TwitterShare>
     </div>

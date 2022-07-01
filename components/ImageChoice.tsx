@@ -8,21 +8,21 @@ import { useRef } from "react";
 import AnimatedPercentage from "./AnimatedPercentage";
 
 type ImageChoiceProps = {
-  path: string;
+  imageId: string;
   index: number;
-  onSubmit: (index: number) => void;
+  onSubmit: (chosen: string) => void;
   choiceCount: ChoiceCount | undefined;
 };
 
 const ImageChoice: NextPage<ImageChoiceProps> = ({
-  path,
+  imageId,
   index,
   onSubmit,
   choiceCount,
 }) => {
   let percentageText = null;
   if (choiceCount) {
-    const count = choiceCount[index] ?? 0;
+    const count = choiceCount[imageId] ?? 0;
     const sum = Object.values(choiceCount).reduce((prev, curr) => prev + curr);
     const percentage = Number(((count / sum) * 100).toFixed(0));
     percentageText = <AnimatedPercentage end={percentage} />;
@@ -31,10 +31,8 @@ const ImageChoice: NextPage<ImageChoiceProps> = ({
   const [executeScroll, scrollRef] = useScroll();
   const buttonRef = useRef(null);
 
-  if (path.includes("undefined")) return <div />;
-
   const submitImage = () => {
-    if (document.activeElement === buttonRef?.current) onSubmit(index);
+    if (document.activeElement === buttonRef?.current) onSubmit(imageId);
     else scrollRef?.current?.focus();
   };
 
@@ -50,7 +48,7 @@ const ImageChoice: NextPage<ImageChoiceProps> = ({
         className={styles.image}
         layout="fill"
         objectFit="cover"
-        src={path}
+        src={`/choice/${imageId}.jpg`}
         priority
         alt={`Image Choice ${index}`}
       />

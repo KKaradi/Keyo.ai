@@ -8,14 +8,21 @@ type VoteGaugeProps = {
 };
 
 const VoteGauge: NextPage<VoteGaugeProps> = ({ votes, percentiles }) => {
-  const index = percentiles.indexOf(votes);
-  const percent = index == -1 ? 0 : index / (percentiles.length - 1);
+  let index = percentiles.indexOf(votes);
+  if (index == -1) {
+    percentiles.push(votes);
+    percentiles.sort();
+    index = percentiles.indexOf(votes);
+  }
+
+  const percent = index / (percentiles.length - 1);
+
   return (
     <div className={styles.chartContainer}>
       <GaugeChart
         id="chart"
         className={styles.chart}
-        percent={percent}
+        percent={isNaN(percent) ? 1 : percent}
         hideText
         colors={["#FF0000", "#FFFF00", "#00FF00"]}
         needleColor="#FFFFFF"

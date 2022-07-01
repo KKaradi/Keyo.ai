@@ -1,14 +1,13 @@
 import { useRef } from "react";
+import Prisma from "@prisma/client";
 
-export const getDayIndex = () => {
+export const getDay = () => {
   const { START_DATE } = process.env;
   if (!START_DATE) throw new Error("START_DATE not initialized");
 
   const sinceStart = Date.now() - new Date(START_DATE).getTime();
   return Math.floor(sinceStart / (1000 * 60 * 60 * 24)) + 1;
 };
-
-type Body = { [key: string]: unknown };
 
 export const get = async (url: string) => {
   return await fetch(url, {
@@ -20,7 +19,7 @@ export const get = async (url: string) => {
   });
 };
 
-export const post = async (url: string, body?: Body) => {
+export const post = async <T>(url: string, body?: T) => {
   return await fetch(url, {
     method: "POST",
     headers: {
@@ -36,4 +35,9 @@ export const useScroll = () => {
   const executeScroll = () =>
     scrollRef?.current?.scrollIntoView({ block: "end", behavior: "smooth" });
   return [executeScroll, scrollRef] as const;
+};
+
+export type Vote = Omit<Prisma.Vote, "id" | "createdAt"> & {
+  id?: string;
+  createdAt?: Date;
 };

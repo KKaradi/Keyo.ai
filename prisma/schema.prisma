@@ -19,9 +19,13 @@ model Wallet {
 model Vote {
   id String @default(cuid()) @id
   createdAt DateTime @default(now())
+
+  day Int
+  imageset Int
+
+  chosen String
+  denied String
+
   walletAddress String
-  choiceIndex Int
-  imageSetIndex Int
-  dayIndex Int
   wallet Wallet @relation(fields: [walletAddress], references: [address], onDelete: Cascade)
 }

@@ -1,4 +1,4 @@
-import { Vote } from "../pages/index";
+import { Vote } from "../helpers";
 import type { NextPage } from "next/types";
 import Image from "next/image";
 import styles from "../styles/components/History.module.css";
@@ -11,8 +11,8 @@ type HistoryProps = {
 const History: NextPage<HistoryProps> = ({ votes }) => {
   return (
     <div className={styles.container}>
-      {votes.map(({ dayIndex, imageSetIndex, choiceIndex }, index) => {
-        const path = `/choice/${dayIndex}/${imageSetIndex}/${choiceIndex}.jpg`;
+      {votes.map(({ chosen }, index) => {
+        const path = `/choice/${chosen}.jpg`;
         return (
           <div className={styles.imageContainer} key={index}>
             <ImageDialog path={path}>
