@@ -23,8 +23,7 @@ const Header: NextPage<HeaderProps> = ({ votes, percentiles }) => {
   const [historyOpen, setHistoryOpen] = useState(false);
 
   const toggleHistory = () => {
-    if (!historyOpen && (votes?.length ?? 0) > 1) setHistoryOpen(true);
-    if (historyOpen) setHistoryOpen(false);
+    setHistoryOpen(!historyOpen);
   };
 
   return (

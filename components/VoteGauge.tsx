@@ -26,6 +26,7 @@ const VoteGauge: NextPage<VoteGaugeProps> = ({ votes, percentiles }) => {
         colors={["#FF0000", "#FFFF00", "#00FF00"]}
         needleColor="#FFFFFF"
         needleBaseColor="#FFFFFF"
+        animate={false}
       />
     </div>
   );

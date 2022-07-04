@@ -12,8 +12,33 @@
   width: 100px;
   position: relative;
   flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.imageContainer:hover {
+  transform: scale(0.95);
 }
 
 .imageContainer img {
   border-radius: 10%;
+  position: relative;
+}
+
+.overlay {
+  position: absolute;
+  display: flex;
+  height: 100%;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+}
+
+.count {
+  padding: 0;
+  margin: 0;
+  color: white;
+  font-size: 3rem;
+  user-select: none;
+  -webkit-text-stroke-width: 1px;
+  -webkit-text-stroke-color: black;
 }

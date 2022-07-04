@@ -95,7 +95,7 @@ const ImageVote: NextPage<ImageVoteProps> = ({
   });
 
   const continueButton = choiceCount ? (
-    <div className={styles.continueButtonContainer}>
+    <div className={styles.continueContainer}>
       <Button variant="contained" size="large" onClick={() => nextImageSet()}>
         CONTINUE
       </Button>
@@ -117,9 +117,9 @@ const ImageVote: NextPage<ImageVoteProps> = ({
         isOpen={reloadDialogIsOpen}
         setIsOpen={setReloadDialogIsOpen}
       />
-      <div className={styles.imageRow}> {images}</div>
-
-      {continueButton}
+      <div className={styles.imageRow}>
+        {images} {continueButton}
+      </div>
     </div>
   );
 };

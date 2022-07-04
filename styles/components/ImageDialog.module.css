@@ -11,3 +11,22 @@
 .image {
   border-radius: 5%;
 }
+
+.overlay {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.download {
+  color: white;
+  margin: 20px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.download:hover {
+  transform: scale(1.05);
+}
