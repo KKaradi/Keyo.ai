@@ -1,12 +1,14 @@
 {
   "schedule": [
     [
-      ["shrine/1", "shrine/2"],
-      ["samurai/1", "samurai/2"],
-      ["corn/1", "corn/2"]
+      ["samurai/1", "shrine/2"],
+      ["shrine/1", "corn/1"],
+      ["samurai/2", "shrine/1"],
+      ["shrine/2", "corn/2"],
+      ["corn/1", "samurai/1"],
+      ["shrine/1", "shrine/2"]
     ]
   ],
-  "tournament": ["shrine/1", "samurai/2", "corn/1", "samurai/1"],
   "prompts": {
     "shrine": "A floral japanese shrine jinja standing in a mountain, vibrant colors, Japanese Hydrangea, Ajisai, rose, suisen flower, sakura, rococo, traditional Japanese art, manga",
     "samurai": "A red samurai standing at the base of an enormous mountain on a battlefield littered with broken weapons and debris, rising sun, misty day, fuji-san, snow, bonsai, Chinese mountains",

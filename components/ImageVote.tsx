@@ -9,7 +9,7 @@ import Button from "@mui/material/Button";
 import type { Response } from "../pages/api/post/vote";
 import TwitterShare from "./TwitterShare";
 import ShareIcon from "@mui/icons-material/Share";
-import imageData from "../data.json";
+import SETTINGS from "../settings.json";
 
 export type ChoiceCount = Response["choiceCount"];
 
@@ -22,9 +22,14 @@ if (!START_DATE) throw new Error("START_DATE env var not present");
 type ImageVoteProps = {
   imageIndexState: [number, Dispatch<SetStateAction<number>>];
   addVote?: (vote: Vote) => void;
+  setIsVoting: (value: boolean) => void;
 };
 
-const ImageVote: NextPage<ImageVoteProps> = ({ addVote, imageIndexState }) => {
+const ImageVote: NextPage<ImageVoteProps> = ({
+  addVote,
+  imageIndexState,
+  setIsVoting,
+}) => {
   const [day, setDay] = useState<number | undefined>();
   const [imageset, setImageset] = imageIndexState;
   const [choiceCount, setChoiceCount] = useState<ChoiceCount | undefined>();
@@ -44,7 +49,7 @@ const ImageVote: NextPage<ImageVoteProps> = ({ addVote, imageIndexState }) => {
     if (!walletAddress) return setConnectDialogIsOpen(true);
     if (!day) return;
 
-    const ids = imageData.schedule[day - 1][imageset - 1];
+    const ids = SETTINGS.schedule[day - 1][imageset - 1];
 
     const denied = ids[1 - ids.indexOf(chosen)];
 
@@ -66,8 +71,14 @@ const ImageVote: NextPage<ImageVoteProps> = ({ addVote, imageIndexState }) => {
     setChoiceCount(undefined);
   };
 
+  useEffect(() => {
+    if (day && imageset > SETTINGS.schedule[day - 1].length) {
+      setIsVoting(false);
+    }
+  }, [imageset]);
+
   const images = [1, 2].map((index) => {
-    const daySchedule = imageData.schedule[(day ?? 0) - 1];
+    const daySchedule = SETTINGS.schedule[(day ?? 0) - 1];
     if (!day || imageset > daySchedule.length) return <div key={index} />;
 
     const imageId = daySchedule[imageset - 1][index - 1];

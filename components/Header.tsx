@@ -17,25 +17,13 @@ import { Vote } from "../helpers";
 type HeaderProps = {
   votes?: Vote[];
   percentiles?: number[];
-  addVote?: (vote: Vote) => void;
 };
 
-const vote: Vote = {
-  imageset: 1,
-  day: 1,
-  chosen: "corn/1",
-  denied: "corn/2",
-  walletAddress: "me",
-};
-
-const Header: NextPage<HeaderProps> = ({ votes, percentiles, addVote }) => {
+const Header: NextPage<HeaderProps> = ({ votes, percentiles }) => {
   const [historyOpen, setHistoryOpen] = useState(false);
 
   const toggleHistory = () => {
-    if (!historyOpen && (votes?.length ?? 0) > 1) {
-      if (addVote) addVote(vote);
-      setHistoryOpen(true);
-    }
+    if (!historyOpen && (votes?.length ?? 0) > 1) setHistoryOpen(true);
     if (historyOpen) setHistoryOpen(false);
   };
 

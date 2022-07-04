@@ -19,6 +19,7 @@ const GamePage: NextPage = () => {
   useEffect(() => {
     (async () => {
       if (!address) {
+        setIsVoting(true);
         setVotes(undefined);
         return setImageset(1);
       }
@@ -38,18 +39,16 @@ const GamePage: NextPage = () => {
     })();
   }, [address]);
 
-  useEffect(() => {
-    if (imageset > Number(process.env.IMAGESETS_PER_DAY)) {
-      setIsVoting(false);
-    }
-  }, [imageset]);
-
   const addVote = (vote: Vote) => {
     if (voteArray) setVotes([...voteArray, vote]);
   };
 
   const content = isVoting ? (
-    <ImageVote imageIndexState={[imageset, setImageset]} addVote={addVote} />
+    <ImageVote
+      imageIndexState={[imageset, setImageset]}
+      addVote={addVote}
+      setIsVoting={setIsVoting}
+    />
   ) : (
     <h1 className={styles.endText}> THAT'S ALL FOLKS</h1>
   );
@@ -61,7 +60,7 @@ const GamePage: NextPage = () => {
         <link rel="icon" href="/icon.jpeg" />
       </Head>
 
-      <Header votes={voteArray} percentiles={percentiles} addVote={addVote} />
+      <Header votes={voteArray} percentiles={percentiles} />
 
       <main className={styles.main}> {content} </main>
     </div>
