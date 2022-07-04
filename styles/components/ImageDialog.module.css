@@ -12,11 +12,12 @@
   border-radius: 5%;
 }
 
+.listitem {
+  font-size: large;
+  color:white;
+}
+
 .dialogtitle {
-  margin: 0;
-  padding-top: 2rem;
-  padding-bottom: 1.5rem;
-  line-height: 1.15;
   font-size: 2.5rem;
   font-weight: 700;
   font-family: sans-serif;

@@ -7,5 +7,5 @@ export const colors = {
   grey: "#36393B",
   gold: "#FFD700",
   silver: "#C0C0C0",
-  bronze: "CD7F32",
+  bronze: "#CD7F32",
 };

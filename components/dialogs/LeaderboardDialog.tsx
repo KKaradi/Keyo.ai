@@ -1,12 +1,23 @@
 import { useState, ReactElement } from "react";
 import type { NextPage } from "next/types";
 import SlideTransition from "./SlideTransition";
-import { Dialog } from "@mui/material";
+import {
+  Avatar,
+  Button,
+  Dialog,
+  DialogTitle,
+  List,
+  ListItem,
+  ListItemAvatar,
+  ListItemText,
+} from "@mui/material";
 import { get, clipboard } from "../../helpers";
 import type { Response } from "../../pages/api/get/leaderboard";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import styles from "../../styles/components/Leaderboard.module.css";
 import { colors } from "../../constants/colors";
+import { blue } from "@mui/material/colors";
+import { fontSize } from '@mui/system';
 
 type LeaderboardDialogProps = {
   children: ReactElement;
@@ -34,30 +45,44 @@ const LeaderboardDialog: NextPage<LeaderboardDialogProps> = ({ children }) => {
     setIsOpen(true);
   };
 
-  let placement = 1;
-  const rows = addresses.map(({ walletAddress, votes }, index) => {
-    if (index > 0 && votes < addresses[index - 1].votes) placement++;
+  //let placement = 1;
+  // const rows = () => {
+  //   <List>
+  //     {addresses.map(({ walletAddress, votes }, index) => {
+  //       <ListItem>
+  //         {" "}
+  //         <ListItemText primary={walletAddress} />
+  //       </ListItem>;
+  //     })}
+  //   </List>;
+  // };
 
-    return (
-      <div className={styles.row} key={index}>
-        <div
-          className={styles.addressContainer}
-          onClick={() => clipboard(walletAddress)}
-        >
-          <EmojiEventsIcon
-            fontSize="large"
-            sx={{
-              color: trophyColors[placement - 1],
-              opacity: placement <= 3 ? 1 : 0,
-            }}
-          />
-          <h1 className={styles.address}>{ellipsize(walletAddress)}</h1>
-        </div>
-        <h1 className={styles.score}> {votes}</h1>
-      </div>
-    );
-  });
+  // addresses.map(({ walletAddress, votes }, index) => {
+  //   if (index > 0 && votes < addresses[index - 1].votes) placement++;
 
+  //   return (
+  //     <div className={styles.row} key={index}>
+  //       <div
+  //         className={styles.addressContainer}
+  //         onClick={() => clipboard(walletAddress)}
+  //       >
+  //         <EmojiEventsIcon
+  //           fontSize="large"
+  //           sx={{
+  //             color: trophyColors[placement - 1],
+  //             opacity: placement <= 3 ? 1 : 0,
+  //           }}
+  //         />
+  //         <h1 className={styles.address}>{ellipsize(walletAddress)+' | Votes: '+votes}</h1>
+  //       </div>
+  //     </div>
+  //   );
+  // });<div className={styles.container}>{rows}</div>
+  //{/* <ListItemText><h1 className={styles.address}>{ellipsize(walletAddress, 30)}</h1></ListItemText>  */}
+  //<ListItemText>{votes}</ListItemText>
+  //
+  //
+  //
   return (
     <div>
       <div onClick={openLeaderboard}>{children}</div>
@@ -66,8 +91,66 @@ const LeaderboardDialog: NextPage<LeaderboardDialogProps> = ({ children }) => {
         TransitionComponent={SlideTransition}
         keepMounted
         onClose={() => setIsOpen(false)}
+        PaperProps={{
+          style: {
+            backgroundColor: colors.background,
+            boxShadow: "none",
+          },
+        }}
       >
-        <div className={styles.container}>{rows}</div>
+        <div className={styles.container}>
+          <DialogTitle>
+            <h1 className={styles.dialogtitle}>Voting Leaderboards</h1>
+            <hr style={{borderWidth:2}}/>
+          </DialogTitle>
+          <List sx={{ pt: 0 }}>
+            <ListItem>
+              <ListItemText>
+                <div className={styles.wrapper}>
+                  <div className={styles.addresscolumnheader}>{"Address"}</div>
+                  <div className={styles.votecolumnheader}>{"Votes"}</div>
+                </div>
+              </ListItemText>
+            </ListItem>
+            {addresses.splice(0,7).map(({ walletAddress, votes }, index) => (
+              <ListItem
+                key={walletAddress}
+                onClick={() => clipboard(walletAddress)}
+              >
+                <ListItemAvatar >
+                  <EmojiEventsIcon
+                    fontSize='inherit'
+                    sx={{
+                      color: trophyColors[index],
+                      opacity: index < 3 ? 1 : 0,
+                      marginBottom: '20px',
+                      fontSize: '26px'
+
+                    }}
+                  />
+                </ListItemAvatar>
+                <ListItemText>
+                  <div className={styles.wrapper}>
+                    <div className={styles.address}>
+                      { ellipsize(walletAddress, 30)}
+                    </div>
+                    <div className={styles.score}>{votes}</div>
+                  </div>
+                </ListItemText>
+              </ListItem>
+            ))}
+          </List>
+          
+        </div>
+        <Button
+              variant="contained"
+              className={styles.dialogbutton}
+              size="medium"
+
+              onClick={() => setIsOpen(false)}
+            >
+              OK
+            </Button>
       </Dialog>
     </div>
   );
