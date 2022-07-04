@@ -41,6 +41,6 @@ export const getWallet = (address: string) => {
   });
 };
 
-export const createWallet = (address: string) => {
-  return prisma.wallet.create({ data: { address } });
+export const createWallet = (address: string, ens?: string) => {
+  return prisma.wallet.create({ data: { address, ens } });
 };

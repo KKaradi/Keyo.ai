@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getDay } from "../../../helpers";
 import prisma from "../../../lib/prisma";
+import provider from "../../../lib/provider";
 import { authenticate, createWallet, getWallet, response } from "../helpers";
 
 type ChoiceCount = { [image: string]: number };
@@ -17,8 +18,10 @@ type Body = {
 export type Response = { message: string; choiceCount: ChoiceCount };
 
 const upsertWallet = async (address: string) => {
+  const ens = await provider.lookupAddress(address).catch(() => null);
+
   const wallet = await getWallet(address);
-  if (!wallet) return await createWallet(address);
+  if (!wallet) return await createWallet(address, ens ?? undefined);
 
   return prisma.wallet.update({
     data: { address, voteCount: wallet.voteCount + 1 },

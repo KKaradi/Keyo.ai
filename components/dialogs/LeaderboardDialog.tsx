@@ -12,7 +12,7 @@ type LeaderboardDialogProps = {
   children: ReactElement;
 };
 
-const ellipsize = (word: string, limit = 20, ellipsis = "...") => {
+const ellipsize = (word: string, limit = 21, ellipsis = "...") => {
   if (word.length < limit) return word;
 
   const chars = Math.floor(limit / 2) - ellipsis.length;
@@ -35,7 +35,7 @@ const LeaderboardDialog: NextPage<LeaderboardDialogProps> = ({ children }) => {
   };
 
   let placement = 1;
-  const rows = addresses.map(({ walletAddress, votes }, index) => {
+  const rows = addresses.map(({ walletAddress, votes, ens }, index) => {
     if (index > 0 && votes < addresses[index - 1].votes) placement++;
 
     return (
@@ -51,7 +51,7 @@ const LeaderboardDialog: NextPage<LeaderboardDialogProps> = ({ children }) => {
               opacity: placement <= 3 ? 1 : 0,
             }}
           />
-          <h1 className={styles.address}>{ellipsize(walletAddress)}</h1>
+          <h1 className={styles.address}>{ens ?? ellipsize(walletAddress)}</h1>
         </div>
         <h1 className={styles.score}> {votes}</h1>
       </div>

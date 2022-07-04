@@ -29,6 +29,8 @@
   color: black;
   transition: all 0.2s ease;
   cursor: pointer;
+  width: 13.8rem;
+  overflow: scroll;
 }
 
 .address:hover {

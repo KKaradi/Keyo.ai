@@ -4,7 +4,7 @@ import { authenticate, response } from "../helpers";
 
 export type Response = {
   message: string;
-  addresses: { walletAddress: string; votes: number }[];
+  addresses: { walletAddress: string; votes: number; ens: string | null }[];
 };
 
 export default async function storeVote(
@@ -20,8 +20,8 @@ export default async function storeVote(
     include: { votes: true },
   });
 
-  const addresses = result.map(({ address, voteCount }) => {
-    return { walletAddress: address, votes: voteCount };
+  const addresses = result.map(({ address, voteCount, ens }) => {
+    return { walletAddress: address, votes: voteCount, ens };
   });
 
   if (!addresses) return response(res, "DBError");
