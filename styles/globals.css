@@ -16,3 +16,10 @@ a {
 * {
   box-sizing: border-box;
 }
+
+#__next,
+#__next > div,
+#__next > div > div {
+  height: 100%;
+  width: 100%;
+}

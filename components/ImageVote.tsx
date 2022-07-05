@@ -1,40 +1,99 @@
 import { NextPage } from "next";
-import Image from "next/image";
 import styles from "../styles/components/ImageVote.module.css";
 import { useAccount } from "wagmi";
+import ErrorDialog from "./dialogs/ErrorDialog";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { post, getDayIndex } from "../helpers";
+import ImageChoice from "./ImageChoice";
+import Button from "@mui/material/Button";
+import type { Response } from "../pages/api/post/vote";
+
+export type ChoiceCount = Response["choiceCount"];
+
+const connectMessage = "Connect your wallet before voting!";
+const reloadMessage = "You are out of date! Please reload the page.";
+
+const START_DATE = process.env.START_DATE;
+if (!START_DATE) throw new Error("START_DATE env var not present");
 
 type ImageVoteProps = {
-  paths: [string, string];
+  imageIndexState: [number, Dispatch<SetStateAction<number>>];
+  incrementChoicesMade?: () => void;
 };
 
-const ImageVote: NextPage<ImageVoteProps> = ({ paths }) => {
-  const walletAddress = useAccount().data?.address ?? undefined;
+const ImageVote: NextPage<ImageVoteProps> = ({
+  incrementChoicesMade,
+  imageIndexState,
+}) => {
+  const [dayIndex, setDayIndex] = useState<number | undefined>();
+  const [imageSetIndex, setImageSetIndex] = imageIndexState;
+  const [choiceCount, setChoiceCount] = useState<ChoiceCount | undefined>();
 
-  const onClick = async (index: number) => {
-    if (!walletAddress) return;
+  useEffect(() => setDayIndex(getDayIndex()), []);
 
-    await fetch("/api/post/vote", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ index, walletAddress }),
-    });
+  const [connectDialogIsOpen, setConnectDialogIsOpen] = useState(false);
+  const [reloadDialogIsOpen, setReloadDialogIsOpen] = useState(false);
+
+  const walletAddress = useAccount().data?.address;
+
+  useEffect(() => {
+    if (!walletAddress) setChoiceCount(undefined);
+  }, [walletAddress]);
+
+  const onSubmit = async (choiceIndex: number) => {
+    if (!walletAddress) return setConnectDialogIsOpen(true);
+
+    const body = { choiceIndex, imageSetIndex, dayIndex, walletAddress };
+    const response = await post("/api/post/vote", body);
+
+    if (response.status == 461) setReloadDialogIsOpen(true);
+
+    if (response.status == 200) {
+      const { choiceCount: count } = (await response.json()) as Response;
+      if (count) setChoiceCount(count);
+
+      if (incrementChoicesMade) incrementChoicesMade();
+    }
   };
 
-  const images = paths.map((path, index) => (
-    <div className={styles.imageContainer} key={index}>
-      <Image
-        className={styles.image}
-        layout="fill"
-        src={path}
-        alt=""
-        onClick={() => onClick(index)}
-      />
-    </div>
+  const nextImageSet = () => {
+    setImageSetIndex(imageSetIndex + 1);
+    setChoiceCount(undefined);
+  };
+
+  const images = [1, 2].map((index) => (
+    <ImageChoice
+      choiceCount={choiceCount}
+      index={index}
+      onSubmit={onSubmit}
+      path={`/choice/${dayIndex}/${imageSetIndex}/${index}.jpg`}
+      key={index}
+    />
   ));
 
-  return <div className={styles.imageRow}> {images} </div>;
+  const continueButton = choiceCount ? (
+    <Button variant="contained" size="large" onClick={() => nextImageSet()}>
+      CONTINUE
+    </Button>
+  ) : null;
+
+  return (
+    <div className={styles.imageRowContainer}>
+      <ErrorDialog
+        text={connectMessage}
+        isOpen={connectDialogIsOpen}
+        setIsOpen={setConnectDialogIsOpen}
+      />
+      <ErrorDialog
+        text={reloadMessage}
+        isOpen={reloadDialogIsOpen}
+        setIsOpen={setReloadDialogIsOpen}
+      />
+      <div className={styles.imageRow}> {images}</div>
+
+      <div className={styles.continueButtonContainer}> {continueButton} </div>
+    </div>
+  );
 };
 
 export default ImageVote;
