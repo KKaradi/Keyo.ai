@@ -1,7 +1,6 @@
 import { useState, ReactElement } from "react";
 import Dialog from "@mui/material/Dialog";
 import Image from "next/image";
-import Link from "next/link";
 import type { NextPage } from "next/types";
 import SlideTransition from "./SlideTransition";
 import styles from "../../styles/components/ImageDialog.module.css";

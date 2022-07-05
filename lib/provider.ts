@@ -1,3 +1,6 @@
 import { ethers } from "ethers";
 
-export default ethers.getDefaultProvider();
+export default new ethers.providers.EtherscanProvider(
+  "homestead",
+  process.env.ETHERSCAN_KEY ?? undefined
+);
