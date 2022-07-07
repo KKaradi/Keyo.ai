@@ -67,6 +67,18 @@ const LeaderboardDialog: NextPage<LeaderboardDialogProps> = ({ children }) => {
           </DialogTitle>
           <List sx={{ pt: 0 }}>
             <ListItem>
+              <ListItemAvatar >
+                  <EmojiEventsIcon
+                    fontSize='inherit'
+                    sx={{
+                      color: trophyColors[0],
+                      opacity: 0,
+                      marginBottom: '20px',
+                      fontSize: '26px'
+
+                    }}
+                  />
+                  </ListItemAvatar>
               <ListItemText>
                 <div className={styles.wrapper}>
                   <div className={styles.addresscolumnheader}>{"Address"}</div>

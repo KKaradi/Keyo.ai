@@ -4,12 +4,11 @@
   align-items: center;
   justify-content: center;
   padding: 20px;
-  
 }
 
 .dialogtitle {
   margin: 0;
-  padding-bottom: .2rem;
+  padding-bottom: 0.2rem;
   line-height: 1.15;
   font-size: 2.5rem;
   font-weight: 700;
@@ -17,10 +16,10 @@
   color: white;
   text-align: center;
   user-select: none;
-
 }
 .addressContainer {
   display: flex;
+
   flex-direction: row;
   align-items: center;
   justify-content: center;
@@ -35,35 +34,35 @@
   gap: 50px;
 }
 
-
-.addresscolumnheader{
+.addresscolumnheader {
   padding: 0;
+
   text-align: center;
-  font-size: 1.5rem;
+  font-size: 1.4rem;
+  overflow: hidden;
   color: white;
+  margin-right: 20px;
   transition: all 0.2s ease;
   cursor: pointer;
 }
 
-.votecolumnheader{
+.votecolumnheader {
   padding: 0;
+
   text-align: center;
-  font-size: 1.5rem;
+
+  font-size: 1.4rem;
   color: white;
   transition: all 0.2s ease;
   cursor: pointer;
-  width: 13.8rem;
-  overflow: scroll;
+
+  overflow: hidden;
 }
 
-
-
-
-.wrapper{
+.wrapper {
   margin-top: -20px;
   display: grid;
   grid-template-columns: 6fr 1fr;
-
 }
 
 .address:hover {
@@ -72,8 +71,8 @@
 
 .address {
   padding: 0;
-
-  margin-right: 15px;
+  text-align: center;
+  margin-right: 20px;
   font-size: 1.2rem;
   color: white;
   transition: all 0.2s ease;
@@ -82,14 +81,14 @@
 
 .dialogbutton {
   margin-top: -25px;
-  margin-bottom:20px;
+  margin-bottom: 20px;
   margin-left: 45px;
   margin-right: 45px;
 }
 
 .score {
-  padding: 0;
+  border-width: 0 4px;
   text-align: center;
-  font-size: 1.2rem;
+  font-size: 1.4rem;
   color: white;
 }
