@@ -69,7 +69,7 @@ const History: NextPage<HistoryProps> = ({ votes }) => {
         <ExpandCircleDownIcon
           onClick={toggleHistory}
           className={iconStyle}
-          font-size="large"
+          fontSize="large"
         />,
         !historyOpen
       )}

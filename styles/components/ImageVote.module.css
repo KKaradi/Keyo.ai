@@ -1,5 +1,5 @@
 .imageRowContainer {
-  height: 100vh;
+  height: 100%;
   width: 100%;
 }
 
@@ -9,8 +9,14 @@
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  height: 100vh;
+  height: 100%;
   width: 100%;
+}
+
+@media only screen and (max-device-width: 480px) {
+  .imageRow {
+    flex-direction: column;
+  }
 }
 
 .continueContainer {

@@ -4,8 +4,16 @@
 }
 
 .imageContainer {
+  position: relative;
   width: calc(100vh * 0.8);
   height: calc(100vh * 0.8);
+}
+
+@media only screen and (max-device-width: 480px) {
+  .imageContainer {
+    width: calc(100vw * 0.8);
+    height: calc(100vw * 0.8);
+  }
 }
 
 .image {
@@ -21,10 +29,16 @@
 }
 
 .download {
-  color: white;
   margin: 20px;
   cursor: pointer;
   transition: transform 0.2s ease;
+}
+
+.download path {
+  fill: white;
+  stroke: black;
+  stroke-width: 1px;
+  stroke-linejoin: round;
 }
 
 .download:hover {

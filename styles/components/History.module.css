@@ -66,6 +66,7 @@
 
 .iconClosed {
   margin-top: 10px;
+  margin-bottom: 10px;
   color: white;
   cursor: pointer;
   transition: all 1s ease;
@@ -73,6 +74,7 @@
 
 .iconOpen {
   margin-top: 10px;
+  margin-bottom: 10px;
   transform: rotate(180deg);
   color: white;
   cursor: pointer;

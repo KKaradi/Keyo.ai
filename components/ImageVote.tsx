@@ -3,12 +3,10 @@ import styles from "../styles/components/ImageVote.module.css";
 import { useAccount } from "wagmi";
 import ErrorDialog from "./dialogs/ErrorDialog";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { Vote, post, getDay } from "../helpers";
+import { Vote, post, getDay, useScroll } from "../helpers";
 import ImageChoice from "./ImageChoice";
 import Button from "@mui/material/Button";
 import type { Response } from "../pages/api/post/vote";
-import TwitterShare from "./TwitterShare";
-import ShareIcon from "@mui/icons-material/Share";
 import SETTINGS from "../settings.json";
 
 export type ChoiceCount = Response["choiceCount"];
@@ -99,11 +97,10 @@ const ImageVote: NextPage<ImageVoteProps> = ({
       <Button variant="contained" size="large" onClick={() => nextImageSet()}>
         CONTINUE
       </Button>
-      <TwitterShare text={""}>
-        <ShareIcon sx={{ color: "white" }} />
-      </TwitterShare>
     </div>
   ) : null;
+
+  const [executeScroll, scrollRef] = useScroll();
 
   return (
     <div className={styles.imageRowContainer}>
@@ -117,7 +114,7 @@ const ImageVote: NextPage<ImageVoteProps> = ({
         isOpen={reloadDialogIsOpen}
         setIsOpen={setReloadDialogIsOpen}
       />
-      <div className={styles.imageRow}>
+      <div ref={scrollRef} className={styles.imageRow} onClick={executeScroll}>
         {images} {continueButton}
       </div>
     </div>
