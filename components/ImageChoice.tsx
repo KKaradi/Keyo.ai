@@ -3,7 +3,6 @@ import { NextPage } from "next/types";
 import Image from "next/image";
 import { ChoiceCount } from "./ImageVote";
 import styles from "../styles/components/ImageChoice.module.css";
-import { useScroll } from "../helpers";
 import { useRef } from "react";
 import AnimatedPercentage from "./AnimatedPercentage";
 
@@ -28,12 +27,12 @@ const ImageChoice: NextPage<ImageChoiceProps> = ({
     percentageText = <AnimatedPercentage end={percentage} />;
   }
 
-  const [executeScroll, scrollRef] = useScroll();
+  const imageRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef(null);
 
   const submitImage = () => {
     if (document.activeElement === buttonRef?.current) onSubmit(imageId);
-    else scrollRef?.current?.focus();
+    else imageRef?.current?.focus();
   };
 
   return (
@@ -41,8 +40,7 @@ const ImageChoice: NextPage<ImageChoiceProps> = ({
       key={index}
       className={styles.imageContainer}
       tabIndex={choiceCount ? undefined : -1}
-      ref={scrollRef}
-      onClick={executeScroll}
+      ref={imageRef}
     >
       <Image
         className={styles.image}

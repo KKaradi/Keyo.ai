@@ -7,6 +7,7 @@ import ImageVote from "../components/ImageVote";
 import { Vote, get } from "../helpers";
 import styles from "../styles/pages/Choose.module.css";
 import type { Response } from "./api/get/wallet/[walletAddress]";
+import History from "../components/History";
 
 const GamePage: NextPage = () => {
   const [voteArray, setVotes] = useState<Vote[] | undefined>();
@@ -50,17 +51,20 @@ const GamePage: NextPage = () => {
       setIsVoting={setIsVoting}
     />
   ) : (
-    <h1 className={styles.endText}> THAT'S ALL FOLKS</h1>
+    <h1 className={styles.endText}> COME BACK TOMORROW FOR MORE... </h1>
   );
 
   return (
     <div className={styles.container}>
       <Head>
-        <title>CHOOSE</title>
+        <title>Non Fungible AI</title>
         <link rel="icon" href="/icon.jpeg" />
       </Head>
 
-      <Header votes={voteArray} percentiles={percentiles} />
+      <div className={styles.header}>
+        <Header votes={voteArray} percentiles={percentiles} />
+        {voteArray ? <History votes={voteArray} /> : null}
+      </div>
 
       <main className={styles.main}> {content} </main>
     </div>

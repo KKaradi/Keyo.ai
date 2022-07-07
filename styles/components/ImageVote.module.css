@@ -1,25 +1,32 @@
 .imageRowContainer {
-  height: 100vh;
+  height: 100%;
   width: 100%;
 }
 
 .imageRow {
+  position: relative;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  height: 100vh;
+  height: 100%;
   width: 100%;
 }
 
-.continueButtonContainer {
+@media only screen and (max-device-width: 480px) {
+  .imageRow {
+    flex-direction: column;
+  }
+}
+
+.continueContainer {
   position: absolute;
+  height: 100%;
   width: 100%;
-  bottom: -10%;
   display: flex;
   flex-direction: row;
-  gap: 1rem;
   justify-content: center;
-  align-items: center;
-  transition: all 2s ease-in;
+  align-items: flex-end;
+  margin-bottom: 200px;
+  gap: 1rem;
 }

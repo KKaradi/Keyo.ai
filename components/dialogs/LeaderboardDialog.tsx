@@ -23,7 +23,7 @@ type LeaderboardDialogProps = {
   children: ReactElement;
 };
 
-const ellipsize = (word: string, limit = 20, ellipsis = "...") => {
+const ellipsize = (word: string, limit = 21, ellipsis = "...") => {
   if (word.length < limit) return word;
 
   const chars = Math.floor(limit / 2) - ellipsis.length;
@@ -45,44 +45,6 @@ const LeaderboardDialog: NextPage<LeaderboardDialogProps> = ({ children }) => {
     setIsOpen(true);
   };
 
-  //let placement = 1;
-  // const rows = () => {
-  //   <List>
-  //     {addresses.map(({ walletAddress, votes }, index) => {
-  //       <ListItem>
-  //         {" "}
-  //         <ListItemText primary={walletAddress} />
-  //       </ListItem>;
-  //     })}
-  //   </List>;
-  // };
-
-  // addresses.map(({ walletAddress, votes }, index) => {
-  //   if (index > 0 && votes < addresses[index - 1].votes) placement++;
-
-  //   return (
-  //     <div className={styles.row} key={index}>
-  //       <div
-  //         className={styles.addressContainer}
-  //         onClick={() => clipboard(walletAddress)}
-  //       >
-  //         <EmojiEventsIcon
-  //           fontSize="large"
-  //           sx={{
-  //             color: trophyColors[placement - 1],
-  //             opacity: placement <= 3 ? 1 : 0,
-  //           }}
-  //         />
-  //         <h1 className={styles.address}>{ellipsize(walletAddress)+' | Votes: '+votes}</h1>
-  //       </div>
-  //     </div>
-  //   );
-  // });<div className={styles.container}>{rows}</div>
-  //{/* <ListItemText><h1 className={styles.address}>{ellipsize(walletAddress, 30)}</h1></ListItemText>  */}
-  //<ListItemText>{votes}</ListItemText>
-  //
-  //
-  //
   return (
     <div>
       <div onClick={openLeaderboard}>{children}</div>

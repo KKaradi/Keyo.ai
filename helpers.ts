@@ -43,6 +43,5 @@ export type Vote = Omit<Prisma.Vote, "id" | "createdAt"> & {
 };
 
 export const clipboard = async (text: string) => {
-  console.log(text);
-  await navigator.clipboard.writeText(text);
+  await navigator?.clipboard?.writeText(text);
 };

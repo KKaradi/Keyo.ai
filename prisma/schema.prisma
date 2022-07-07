@@ -14,6 +14,7 @@ model Wallet {
   address String @unique
   votes Vote[]
   voteCount Int @default(0)
+   ens String?
 }
 
 model Vote {
