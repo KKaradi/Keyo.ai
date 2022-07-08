@@ -13,12 +13,6 @@
   width: 100%;
 }
 
-@media only screen and (max-device-width: 480px) {
-  .imageRow {
-    flex-direction: column;
-  }
-}
-
 .continueContainer {
   position: absolute;
   height: 100%;
@@ -29,4 +23,14 @@
   align-items: flex-end;
   margin-bottom: 200px;
   gap: 1rem;
+}
+
+@media only screen and (max-device-width: 480px) {
+  .imageRow {
+    flex-direction: column;
+  }
+  .continueContainer {
+    align-items: center;
+    margin-bottom: 0;
+  }
 }

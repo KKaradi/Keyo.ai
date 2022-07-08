@@ -3,14 +3,23 @@ import { NextPage } from "next/types";
 import Image from "next/image";
 import { ChoiceCount } from "./ImageVote";
 import styles from "../styles/components/ImageChoice.module.css";
-import { useRef } from "react";
+import { Dispatch, ReactElement, SetStateAction, useRef } from "react";
 import AnimatedPercentage from "./AnimatedPercentage";
+import TinderCard from "react-tinder-card";
+import { useMediaQuery } from "react-responsive";
 
 type ImageChoiceProps = {
   imageId: string;
   index: number;
   onSubmit: (chosen: string) => void;
   choiceCount: ChoiceCount | undefined;
+  tinderState: [boolean, Dispatch<SetStateAction<boolean>>];
+  isMobile: boolean;
+};
+
+const defaultTinderStyle = {
+  display: "none !important",
+  transform: "none !important",
 };
 
 const ImageChoice: NextPage<ImageChoiceProps> = ({
@@ -18,7 +27,11 @@ const ImageChoice: NextPage<ImageChoiceProps> = ({
   index,
   onSubmit,
   choiceCount,
+  tinderState,
+  isMobile,
 }) => {
+  const [isTinder, setIsTinder] = tinderState;
+
   let percentageText = null;
   if (choiceCount) {
     const count = choiceCount[imageId] ?? 0;
@@ -35,6 +48,26 @@ const ImageChoice: NextPage<ImageChoiceProps> = ({
     else imageRef?.current?.focus();
   };
 
+  const swipe = () => {
+    onSubmit(imageId);
+    setIsTinder(false);
+  };
+
+  const tinderify = (children: ReactElement) => {
+    return isMobile && isTinder ? (
+      // @ts-ignore
+      <TinderCard
+        swipeRequirementType="position"
+        onSwipe={swipe}
+        swipeThreshold={200}
+      >
+        {children}
+      </TinderCard>
+    ) : (
+      children
+    );
+  };
+
   return (
     <div
       key={index}
@@ -42,27 +75,31 @@ const ImageChoice: NextPage<ImageChoiceProps> = ({
       tabIndex={choiceCount ? undefined : -1}
       ref={imageRef}
     >
-      <Image
-        className={styles.image}
-        layout="fill"
-        objectFit="cover"
-        src={`/choice/${imageId}.jpg`}
-        priority
-        alt={`Image Choice ${index}`}
-      />
-      <div className={styles.overlay}>
-        <div> </div>
-        <div> {percentageText} </div>
-        <Button
-          onClick={submitImage}
-          className={styles.submitButton}
-          variant="contained"
-          size="large"
-          ref={buttonRef}
-        >
-          SUBMIT
-        </Button>
-      </div>
+      {tinderify(
+        <div>
+          <Image
+            className={styles.image}
+            layout="fill"
+            objectFit="cover"
+            src={`/choice/${imageId}.jpg`}
+            priority
+            alt={`Image Choice ${index}`}
+          />
+          <div className={styles.overlay}>
+            <div> </div>
+            <div> {percentageText} </div>
+            <Button
+              onClick={submitImage}
+              className={styles.submitButton}
+              variant="contained"
+              size="large"
+              ref={buttonRef}
+            >
+              SUBMIT
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

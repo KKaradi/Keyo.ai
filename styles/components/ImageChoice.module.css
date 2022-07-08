@@ -5,6 +5,12 @@
   transition: all 1s ease-in-out;
   filter: none;
   cursor: pointer;
+  overflow: hidden;
+}
+
+.imageContainer > div {
+  height: 100%;
+  width: 100%;
 }
 
 .imageContainer:focus {
@@ -54,6 +60,10 @@
   .imageContainer:nth-child(2) {
     border-top: solid 3px white;
     border-left: none;
+  }
+
+  .imageContainer img {
+    border-radius: 5%;
   }
 }
 

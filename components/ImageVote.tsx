@@ -8,14 +8,12 @@ import ImageChoice from "./ImageChoice";
 import Button from "@mui/material/Button";
 import type { Response } from "../pages/api/post/vote";
 import SETTINGS from "../settings.json";
+import { useMediaQuery } from "react-responsive";
 
 export type ChoiceCount = Response["choiceCount"];
 
 const connectMessage = "Connect your wallet before voting!";
 const reloadMessage = "You are out of date! Please reload the page.";
-
-const START_DATE = process.env.START_DATE;
-if (!START_DATE) throw new Error("START_DATE env var not present");
 
 type ImageVoteProps = {
   imageIndexState: [number, Dispatch<SetStateAction<number>>];
@@ -32,6 +30,9 @@ const ImageVote: NextPage<ImageVoteProps> = ({
   const [imageset, setImageset] = imageIndexState;
   const [choiceCount, setChoiceCount] = useState<ChoiceCount | undefined>();
 
+  const isMobile = useMediaQuery({ query: `(max-width: 480px)` });
+  const [isTinder, setIsTinder] = useState(isMobile);
+
   useEffect(() => setDay(getDay()), []);
 
   const [connectDialogIsOpen, setConnectDialogIsOpen] = useState(false);
@@ -44,7 +45,11 @@ const ImageVote: NextPage<ImageVoteProps> = ({
   }, [walletAddress]);
 
   const onSubmit = async (chosen: string) => {
-    if (!walletAddress) return setConnectDialogIsOpen(true);
+    if (!walletAddress) {
+      setIsTinder(true);
+      return setConnectDialogIsOpen(true);
+    }
+
     if (!day) return;
 
     const ids = SETTINGS.schedule[day - 1][imageset - 1];
@@ -54,7 +59,10 @@ const ImageVote: NextPage<ImageVoteProps> = ({
     const body = { imageset, day, walletAddress, chosen, denied };
     const response = await post<Vote>("/api/post/vote", body);
 
-    if (response.status == 461) setReloadDialogIsOpen(true);
+    if (response.status == 461) {
+      setIsTinder(true);
+      return setReloadDialogIsOpen(true);
+    }
 
     if (response.status == 200) {
       const { choiceCount: count } = (await response.json()) as Response;
@@ -87,14 +95,21 @@ const ImageVote: NextPage<ImageVoteProps> = ({
         index={index}
         onSubmit={onSubmit}
         imageId={imageId}
+        tinderState={[isTinder, setIsTinder]}
+        isMobile={isMobile}
         key={index}
       />
     );
   });
 
+  const nextImage = () => {
+    setIsTinder(true);
+    nextImageSet();
+  };
+
   const continueButton = choiceCount ? (
     <div className={styles.continueContainer}>
-      <Button variant="contained" size="large" onClick={() => nextImageSet()}>
+      <Button variant="contained" size="large" onClick={nextImage}>
         CONTINUE
       </Button>
     </div>

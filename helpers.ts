@@ -1,9 +1,9 @@
 import { useRef } from "react";
 import Prisma from "@prisma/client";
+import SETTINGS from "./settings.json";
 
 export const getDay = () => {
-  const { START_DATE } = process.env;
-  if (!START_DATE) throw new Error("START_DATE not initialized");
+  const START_DATE = SETTINGS.start_date ?? new Date(Date.now());
 
   const sinceStart = Date.now() - new Date(START_DATE).getTime();
   return Math.floor(sinceStart / (1000 * 60 * 60 * 24)) + 1;
