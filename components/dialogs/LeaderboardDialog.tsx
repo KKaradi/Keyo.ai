@@ -16,8 +16,6 @@ import type { Response } from "../../pages/api/get/leaderboard";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import styles from "../../styles/components/Leaderboard.module.css";
 import { colors } from "../../constants/colors";
-import { blue } from "@mui/material/colors";
-import { fontSize } from '@mui/system';
 
 type LeaderboardDialogProps = {
   children: ReactElement;
@@ -62,7 +60,7 @@ const LeaderboardDialog: NextPage<LeaderboardDialogProps> = ({ children }) => {
       >
         <div className={styles.container}>
           <DialogTitle>
-            <h1 className={styles.dialogtitle}>Voting Leaderboards</h1>
+            <h1 className={styles.dialogTitle}>Voting Leaderboards</h1>
             <hr style={{borderWidth:2}}/>
           </DialogTitle>
           <List sx={{ pt: 0 }}>
@@ -72,7 +70,7 @@ const LeaderboardDialog: NextPage<LeaderboardDialogProps> = ({ children }) => {
                     fontSize='inherit'
                     sx={{
                       color: trophyColors[0],
-                      opacity: 0,
+                      opacity: 0, // the opacity is 0 as this icon is used to keep the padding of the header consistant with the rest of the rows
                       marginBottom: '20px',
                       fontSize: '26px'
 
@@ -81,8 +79,8 @@ const LeaderboardDialog: NextPage<LeaderboardDialogProps> = ({ children }) => {
                   </ListItemAvatar>
               <ListItemText>
                 <div className={styles.wrapper}>
-                  <div className={styles.addresscolumnheader}>{"Address"}</div>
-                  <div className={styles.votecolumnheader}>{"Votes"}</div>
+                  <div className={styles.addressColumnHeader}>{"Address"}</div>
+                  <div className={styles.voteColumnHeader}>{"Votes"}</div>
                 </div>
               </ListItemText>
             </ListItem>
@@ -118,7 +116,7 @@ const LeaderboardDialog: NextPage<LeaderboardDialogProps> = ({ children }) => {
         </div>
         <Button
               variant="contained"
-              className={styles.dialogbutton}
+              className={styles.dialogButton}
               size="medium"
 
               onClick={() => setIsOpen(false)}
