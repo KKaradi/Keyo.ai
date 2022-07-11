@@ -6,7 +6,6 @@ import styles from "../styles/components/ImageChoice.module.css";
 import { Dispatch, ReactElement, SetStateAction, useRef } from "react";
 import AnimatedPercentage from "./AnimatedPercentage";
 import TinderCard from "react-tinder-card";
-import { useMediaQuery } from "react-responsive";
 
 type ImageChoiceProps = {
   imageId: string;
@@ -15,11 +14,6 @@ type ImageChoiceProps = {
   choiceCount: ChoiceCount | undefined;
   tinderState: [boolean, Dispatch<SetStateAction<boolean>>];
   isMobile: boolean;
-};
-
-const defaultTinderStyle = {
-  display: "none !important",
-  transform: "none !important",
 };
 
 const ImageChoice: NextPage<ImageChoiceProps> = ({

@@ -38,6 +38,7 @@ const ImageDialog: NextPage<ImageDialogProps> = ({
             src={path}
             layout="fill"
             objectFit="cover"
+            alt="Image Dialog"
           />
           <div className={styles.overlay}>
             <a href={`/choice/${imageId}.jpg`} download={true}>

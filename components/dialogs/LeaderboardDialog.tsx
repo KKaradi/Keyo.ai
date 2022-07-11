@@ -2,7 +2,6 @@ import { useState, ReactElement } from "react";
 import type { NextPage } from "next/types";
 import SlideTransition from "./SlideTransition";
 import {
-  Avatar,
   Button,
   Dialog,
   DialogTitle,
@@ -61,22 +60,21 @@ const LeaderboardDialog: NextPage<LeaderboardDialogProps> = ({ children }) => {
         <div className={styles.container}>
           <DialogTitle>
             <h1 className={styles.dialogTitle}>Voting Leaderboards</h1>
-            <hr style={{borderWidth:2}}/>
+            <hr style={{ borderWidth: 2 }} />
           </DialogTitle>
           <List sx={{ pt: 0 }}>
             <ListItem>
-              <ListItemAvatar >
-                  <EmojiEventsIcon
-                    fontSize='inherit'
-                    sx={{
-                      color: trophyColors[0],
-                      opacity: 0, // the opacity is 0 as this icon is used to keep the padding of the header consistant with the rest of the rows
-                      marginBottom: '20px',
-                      fontSize: '26px'
-
-                    }}
-                  />
-                  </ListItemAvatar>
+              <ListItemAvatar>
+                <EmojiEventsIcon
+                  fontSize="inherit"
+                  sx={{
+                    color: trophyColors[0],
+                    opacity: 0, // the opacity is 0 as this icon is used to keep the padding of the header consistent with the rest of the rows
+                    marginBottom: "20px",
+                    fontSize: "26px",
+                  }}
+                />
+              </ListItemAvatar>
               <ListItemText>
                 <div className={styles.wrapper}>
                   <div className={styles.addressColumnHeader}>{"Address"}</div>
@@ -84,27 +82,26 @@ const LeaderboardDialog: NextPage<LeaderboardDialogProps> = ({ children }) => {
                 </div>
               </ListItemText>
             </ListItem>
-            {addresses.splice(0,7).map(({ walletAddress, votes }, index) => (
+            {addresses.splice(0, 7).map(({ walletAddress, votes }, index) => (
               <ListItem
                 key={walletAddress}
                 onClick={() => clipboard(walletAddress)}
               >
-                <ListItemAvatar >
+                <ListItemAvatar>
                   <EmojiEventsIcon
-                    fontSize='inherit'
+                    fontSize="inherit"
                     sx={{
                       color: trophyColors[index],
                       opacity: index < 3 ? 1 : 0,
-                      marginBottom: '20px',
-                      fontSize: '26px'
-
+                      marginBottom: "20px",
+                      fontSize: "26px",
                     }}
                   />
                 </ListItemAvatar>
                 <ListItemText>
                   <div className={styles.wrapper}>
                     <div className={styles.address}>
-                      { ellipsize(walletAddress, 30)}
+                      {ellipsize(walletAddress, 30)}
                     </div>
                     <div className={styles.score}>{votes}</div>
                   </div>
@@ -112,17 +109,15 @@ const LeaderboardDialog: NextPage<LeaderboardDialogProps> = ({ children }) => {
               </ListItem>
             ))}
           </List>
-          
         </div>
         <Button
-              variant="contained"
-              className={styles.dialogButton}
-              size="medium"
-
-              onClick={() => setIsOpen(false)}
-            >
-              OK
-            </Button>
+          variant="contained"
+          className={styles.dialogButton}
+          size="medium"
+          onClick={() => setIsOpen(false)}
+        >
+          OK
+        </Button>
       </Dialog>
     </div>
   );
