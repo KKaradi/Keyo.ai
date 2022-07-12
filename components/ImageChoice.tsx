@@ -31,7 +31,7 @@ const ImageChoice: NextPage<ImageChoiceProps> = ({
     const count = choiceCount[imageId] ?? 0;
     const sum = Object.values(choiceCount).reduce((prev, curr) => prev + curr);
     const percentage = Number(((count / sum) * 100).toFixed(0));
-    percentageText = <AnimatedPercentage end={percentage} />;
+    percentageText = <AnimatedPercentage endValue={percentage} />;
   }
 
   const imageRef = useRef<HTMLDivElement>(null);

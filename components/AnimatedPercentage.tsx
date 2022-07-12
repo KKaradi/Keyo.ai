@@ -9,36 +9,41 @@ const quadratic: Easing = (duration, range, current) => {
 };
 
 type AnimatedPercentageProps = {
-  end: number;
+  endValue: number;
   startValue?: number;
   durationValue?: number;
+  incrementValue?: number;
 };
 
 const AnimatedPercentage: NextPage<AnimatedPercentageProps> = ({
   startValue,
-  end,
+  endValue,
   durationValue,
+  incrementValue,
 }) => {
   const start = startValue ?? 0;
   const duration = durationValue ?? 1000;
+  const increment = incrementValue ?? 1;
 
-  const range = end - start;
-  const increment = 1;
+  const range = endValue - start;
+
   let current = start;
 
-  const [value, setValue] = useState(current);
+  const [percentage, setPercentage] = useState(current);
+
   const step = () => {
     current += increment;
-    setValue(current);
+    setPercentage(current);
 
-    if (current < end) setTimeout(step, quadratic(duration, range, current));
+    if (current < endValue)
+      setTimeout(step, quadratic(duration, range, current));
   };
 
   useEffect(() => {
     if (range != 0) setTimeout(step, quadratic(duration, range, current));
   }, []);
 
-  return <h1 className={styles.percentage}>{value}%</h1>;
+  return <h1 className={styles.percentage}>{percentage}%</h1>;
 };
 
 export default AnimatedPercentage;

@@ -7,7 +7,7 @@ export type Response = {
   addresses: { walletAddress: string; votes: number; ens: string | null }[];
 };
 
-export default async function storeVote(
+export default async function getLeaderboard(
   req: NextApiRequest,
   res: NextApiResponse<Response>
 ) {

@@ -18,7 +18,7 @@ const getPercentileArray = async () => {
   return byVotes.map((elem) => elem.voteCount);
 };
 
-export default async function storeVote(
+export default async function getWalletStats(
   req: NextApiRequest,
   res: NextApiResponse<Response>
 ) {

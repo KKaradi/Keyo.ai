@@ -24,11 +24,6 @@
   border-radius: 5%;
 }
 
-.listitem {
-  font-size: large;
-  color: white;
-}
-
 .overlay {
   position: absolute;
   height: 100%;
