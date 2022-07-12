@@ -9,12 +9,37 @@
       ["corn/1", "samurai/1"],
       ["nebula/1", "samurai/3"],
       ["shrine/3", "corn/4"]
+    ],
+    [
+      ["samurai/1", "shrine/2"],
+      ["mech/1", "corn/4"],
+      ["shrine/1", "corn/1"],
+      ["samurai/2", "shrine/1"],
+      ["shrine/2", "corn/3"],
+      ["corn/1", "samurai/1"],
+      ["nebula/1", "samurai/3"],
+      ["shrine/3", "corn/4"]
+    ],
+    [
+      ["samurai/1", "shrine/2"],
+      ["mech/1", "corn/4"],
+      ["shrine/1", "corn/1"],
+      ["samurai/2", "shrine/1"],
+      ["shrine/2", "corn/3"],
+      ["corn/1", "samurai/1"],
+      ["nebula/1", "samurai/3"],
+      ["shrine/3", "corn/4"]
+    ],
+    [
+      ["samurai/1", "shrine/2"],
+      ["mech/1", "corn/4"],
+      ["shrine/1", "corn/1"],
+      ["samurai/2", "shrine/1"],
+      ["shrine/2", "corn/3"],
+      ["corn/1", "samurai/1"],
+      ["nebula/1", "samurai/3"],
+      ["shrine/3", "corn/4"]
     ]
   ],
-  "prompts": {
-    "shrine": "A floral japanese shrine jinja standing in a mountain, vibrant colors, Japanese Hydrangea, Ajisai, rose, suisen flower, sakura, rococo, traditional Japanese art, manga",
-    "samurai": "A red samurai standing at the base of an enormous mountain on a battlefield littered with broken weapons and debris, rising sun, misty day, fuji-san, snow, bonsai, Chinese mountains",
-    "corn": "Corn field with the Colorado mountains in the background, Hudson River School"
-  },
-  "start_date": "2022-07-08"
+  "start_date": "2022-07-12"
 }

@@ -1,6 +1,6 @@
 import { useState, ReactElement } from "react";
 import Button from "@mui/material/Button";
-import styles from "../../styles/components/ImageDialog.module.css";
+import styles from "../../styles/components/InfoDialog.module.css";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
@@ -32,10 +32,10 @@ const InfoDialog: NextPage<InfoDialogProps> = ({ children }) => {
         }}
       >
         <DialogTitle>
-          <h1 className={styles.dialogtitle}>What Am I Looking At?</h1>
+          <h1 className={styles.dialogTitle}>What Am I Looking At?</h1>
         </DialogTitle>
         <DialogContent>
-          <DialogContentText className={styles.dialogcontent}>
+          <DialogContentText className={styles.dialogContent}>
             Short answer is: you&apos;ll see. We&apos;re working on some pretty
             cool stuff right now, but it&apos;s not quite ready to be released
             yet. In the meantime, connect your wallet and try your hand at
@@ -46,7 +46,7 @@ const InfoDialog: NextPage<InfoDialogProps> = ({ children }) => {
 
         <Button
           variant="contained"
-          className={styles.dialogbutton}
+          className={styles.dialogButton}
           size="large"
           onClick={() => setIsOpen(false)}
         >

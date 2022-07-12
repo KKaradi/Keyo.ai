@@ -20,7 +20,7 @@ const AnimatedPercentage: NextPage<AnimatedPercentageProps> = ({
   durationValue,
 }) => {
   const start = startValue ?? 0;
-  const duration = durationValue ?? 2000;
+  const duration = durationValue ?? 1000;
 
   const range = end - start;
   const increment = 1;
