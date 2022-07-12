@@ -1,11 +1,11 @@
-import { Vote } from "../helpers";
+import { Vote } from "../../helpers";
 import type { NextPage } from "next/types";
 import Image from "next/image";
-import styles from "../styles/components/History.module.css";
-import ImageDialog from "./dialogs/ImageDialog";
+import styles from "../../styles/components/History.module.css";
+import ImageDialog from "../dialogs/ImageDialog";
 import { ReactElement, useState } from "react";
 import ExpandCircleDownIcon from "@mui/icons-material/ExpandCircleDown";
-import ToolTip from "./ToolTip";
+import ToolTip from "../misc/ToolTip";
 
 type HistoryProps = {
   votes: Vote[];

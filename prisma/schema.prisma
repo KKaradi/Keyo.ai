@@ -30,3 +30,10 @@ model Vote {
   walletAddress String
   wallet Wallet @relation(fields: [walletAddress], references: [address], onDelete: Cascade)
 }
+
+model Prompt {
+  id String @default(cuid()) @id
+  createdAt DateTime @default(now())
+  prompt String @unique
+  dayIndex Int
+}

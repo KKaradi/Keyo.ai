@@ -1,6 +1,6 @@
 import type { NextPage } from "next/types";
 import { useEffect, useState } from "react";
-import styles from "../styles/components/ImageChoice.module.css";
+import styles from "../../styles/components/ImageChoice.module.css";
 
 type Easing = (duration: number, range: number, current: number) => number;
 

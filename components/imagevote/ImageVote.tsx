@@ -1,13 +1,13 @@
 import { NextPage } from "next";
-import styles from "../styles/components/ImageVote.module.css";
+import styles from "../../styles/components/ImageVote.module.css";
 import { useAccount } from "wagmi";
-import ErrorDialog from "./dialogs/ErrorDialog";
+import ErrorDialog from "../dialogs/ErrorDialog";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { Vote, post, getDay, useScroll } from "../helpers";
+import { Vote, post, getDay, useScroll } from "../../helpers";
 import ImageChoice from "./ImageChoice";
 import Button from "@mui/material/Button";
-import type { Response } from "../pages/api/post/vote";
-import SETTINGS from "../settings.json";
+import type { Response } from "../../pages/api/post/vote";
+import SETTINGS from "../../settings.json";
 import { useMediaQuery } from "react-responsive";
 
 export type ChoiceCount = Response["choiceCount"];
