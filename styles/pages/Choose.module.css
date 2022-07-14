@@ -8,6 +8,11 @@
   gap: 50px;
 }
 
+.header {
+  border-bottom: solid white 1px;
+}
+
 .endText {
   color: white;
+  text-align: center;
 }

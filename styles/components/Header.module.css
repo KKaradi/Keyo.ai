@@ -1,32 +1,37 @@
-.container {
-  border-bottom: solid white 1px;
-  padding: 10px;
-  width: 100%;
+.header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem;
+  padding: 0.5rem 1.5rem 0.5rem 1.5rem;
 }
 
 .title {
   margin: 0;
+  padding: 0;
   line-height: 1.15;
   font-size: 4rem;
   color: white;
   user-select: none;
 }
 
-.iconContainer {
+.iconsContainer {
   display: flex;
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  gap: 50px;
+  gap: 40px;
+  flex-wrap: wrap;
 }
 
-.iconContainer > * {
+.iconsContainer > * {
   cursor: pointer;
+}
+
+.iconContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .votes {
@@ -35,6 +40,7 @@
   margin: 0;
   user-select: none;
   cursor: auto;
+  display: none;
 }
 
 .info {
@@ -48,4 +54,37 @@
 
 .twitter:hover {
   color: #1da1f2;
+}
+
+.toolTip {
+  padding: 5px 0;
+}
+
+.chartContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  margin-top: 10px;
+  width: 75px;
+  height: auto;
+}
+
+.chart {
+  height: 100%;
+  width: 100%;
+}
+
+@media only screen and (max-device-width: 480px) {
+  .title {
+    display: none;
+  }
+  .header {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .iconsContainer {
+    margin-top: 10px;
+  }
 }

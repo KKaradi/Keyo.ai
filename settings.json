@@ -1,0 +1,45 @@
+{
+  "schedule": [
+    [
+      ["samurai/1", "shrine/2"],
+      ["mech/1", "corn/4"],
+      ["shrine/1", "corn/1"],
+      ["samurai/2", "shrine/1"],
+      ["shrine/2", "corn/3"],
+      ["corn/1", "samurai/1"],
+      ["nebula/1", "samurai/3"],
+      ["shrine/3", "corn/4"]
+    ],
+    [
+      ["samurai/1", "shrine/2"],
+      ["mech/1", "corn/4"],
+      ["shrine/1", "corn/1"],
+      ["samurai/2", "shrine/1"],
+      ["shrine/2", "corn/3"],
+      ["corn/1", "samurai/1"],
+      ["nebula/1", "samurai/3"],
+      ["shrine/3", "corn/4"]
+    ],
+    [
+      ["samurai/1", "shrine/2"],
+      ["mech/1", "corn/4"],
+      ["shrine/1", "corn/1"],
+      ["samurai/2", "shrine/1"],
+      ["shrine/2", "corn/3"],
+      ["corn/1", "samurai/1"],
+      ["nebula/1", "samurai/3"],
+      ["shrine/3", "corn/4"]
+    ],
+    [
+      ["samurai/1", "shrine/2"],
+      ["mech/1", "corn/4"],
+      ["shrine/1", "corn/1"],
+      ["samurai/2", "shrine/1"],
+      ["shrine/2", "corn/3"],
+      ["corn/1", "samurai/1"],
+      ["nebula/1", "samurai/3"],
+      ["shrine/3", "corn/4"]
+    ]
+  ],
+  "start_date": "2022-07-12"
+}

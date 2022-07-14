@@ -5,6 +5,12 @@
   transition: all 1s ease-in-out;
   filter: none;
   cursor: pointer;
+  overflow: hidden;
+}
+
+.imageContainer > div {
+  height: 100%;
+  width: 100%;
 }
 
 .imageContainer:focus {
@@ -21,11 +27,11 @@
 }
 
 .imageContainer:nth-child(1) {
-  border-right: solid 3px gray;
+  border-right: solid 3px white;
 }
 
 .imageContainer:nth-child(2) {
-  border-left: solid 3px gray;
+  border-left: solid 3px white;
 }
 
 .choiceContainer {
@@ -35,10 +41,37 @@
   align-items: center;
 }
 
+@media only screen and (max-device-width: 480px) {
+  .imageContainer {
+    width: 100vw;
+    height: 50%;
+  }
+
+  .imageContainer:focus {
+    height: 50%;
+    width: 100%;
+  }
+
+  .imageContainer:nth-child(1) {
+    border-bottom: solid 3px white;
+    border-right: none;
+  }
+
+  .imageContainer:nth-child(2) {
+    border-top: solid 3px white;
+    border-left: none;
+  }
+
+  .imageContainer img {
+    border-radius: 5%;
+  }
+}
+
 .overlay {
   position: absolute;
-  height: 95%;
+  height: 100%;
   width: 100%;
+  padding-bottom: 30px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;

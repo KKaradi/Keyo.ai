@@ -7,35 +7,52 @@ import Link from "next/link";
 import InfoDialog from "./dialogs/InfoDialog";
 import ConnectWallet from "./ConnectWallet";
 import LeaderboardDialog from "./dialogs/LeaderboardDialog";
+import ToolTip from "./ToolTip";
+import VoteGauge from "./VoteGauge";
+import { Vote } from "../helpers";
 
 type HeaderProps = {
-  votes?: number;
+  votes?: Vote[];
+  percentiles?: number[];
 };
 
-const Header: NextPage<HeaderProps> = ({ votes }) => {
+const Header: NextPage<HeaderProps> = ({ votes, percentiles }) => {
   return (
-    <header className={styles.container}>
+    <div className={styles.header}>
       <h1 className={styles.title}>NON FUNGIBLE AI</h1>
-      <div className={styles.iconContainer}>
-        <ConnectWallet />
-
-        {votes ? <h1 className={styles.votes}> {votes} </h1> : null}
-
+      <ConnectWallet />
+      <div className={styles.iconsContainer}>
+        {votes !== undefined ? (
+          <ToolTip title="My Votes">
+            <h1 className={styles.votes}> {votes.length} </h1>
+          </ToolTip>
+        ) : null}
+        {percentiles && votes !== undefined ? (
+          <ToolTip title="My Voting Percentile" offset={-15}>
+            <div className={styles.iconContainer}>
+              <VoteGauge votes={votes.length} percentiles={percentiles} />
+            </div>
+          </ToolTip>
+        ) : null}
         <LeaderboardDialog>
-          <LeaderboardIcon className={styles.info} sx={{ fontSize: 40 }} />
+          <ToolTip title="Voting Leaderboard">
+            <LeaderboardIcon className={styles.info} sx={{ fontSize: 40 }} />
+          </ToolTip>
         </LeaderboardDialog>
-
         <InfoDialog>
-          <InfoIcon className={styles.info} sx={{ fontSize: 40 }} />
+          <ToolTip title="More Info">
+            <InfoIcon className={styles.info} sx={{ fontSize: 40 }} />
+          </ToolTip>
         </InfoDialog>
-
         <Link href={"https://twitter.com/nonfungedai"}>
           <a target="_blank">
-            <TwitterIcon className={styles.twitter} sx={{ fontSize: 40 }} />
+            <ToolTip title="Our Twitter">
+              <TwitterIcon className={styles.twitter} sx={{ fontSize: 40 }} />
+            </ToolTip>
           </a>
         </Link>
       </div>
-    </header>
+    </div>
   );
 };
 

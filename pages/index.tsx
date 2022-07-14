@@ -4,59 +4,67 @@ import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import Header from "../components/Header";
 import ImageVote from "../components/ImageVote";
-import { get } from "../helpers";
+import { Vote, get } from "../helpers";
 import styles from "../styles/pages/Choose.module.css";
 import type { Response } from "./api/get/wallet/[walletAddress]";
+import History from "../components/History";
 
 const GamePage: NextPage = () => {
-  const [choicesMade, setChoicesMade] = useState(0);
+  const [voteArray, setVotes] = useState<Vote[] | undefined>();
+  const [percentiles, setPercentiles] = useState<number[] | undefined>();
   const [isVoting, setIsVoting] = useState(true);
-  const [imageSetIndex, setImageSetIndex] = useState(1);
+  const [imageset, setImageset] = useState(1);
 
-  const { data } = useAccount();
+  const address = useAccount().data?.address;
 
   useEffect(() => {
     (async () => {
-      if (!data?.address) return setChoicesMade(0);
+      if (!address) {
+        setIsVoting(true);
+        setVotes(undefined);
+        return setImageset(1);
+      }
 
-      const { address } = data;
       const result = await get(`/api/get/wallet/${address}`);
 
-      const { votes } = (await result.json()) as Response;
-      if (votes) {
-        setChoicesMade(votes.length);
-        if (votes.length > 0) {
-          setImageSetIndex(votes[0]?.imageSetIndex + 1);
-        }
+      const { votes, percentileArray } = (await result.json()) as Response;
+
+      if (!votes || !percentileArray) return;
+
+      setPercentiles(percentileArray);
+      setVotes(votes);
+
+      if (votes.length > 0) {
+        setImageset(votes[votes.length - 1]?.imageset + 1);
       }
     })();
-  }, [data]);
+  }, [address]);
 
-  useEffect(() => {
-    if (imageSetIndex > Number(process.env.IMAGESETS_PER_DAY)) {
-      setIsVoting(false);
-    }
-  }, [imageSetIndex]);
-
-  const incrementChoicesMade = () => setChoicesMade(choicesMade + 1);
+  const addVote = (vote: Vote) => {
+    if (voteArray) setVotes([...voteArray, vote]);
+  };
 
   const content = isVoting ? (
     <ImageVote
-      imageIndexState={[imageSetIndex, setImageSetIndex]}
-      incrementChoicesMade={incrementChoicesMade}
+      imageIndexState={[imageset, setImageset]}
+      addVote={addVote}
+      setIsVoting={setIsVoting}
     />
   ) : (
-    <h1 className={styles.endText}> THAT'S ALL FOLKS</h1>
+    <h1 className={styles.endText}> COME BACK TOMORROW FOR MORE... </h1>
   );
 
   return (
     <div className={styles.container}>
       <Head>
-        <title>CHOOSE</title>
+        <title>Non Fungible AI</title>
         <link rel="icon" href="/icon.jpeg" />
       </Head>
 
-      <Header votes={choicesMade} />
+      <div className={styles.header}>
+        <Header votes={voteArray} percentiles={percentiles} />
+        {voteArray ? <History votes={voteArray} /> : null}
+      </div>
 
       <main className={styles.main}> {content} </main>
     </div>

@@ -3,33 +3,37 @@ import styles from "../styles/components/ImageVote.module.css";
 import { useAccount } from "wagmi";
 import ErrorDialog from "./dialogs/ErrorDialog";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { post, getDayIndex } from "../helpers";
+import { Vote, post, getDay, useScroll } from "../helpers";
 import ImageChoice from "./ImageChoice";
 import Button from "@mui/material/Button";
 import type { Response } from "../pages/api/post/vote";
+import SETTINGS from "../settings.json";
+import { useMediaQuery } from "react-responsive";
 
 export type ChoiceCount = Response["choiceCount"];
 
 const connectMessage = "Connect your wallet before voting!";
 const reloadMessage = "You are out of date! Please reload the page.";
 
-const START_DATE = process.env.START_DATE;
-if (!START_DATE) throw new Error("START_DATE env var not present");
-
 type ImageVoteProps = {
   imageIndexState: [number, Dispatch<SetStateAction<number>>];
-  incrementChoicesMade?: () => void;
+  addVote?: (vote: Vote) => void;
+  setIsVoting: (value: boolean) => void;
 };
 
 const ImageVote: NextPage<ImageVoteProps> = ({
-  incrementChoicesMade,
+  addVote,
   imageIndexState,
+  setIsVoting,
 }) => {
-  const [dayIndex, setDayIndex] = useState<number | undefined>();
-  const [imageSetIndex, setImageSetIndex] = imageIndexState;
+  const [day, setDay] = useState<number | undefined>();
+  const [imageset, setImageset] = imageIndexState;
   const [choiceCount, setChoiceCount] = useState<ChoiceCount | undefined>();
 
-  useEffect(() => setDayIndex(getDayIndex()), []);
+  const isMobile = useMediaQuery({ query: `(max-width: 480px)` });
+  const [isTinder, setIsTinder] = useState(isMobile);
+
+  useEffect(() => setDay(getDay()), []);
 
   const [connectDialogIsOpen, setConnectDialogIsOpen] = useState(false);
   const [reloadDialogIsOpen, setReloadDialogIsOpen] = useState(false);
@@ -40,42 +44,78 @@ const ImageVote: NextPage<ImageVoteProps> = ({
     if (!walletAddress) setChoiceCount(undefined);
   }, [walletAddress]);
 
-  const onSubmit = async (choiceIndex: number) => {
-    if (!walletAddress) return setConnectDialogIsOpen(true);
+  const onSubmit = async (chosen: string) => {
+    if (!walletAddress) {
+      setIsTinder(true);
+      return setConnectDialogIsOpen(true);
+    }
 
-    const body = { choiceIndex, imageSetIndex, dayIndex, walletAddress };
-    const response = await post("/api/post/vote", body);
+    if (!day) return;
 
-    if (response.status == 461) setReloadDialogIsOpen(true);
+    const ids = SETTINGS.schedule[day - 1][imageset - 1];
+
+    const denied = ids[1 - ids.indexOf(chosen)];
+
+    const body = { imageset, day, walletAddress, chosen, denied };
+    const response = await post<Vote>("/api/post/vote", body);
+
+    if (response.status == 461) {
+      setIsTinder(true);
+      return setReloadDialogIsOpen(true);
+    }
 
     if (response.status == 200) {
       const { choiceCount: count } = (await response.json()) as Response;
       if (count) setChoiceCount(count);
 
-      if (incrementChoicesMade) incrementChoicesMade();
+      if (addVote) addVote(body);
     }
   };
 
   const nextImageSet = () => {
-    setImageSetIndex(imageSetIndex + 1);
+    setImageset(imageset + 1);
     setChoiceCount(undefined);
   };
 
-  const images = [1, 2].map((index) => (
-    <ImageChoice
-      choiceCount={choiceCount}
-      index={index}
-      onSubmit={onSubmit}
-      path={`/choice/${dayIndex}/${imageSetIndex}/${index}.jpg`}
-      key={index}
-    />
-  ));
+  useEffect(() => {
+    if (day && imageset > SETTINGS.schedule[day - 1].length) {
+      setIsVoting(false);
+    }
+  }, [imageset]);
+
+  const images = [1, 2].map((index) => {
+    const daySchedule = SETTINGS.schedule[(day ?? 0) - 1];
+    if (!day || imageset > daySchedule.length) return <div key={index} />;
+
+    const imageId = daySchedule[imageset - 1][index - 1];
+
+    return (
+      <ImageChoice
+        choiceCount={choiceCount}
+        index={index}
+        onSubmit={onSubmit}
+        imageId={imageId}
+        tinderState={[isTinder, setIsTinder]}
+        isMobile={isMobile}
+        key={index}
+      />
+    );
+  });
+
+  const nextImage = () => {
+    setIsTinder(true);
+    nextImageSet();
+  };
 
   const continueButton = choiceCount ? (
-    <Button variant="contained" size="large" onClick={() => nextImageSet()}>
-      CONTINUE
-    </Button>
+    <div className={styles.continueContainer}>
+      <Button variant="contained" size="large" onClick={nextImage}>
+        CONTINUE
+      </Button>
+    </div>
   ) : null;
+
+  const [executeScroll, scrollRef] = useScroll();
 
   return (
     <div className={styles.imageRowContainer}>
@@ -89,9 +129,9 @@ const ImageVote: NextPage<ImageVoteProps> = ({
         isOpen={reloadDialogIsOpen}
         setIsOpen={setReloadDialogIsOpen}
       />
-      <div className={styles.imageRow}> {images}</div>
-
-      <div className={styles.continueButtonContainer}> {continueButton} </div>
+      <div ref={scrollRef} className={styles.imageRow} onClick={executeScroll}>
+        {images} {continueButton}
+      </div>
     </div>
   );
 };

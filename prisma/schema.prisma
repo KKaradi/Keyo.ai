@@ -10,17 +10,23 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Wallet {
+  address String @unique
+  votes Vote[]
+  voteCount Int @default(0)
+   ens String?
+}
+
 model Vote {
   id String @default(cuid()) @id
   createdAt DateTime @default(now())
-  walletAddress String
-  choiceIndex Int
-  imageSetIndex Int
-  dayIndex Int
-}
 
-model Prompt {
-  id String @default(cuid()) @id
-  createdAt DateTime @default(now())
-  prompt String @unique
+  day Int
+  imageset Int
+
+  chosen String
+  denied String
+
+  walletAddress String
+  wallet Wallet @relation(fields: [walletAddress], references: [address], onDelete: Cascade)
 }
