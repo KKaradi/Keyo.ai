@@ -10,12 +10,9 @@ import LeaderboardDialog from "../dialogs/LeaderboardDialog";
 import ToolTip from "./ToolTip";
 import { Vote } from "../../helpers";
 
-type HeaderProps = {
-  votes?: Vote[];
-  percentiles?: number[];
-};
+type HeaderProps = { votes?: Vote[] };
 
-const Header: NextPage<HeaderProps> = ({ votes, percentiles }) => {
+const Header: NextPage<HeaderProps> = ({ votes }) => {
   return (
     <div className={styles.header}>
       <h1 className={styles.title}>NON FUNGIBLE AI</h1>

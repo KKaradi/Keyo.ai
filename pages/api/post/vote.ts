@@ -49,6 +49,7 @@ const getChoiceCount = async (imageset: number, day: number) => {
     by: ["chosen"],
     where: {
       imageset: { equals: imageset },
+      random: { equals: false },
       day: { equals: day },
     },
     _count: { _all: true },
