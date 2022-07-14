@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import Header from "../components/header/Header";
 import ImageVote from "../components/voting/ImageVote";
-import { Vote, get, shuffle } from "../helpers";
+import { Vote, get, shuffle, getDay } from "../helpers";
 import styles from "../styles/pages/Choose.module.css";
 import type { Response } from "./api/get/wallet/[walletAddress]";
 import History from "../components/header/History";
@@ -14,8 +14,6 @@ import SETTINGS from "../settings.json";
 const GamePage: NextPage = () => {
   const [voteArray, setVotes] = useState<Vote[] | undefined>();
   const [percentiles, setPercentiles] = useState<number[] | undefined>();
-
-  const [day, setDay] = useState<number | undefined>();
   const [imageset, setImageset] = useState(1);
 
   const [isVoting, setIsVoting] = useState(true);
@@ -41,8 +39,14 @@ const GamePage: NextPage = () => {
       setPercentiles(percentileArray);
       setVotes(votes);
 
-      if (votes.length > 0 && votes[votes.length - 1].day == day) {
-        setImageset(votes[votes.length - 1]?.imageset + 1);
+      const day = getDay();
+
+      const filtered = votes.filter((vote: Vote) => {
+        return vote.day == day && !vote.random;
+      });
+
+      if (filtered.length > 0) {
+        setImageset(filtered[filtered.length - 1]?.imageset + 1);
       }
     })();
   }, [address]);
@@ -54,9 +58,9 @@ const GamePage: NextPage = () => {
   const stopVoting = () => setIsVoting(false);
 
   const shuffleMode = () => {
-    if (!day) return;
+    const day = getDay();
 
-    const imageIds = SETTINGS.schedule[day].reduce((prev, curr) => {
+    const imageIds = SETTINGS.schedule[day - 1].reduce((prev, curr) => {
       return prev.concat(curr);
     }, []);
 
@@ -77,7 +81,6 @@ const GamePage: NextPage = () => {
   const content = isVoting ? (
     <ImageVote
       imageIndexState={[imageset, setImageset]}
-      dayState={[day, setDay]}
       addVote={addVote}
       stopVoting={stopVoting}
       shuffledSets={shuffledSets}

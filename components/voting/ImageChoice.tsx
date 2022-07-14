@@ -1,37 +1,51 @@
 import { Button } from "@mui/material";
 import { NextPage } from "next/types";
 import Image from "next/image";
-import { ChoiceCount } from "./ImageVote";
+import { ChoiceCount, Rankings } from "./ImageVote";
 import styles from "../../styles/components/voting/ImageChoice.module.css";
 import { Dispatch, ReactElement, SetStateAction, useRef } from "react";
-import AnimatedPercentage from "./AnimatedPercentage";
+import AnimatedValue from "./AnimatedValue";
 import TinderCard from "react-tinder-card";
+import ToolTip from "../header/ToolTip";
 
 type ImageChoiceProps = {
   imageId: string;
   index: number;
   onSubmit: (chosen: string) => void;
   choiceCount: ChoiceCount | undefined;
+  rankings: Rankings | undefined;
   tinderState: [boolean, Dispatch<SetStateAction<boolean>>];
   isMobile: boolean;
+  randomMode: boolean;
 };
 
 const ImageChoice: NextPage<ImageChoiceProps> = ({
   imageId,
   index,
   onSubmit,
+  rankings,
   choiceCount,
   tinderState,
   isMobile,
+  randomMode,
 }) => {
   const [isTinder, setIsTinder] = tinderState;
 
-  let percentageText = null;
-  if (choiceCount) {
+  let stat = null;
+  if (randomMode && rankings) {
+    const ranking = rankings[imageId] ?? "?";
+    stat = (
+      <ToolTip title="Image Ranking">
+        <h1 className={styles.percentage} style={{ zIndex: 9999 }}>
+          Ranked #{ranking}
+        </h1>
+      </ToolTip>
+    );
+  } else if (choiceCount) {
     const count = choiceCount[imageId] ?? 0;
     const sum = Object.values(choiceCount).reduce((prev, curr) => prev + curr);
     const percentage = Number(((count / sum) * 100).toFixed(0));
-    percentageText = <AnimatedPercentage endValue={percentage} />;
+    stat = <AnimatedValue endValue={percentage} suffix={"%"} />;
   }
 
   const imageRef = useRef<HTMLDivElement>(null);
@@ -80,7 +94,7 @@ const ImageChoice: NextPage<ImageChoiceProps> = ({
           />
           <div className={styles.overlay}>
             <div> </div>
-            <div> {percentageText} </div>
+            <div> {stat} </div>
             <Button
               onClick={submitImage}
               className={styles.submitButton}

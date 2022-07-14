@@ -13,27 +13,30 @@ type AnimatedPercentageProps = {
   startValue?: number;
   durationValue?: number;
   incrementValue?: number;
+  suffix?: string;
 };
 
-const AnimatedPercentage: NextPage<AnimatedPercentageProps> = ({
+const AnimatedValue: NextPage<AnimatedPercentageProps> = ({
   startValue,
   endValue,
   durationValue,
   incrementValue,
+  suffix,
 }) => {
   const start = startValue ?? 0;
   const duration = durationValue ?? 1000;
   const increment = incrementValue ?? 1;
+  suffix = suffix ?? "";
 
   const range = endValue - start;
 
   let current = start;
 
-  const [percentage, setPercentage] = useState(current);
+  const [value, setValue] = useState(current);
 
   const step = () => {
     current += increment;
-    setPercentage(current);
+    setValue(current);
 
     if (current < endValue)
       setTimeout(step, quadratic(duration, range, current));
@@ -43,7 +46,12 @@ const AnimatedPercentage: NextPage<AnimatedPercentageProps> = ({
     if (range != 0) setTimeout(step, quadratic(duration, range, current));
   }, []);
 
-  return <h1 className={styles.percentage}>{percentage}%</h1>;
+  return (
+    <h1 className={styles.percentage}>
+      {value}
+      {suffix}
+    </h1>
+  );
 };
 
-export default AnimatedPercentage;
+export default AnimatedValue;

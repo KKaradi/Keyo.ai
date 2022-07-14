@@ -11,17 +11,20 @@ import {
   response,
 } from "../helpers";
 
+import { z } from "zod";
+
 type ChoiceCount = { [image: string]: number };
 
-type Body = {
-  choice?: number;
-  imageset?: number;
-  day?: number;
-  walletAddress?: string;
-  chosen?: string;
-  denied?: string;
-  randomMode?: boolean;
-};
+const BodySchema = z.object({
+  imageset: z.number(),
+  day: z.number(),
+  walletAddress: z.string(),
+  chosen: z.string(),
+  denied: z.string(),
+  random: z.boolean(),
+});
+
+export type ExpectedBody = z.infer<typeof BodySchema>;
 
 export type Response = {
   message: string;
@@ -67,22 +70,14 @@ export default async function storeVote(
   if (!authenticate(req)) return response(res, "authError");
   if (req.method != "POST") return response(res, "onlyPost");
 
-  const { imageset, day, walletAddress, chosen, denied, randomMode } =
-    req.body as Body;
+  const body = BodySchema.safeParse(req.body);
+  if (!body.success) return response(res, "incorrectParams");
 
-  if (
-    walletAddress === undefined ||
-    day === undefined ||
-    imageset === undefined ||
-    chosen === undefined ||
-    denied === undefined
-  ) {
-    return response(res, "incorrectParams");
-  }
+  const { day, walletAddress, imageset, chosen, denied, random } = body.data;
 
   if (day != getDay()) return response(res, "reloadPage");
 
-  const voteData = { walletAddress, day, imageset, chosen, denied, randomMode };
+  const voteData = { walletAddress, day, imageset, chosen, denied, random };
 
   let choiceCount: ChoiceCount;
   let rankings: Rankings;

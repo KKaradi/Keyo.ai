@@ -27,7 +27,7 @@ model Vote {
   chosen String
   denied String
 
-  randomMode Boolean @default(false)
+  random Boolean @default(false)
 
   walletAddress String
   wallet Wallet @relation(fields: [walletAddress], references: [address], onDelete: Cascade)

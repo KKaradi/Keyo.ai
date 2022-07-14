@@ -82,7 +82,7 @@ const LeaderboardDialog: NextPage<LeaderboardDialogProps> = ({ children }) => {
                 </div>
               </ListItemText>
             </ListItem>
-            {addresses.splice(0, 7).map(({ walletAddress, votes }, index) => (
+            {addresses.map(({ walletAddress, votes }, index) => (
               <ListItem
                 key={walletAddress}
                 onClick={() => clipboard(walletAddress)}
