@@ -1,0 +1,26 @@
+.text {
+  /* color: rgb(255, 0, 0); */
+  background-color: aliceblue;
+  overflow:auto;
+  font-family: Roboto, monospace;
+  text-align: center;
+}
+
+.span {
+  background-color: aliceblue;
+  overflow:auto;
+  font-family: Roboto, monospace;
+  text-align: center;
+  padding-left: 7px;
+  padding-right: 7px;
+}
+
+.paragraph {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+.wrapper {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+}

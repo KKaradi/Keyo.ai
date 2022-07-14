@@ -1,0 +1,10 @@
+{
+  "shrine": {
+    "path": "/prototypes/A/shrine.png",
+    "prompt": "floral japanese shrine, vibrant colors, sakura, rococo, traditional japanese art"
+  },
+  "lofi_nuke": {
+    "path": "/prototypes/A/lofi_nuke.png",
+    "prompt": "lofi nuclear war to relax and study to"
+  }
+}

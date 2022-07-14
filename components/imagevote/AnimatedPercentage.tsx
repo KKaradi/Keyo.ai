@@ -36,6 +36,7 @@ const AnimatedPercentage: NextPage<AnimatedPercentageProps> = ({
 
   useEffect(() => {
     if (range != 0) setTimeout(step, quadratic(duration, range, current));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return <h1 className={styles.percentage}>{value}%</h1>;
