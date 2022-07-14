@@ -52,7 +52,7 @@ const History: NextPage<HistoryProps> = ({ votes }) => {
       <div key={index}>
         <div className={styles.imageContainer}>
           <ImageDialog path={path} imageId={image}>
-            <Image src={path} layout="fill" objectFit="cover" />
+            <Image src={path} layout="fill" objectFit="cover" alt={image} />
             <div className={styles.overlay}>
               <h1 className={styles.count}> {count} </h1>
             </div>
