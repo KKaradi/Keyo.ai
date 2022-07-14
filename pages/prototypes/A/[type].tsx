@@ -185,6 +185,7 @@ const Home: NextPage = () => {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const trueChunks = parsePrompt((prompt as any)[promptQuery as string].prompt);
+  console.log((prompt as any)[promptQuery as string].prompt)
   const hiddenChunks = hideChunks(trueChunks);
 
   const [input, setInput] = useState("");
