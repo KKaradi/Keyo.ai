@@ -2,7 +2,7 @@ import { Button } from "@mui/material";
 import { NextPage } from "next/types";
 import Image from "next/image";
 import { ChoiceCount } from "./ImageVote";
-import styles from "../styles/components/ImageChoice.module.css";
+import styles from "../../styles/components/voting/ImageChoice.module.css";
 import { Dispatch, ReactElement, SetStateAction, useRef } from "react";
 import AnimatedPercentage from "./AnimatedPercentage";
 import TinderCard from "react-tinder-card";
@@ -64,7 +64,6 @@ const ImageChoice: NextPage<ImageChoiceProps> = ({
 
   return (
     <div
-      key={index}
       className={styles.imageContainer}
       tabIndex={choiceCount ? undefined : -1}
       ref={imageRef}

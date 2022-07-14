@@ -2,18 +2,25 @@ import type { NextPage } from "next";
 import Head from "next/head";
 import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
-import Header from "../components/Header";
-import ImageVote from "../components/ImageVote";
-import { Vote, get } from "../helpers";
+import Header from "../components/header/Header";
+import ImageVote from "../components/voting/ImageVote";
+import { Vote, get, shuffle } from "../helpers";
 import styles from "../styles/pages/Choose.module.css";
 import type { Response } from "./api/get/wallet/[walletAddress]";
-import History from "../components/History";
+import History from "../components/header/History";
+import Button from "@mui/material/Button";
+import SETTINGS from "../settings.json";
 
 const GamePage: NextPage = () => {
   const [voteArray, setVotes] = useState<Vote[] | undefined>();
   const [percentiles, setPercentiles] = useState<number[] | undefined>();
-  const [isVoting, setIsVoting] = useState(true);
+
+  const [day, setDay] = useState<number | undefined>();
   const [imageset, setImageset] = useState(1);
+
+  const [isVoting, setIsVoting] = useState(true);
+  const shuffledSetState = useState<string[][] | undefined>(undefined);
+  const [shuffledSets, setShuffledSets] = shuffledSetState;
 
   const address = useAccount().data?.address;
 
@@ -34,7 +41,7 @@ const GamePage: NextPage = () => {
       setPercentiles(percentileArray);
       setVotes(votes);
 
-      if (votes.length > 0) {
+      if (votes.length > 0 && votes[votes.length - 1].day == day) {
         setImageset(votes[votes.length - 1]?.imageset + 1);
       }
     })();
@@ -44,14 +51,44 @@ const GamePage: NextPage = () => {
     if (voteArray) setVotes([...voteArray, vote]);
   };
 
+  const stopVoting = () => setIsVoting(false);
+
+  const shuffleMode = () => {
+    if (!day) return;
+
+    const imageIds = SETTINGS.schedule[day].reduce((prev, curr) => {
+      return prev.concat(curr);
+    }, []);
+
+    const shuffled = shuffle<string>(imageIds);
+
+    setImageset(1);
+    setIsVoting(true);
+    setShuffledSets(
+      shuffled.reduce((prev, _, index, array) => {
+        if (index % 2 == 0) {
+          (prev as string[][]).push(array.slice(index, index + 2));
+        }
+        return prev;
+      }, [])
+    );
+  };
+
   const content = isVoting ? (
     <ImageVote
       imageIndexState={[imageset, setImageset]}
+      dayState={[day, setDay]}
       addVote={addVote}
-      setIsVoting={setIsVoting}
+      stopVoting={stopVoting}
+      shuffledSets={shuffledSets}
     />
   ) : (
-    <h1 className={styles.endText}> COME BACK TOMORROW FOR MORE... </h1>
+    <div className={styles.comeback}>
+      <h1 className={styles.endText}> COME BACK TOMORROW FOR MORE... </h1>
+      <Button variant="contained" size="large" onClick={shuffleMode}>
+        SHUFFLE AND RETRY
+      </Button>
+    </div>
   );
 
   return (

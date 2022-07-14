@@ -1,13 +1,13 @@
 import { NextPage } from "next";
-import styles from "../styles/components/ImageVote.module.css";
+import styles from "../../styles/components/voting/ImageVote.module.css";
 import { useAccount } from "wagmi";
-import ErrorDialog from "./dialogs/ErrorDialog";
+import ErrorDialog from "../dialogs/ErrorDialog";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { Vote, post, getDay, useScroll } from "../helpers";
+import { Vote, post, getDay, useScroll } from "../../helpers";
 import ImageChoice from "./ImageChoice";
 import Button from "@mui/material/Button";
-import type { Response } from "../pages/api/post/vote";
-import SETTINGS from "../settings.json";
+import type { Response } from "../../pages/api/post/vote";
+import SETTINGS from "../../settings.json";
 import { useMediaQuery } from "react-responsive";
 
 export type ChoiceCount = Response["choiceCount"];
@@ -17,23 +17,28 @@ const reloadMessage = "You are out of date! Please reload the page.";
 
 type ImageVoteProps = {
   imageIndexState: [number, Dispatch<SetStateAction<number>>];
+  dayState: [number | undefined, Dispatch<SetStateAction<number | undefined>>];
+  stopVoting: () => void;
   addVote?: (vote: Vote) => void;
-  setIsVoting: (value: boolean) => void;
+  shuffledSets?: string[][];
 };
 
 const ImageVote: NextPage<ImageVoteProps> = ({
   addVote,
+  dayState,
   imageIndexState,
-  setIsVoting,
+  stopVoting,
+  shuffledSets,
 }) => {
-  const [day, setDay] = useState<number | undefined>();
   const [imageset, setImageset] = imageIndexState;
   const [choiceCount, setChoiceCount] = useState<ChoiceCount | undefined>();
+  const [day, setDay] = dayState;
+  const randomMode = Boolean(shuffledSets);
+
+  useEffect(() => setDay(getDay()), [setDay]);
 
   const isMobile = useMediaQuery({ query: `(max-width: 480px)` });
   const [isTinder, setIsTinder] = useState(isMobile);
-
-  useEffect(() => setDay(getDay()), []);
 
   const [connectDialogIsOpen, setConnectDialogIsOpen] = useState(false);
   const [reloadDialogIsOpen, setReloadDialogIsOpen] = useState(false);
@@ -56,7 +61,7 @@ const ImageVote: NextPage<ImageVoteProps> = ({
 
     const denied = ids[1 - ids.indexOf(chosen)];
 
-    const body = { imageset, day, walletAddress, chosen, denied };
+    const body = { imageset, day, walletAddress, chosen, denied, randomMode };
     const response = await post<Vote>("/api/post/vote", body);
 
     if (response.status == 461) {
@@ -79,7 +84,7 @@ const ImageVote: NextPage<ImageVoteProps> = ({
 
   useEffect(() => {
     if (day && imageset > SETTINGS.schedule[day - 1].length) {
-      setIsVoting(false);
+      stopVoting();
     }
   }, [imageset]);
 

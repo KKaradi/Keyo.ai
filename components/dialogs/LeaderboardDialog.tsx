@@ -13,7 +13,7 @@ import {
 import { get, clipboard } from "../../helpers";
 import type { Response } from "../../pages/api/get/leaderboard";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
-import styles from "../../styles/components/Leaderboard.module.css";
+import styles from "../../styles/components/dialogs/Leaderboard.module.css";
 import { colors } from "../../constants/colors";
 
 type LeaderboardDialogProps = {

@@ -1,6 +1,6 @@
 import { NextPage } from "next/types";
 import GaugeChart from "react-gauge-chart";
-import styles from "../styles/components/Header.module.css";
+import styles from "../../styles/components/header/Header.module.css";
 
 type VoteGaugeProps = {
   votes: number;

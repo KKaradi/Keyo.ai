@@ -20,6 +20,7 @@ type Body = {
   walletAddress?: string;
   chosen?: string;
   denied?: string;
+  randomMode?: boolean;
 };
 
 export type Response = {
@@ -66,7 +67,8 @@ export default async function storeVote(
   if (!authenticate(req)) return response(res, "authError");
   if (req.method != "POST") return response(res, "onlyPost");
 
-  const { imageset, day, walletAddress, chosen, denied } = req.body as Body;
+  const { imageset, day, walletAddress, chosen, denied, randomMode } =
+    req.body as Body;
 
   if (
     walletAddress === undefined ||
@@ -80,7 +82,7 @@ export default async function storeVote(
 
   if (day != getDay()) return response(res, "reloadPage");
 
-  const voteData = { walletAddress, day, imageset, chosen, denied };
+  const voteData = { walletAddress, day, imageset, chosen, denied, randomMode };
 
   let choiceCount: ChoiceCount;
   let rankings: Rankings;
