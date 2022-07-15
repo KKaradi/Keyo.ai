@@ -1,0 +1,74 @@
+{
+  "shrine": {
+    "path": "/prototypes/multiwordle/shrine.png",
+    "prompt": "floral japanese shrine, vibrant colors, sakura, rococo, traditional japanese art"
+  },
+  "lofi_nuke": {
+    "path": "/prototypes/multiwordle/lofi_nuke.png",
+    "prompt": "lofi nuclear war to relax and study to"
+  },
+  "1raw": {
+    "path": "/prototypes/multiwordle/a_nighttime_cityscape_of_tokyo_harbor_chillwave_style_trending_on_artstation.png",
+    "prompt": "a night time cityscape of tokyo harbor chillwave style trending on artstation"
+  },
+  "1": {
+    "path": "/prototypes/multiwordle/a_nighttime_cityscape_of_tokyo_harbor_chillwave_style_trending_on_artstation.png",
+    "prompt": "a night time cityscape of tokyo harbor chillwave style"
+  },
+  "2raw": {
+    "path": "/prototypes/multiwordle/a_overgrown_wooden_magic_bicycle_concept_art_trending_on_artstation.png",
+    "prompt": "a overgrown wooden magic bicycle concept art trending on artstation"
+  },
+  "2": {
+    "path": "/prototypes/multiwordle/a_overgrown_wooden_magic_bicycle_concept_art_trending_on_artstation.png",
+    "prompt": "a overgrown wooden magic bicycle concept art"
+  },
+  "3raw": {
+    "path": "/prototypes/multiwordle/a_paintball_war_vivid_colors_concept_art_trending_on_artstation.png",
+    "prompt": "a paintball war vivid colors concept art trending on artstation"
+  },
+  "3": {
+    "path": "/prototypes/multiwordle/a_paintball_war_vivid_colors_concept_art_trending_on_artstation.png",
+    "prompt": "a paintball war vivid colors concept art"
+  },
+  "4raw": {
+    "path": "/prototypes/multiwordle/a_tarrot_card_of_a_vibrant_coral_reef_tropical_water_shells_fish_coral_trending_on_artstation.png",
+    "prompt": "a tarrot card of a vibrant coral reef tropical water shells fish coral trending on artstation"
+  },
+  "4": {
+    "path": "/prototypes/multiwordle/a_tarrot_card_of_a_vibrant_coral_reef_tropical_water_shells_fish_coral_trending_on_artstation.png",
+    "prompt": "a tarrot card of a vibrant coral reef tropical water shells fish coral"
+  },
+  "5raw": {
+    "path": "/prototypes/multiwordle/a_titanic_mech_robot_wading_through_rainy_waters_city_scape_in_the_background_night_time_sci-fip_dark_smog_trending_on_artstation.png",
+    "prompt": "a titanic mech robot wading through rainy waters city scape in the background night time sci-fip dark smog trending on artstation"
+  },
+  "5": {
+    "path": "/prototypes/multiwordle/a_titanic_mech_robot_wading_through_rainy_waters_city_scape_in_the_background_night_time_sci-fip_dark_smog_trending_on_artstation.png",
+    "prompt": "a titanic mech robot wading through rainy waters cityscape in the background"
+  },
+  "6raw": {
+    "path": "/prototypes/multiwordle/artemis_greek_goddess_digital_art_trending_on_artstation.png",
+    "prompt": "artemis greek goddess digital art trending on artstation"
+  },
+  "6": {
+    "path": "/prototypes/multiwordle/artemis_greek_goddess_digital_art_trending_on_artstation.png",
+    "prompt": "artemis greek goddess digital art"
+  },
+  "7raw": {
+    "path": "/prototypes/multiwordle/corn_field_with_the_colorado_mountains_in_the_background_Hudson_River_School.png",
+    "prompt": "corn field with the colorado mountains in the background hudson river school"
+  },
+  "7": {
+    "path": "/prototypes/multiwordle/corn_field_with_the_colorado_mountains_in_the_background_Hudson_River_School.png",
+    "prompt": "corn field with the colorado mountains in the background"
+  },
+  "8": {
+    "path": "/prototypes/multiwordle/obama_as_a_pixar_character.png",
+    "prompt": "obama as a pixar character"
+  },
+  "9": {
+    "path": "/prototypes/multiwordle/lofi_nuke.png",
+    "prompt": "lofi nuclear war to relax and study to"
+  }
+}

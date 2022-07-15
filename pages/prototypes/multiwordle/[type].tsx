@@ -1,13 +1,10 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import type { NextPage } from "next";
+import type { NextPage, NextPageContext } from "next";
+import { ChangeEventHandler, KeyboardEventHandler, useState } from "react";
 
-import { useState } from "react";
-
-import styles from "./../../../styles/components/PrototypeA.module.css";
+import styles from "../../../styles/pages/MultiWordle.module.css";
 import Image from "next/image";
 
-import prompt from "../prompt.json";
-import { useRouter } from "next/router";
+import prompts from "../prompts.json";
 
 const hiddenChar = "■";
 
@@ -171,26 +168,22 @@ const displayWordleHistory = (wordleHistory: Letter[][][]) => {
   return jsxElement;
 };
 
-const Home: NextPage = () => {
-  const router = useRouter();
-  let promptQuery = router.query?.type;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const skipRenderFlag =
-    promptQuery === undefined ||
-    typeof promptQuery !== "string" ||
-    (prompt as any)?.[promptQuery] === undefined;
-  if (skipRenderFlag) {
-    promptQuery = "shrine";
-  }
+type PromptData = { path: string; prompt: string };
+type Prompts = { [key: string]: PromptData };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const trueChunks = parsePrompt((prompt as any)[promptQuery as string].prompt);
-  console.log((prompt as any)[promptQuery as string].prompt)
-  const hiddenChunks = hideChunks(trueChunks);
+type MultiWordleProps = {
+  hiddenChunks: string[];
+  trueChunks: string[];
+  promptData: PromptData;
+};
 
+const MultiWordlePage: NextPage<MultiWordleProps> = ({
+  hiddenChunks,
+  trueChunks,
+  promptData,
+}) => {
   const [input, setInput] = useState("");
-
-  const [chunks, setChunks] = useState<string[]>(() => hiddenChunks);
+  const [chunks, setChunks] = useState<string[]>(hiddenChunks);
 
   const [wordleHistory, setWordleHistory] = useState<Letter[][][]>([]);
 
@@ -198,59 +191,59 @@ const Home: NextPage = () => {
     return curr.length > prev ? curr.length : prev;
   }, 0);
 
-  const handleChange = (event: any) => {
+  const handleChange: ChangeEventHandler<HTMLInputElement> = (event) => {
     const input = event.target.value.slice(0, longest);
     setInput(input);
     setChunks(rewriteChunks(hiddenChunks, wordleHistory[0], input));
   };
 
-  const handleKey = (event: any) => {
-    if (event.key === "Enter") {
-      setInput("");
-      const newWordleHistory = [
-        getWordleLetters(chunks, trueChunks, wordleHistory),
-        ...wordleHistory,
-      ];
-      setWordleHistory(newWordleHistory);
+  const handleKey: KeyboardEventHandler<HTMLInputElement> = (event) => {
+    if (event.key !== "Enter") return;
 
-      setChunks(rewriteChunks(hiddenChunks, newWordleHistory[0], ""));
-    }
+    setInput("");
+    const newWordleHistory = [
+      getWordleLetters(chunks, trueChunks, wordleHistory),
+      ...wordleHistory,
+    ];
+    setWordleHistory(newWordleHistory);
+
+    setChunks(rewriteChunks(hiddenChunks, newWordleHistory[0], ""));
   };
 
   const size = 500;
   const chunksDisplay = displayChunks(chunks);
   const wordleHistoryDisplay = displayWordleHistory(wordleHistory);
 
-  if (skipRenderFlag) {
-    return (
-      <div className={styles.text}>
-        <h1 className={styles.text}>Invalid type query</h1>
-      </div>
-    );
-  } else {
-    return (
-      <div className={styles.text}>
-        <Image
-          height={size / 1.4}
-          width={size}
-          alt=""
-          src={(prompt as any)[promptQuery as string].path}
+  return (
+    <div className={styles.text}>
+      <Image height={size / 1.4} width={size} alt="" src={promptData.path} />
+      <div style={{ textAlign: "left" }}>
+        <input
+          value={input}
+          style={{ width: "700px" }}
+          onChange={handleChange}
+          onKeyDown={handleKey}
         />
-        <div style={{ textAlign: "left" }}>
-          <input
-            value={input}
-            style={{ width: "700px" }}
-            onChange={handleChange}
-            onKeyDown={handleKey}
-          />
-          <div className={styles.wrapper}>
-            <div>{chunksDisplay}</div>
-            <div>{wordleHistoryDisplay}</div>
-          </div>
+        <div className={styles.wrapper}>
+          <div>{chunksDisplay}</div>
+          <div>{wordleHistoryDisplay}</div>
         </div>
       </div>
-    );
-  }
+    </div>
+  );
 };
 
-export default Home;
+export const getServerSideProps = async (context: NextPageContext) => {
+  let { type } = context.query;
+  if (!(type && !Array.isArray(type) && type in prompts)) type = "shrine";
+
+  const promptData = (prompts as Prompts)[type];
+
+  const trueChunks = parsePrompt(promptData.prompt);
+  const hiddenChunks = hideChunks(trueChunks);
+
+  const props: MultiWordleProps = { trueChunks, hiddenChunks, promptData };
+  return { props };
+};
+
+export default MultiWordlePage;
