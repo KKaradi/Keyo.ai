@@ -13,7 +13,7 @@ import {
 import { get, clipboard } from "../../helpers";
 import type { Response } from "../../pages/api/get/leaderboard";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
-import styles from "../../styles/components/Leaderboard.module.css";
+import styles from "../../styles/components/dialogs/Leaderboard.module.css";
 import { colors } from "../../constants/colors";
 
 type LeaderboardDialogProps = {
@@ -82,7 +82,7 @@ const LeaderboardDialog: NextPage<LeaderboardDialogProps> = ({ children }) => {
                 </div>
               </ListItemText>
             </ListItem>
-            {addresses.splice(0, 7).map(({ walletAddress, votes }, index) => (
+            {addresses.map(({ walletAddress, votes }, index) => (
               <ListItem
                 key={walletAddress}
                 onClick={() => clipboard(walletAddress)}

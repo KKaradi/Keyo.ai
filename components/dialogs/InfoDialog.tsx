@@ -1,6 +1,6 @@
 import { useState, ReactElement } from "react";
 import Button from "@mui/material/Button";
-import styles from "../../styles/components/InfoDialog.module.css";
+import styles from "../../styles/components/dialogs/InfoDialog.module.css";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";

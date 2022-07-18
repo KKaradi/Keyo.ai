@@ -9,7 +9,8 @@
     "next"
   ],
   "rules": {
-    "@typescript-eslint/ban-ts-comment": "off"
+    "@typescript-eslint/ban-ts-comment": "off",
+    "react-hooks/exhaustive-deps": "off"
   },
   "parser": "@typescript-eslint/parser",
   "parserOptions": {

@@ -1,8 +1,8 @@
-import { Vote } from "../helpers";
+import { Vote } from "../../helpers";
 import type { NextPage } from "next/types";
 import Image from "next/image";
-import styles from "../styles/components/History.module.css";
-import ImageDialog from "./dialogs/ImageDialog";
+import styles from "../../styles/components/header/History.module.css";
+import ImageDialog from "../dialogs/ImageDialog";
 import { ReactElement, useState } from "react";
 import ExpandCircleDownIcon from "@mui/icons-material/ExpandCircleDown";
 import ToolTip from "./ToolTip";
@@ -52,7 +52,7 @@ const History: NextPage<HistoryProps> = ({ votes }) => {
       <div key={index}>
         <div className={styles.imageContainer}>
           <ImageDialog path={path} imageId={image}>
-            <Image src={path} layout="fill" objectFit="cover" />
+            <Image src={path} layout="fill" objectFit="cover" alt={image} />
             <div className={styles.overlay}>
               <h1 className={styles.count}> {count} </h1>
             </div>

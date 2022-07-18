@@ -3,7 +3,7 @@ import Dialog from "@mui/material/Dialog";
 import Image from "next/image";
 import type { NextPage } from "next/types";
 import SlideTransition from "./SlideTransition";
-import styles from "../../styles/components/ImageDialog.module.css";
+import styles from "../../styles/components/dialogs/ImageDialog.module.css";
 import DownloadIcon from "@mui/icons-material/Download";
 
 type ImageDialogProps = {

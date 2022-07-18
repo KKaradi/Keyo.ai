@@ -1,22 +1,18 @@
 import { NextPage } from "next";
-import styles from "../styles/components/Header.module.css";
+import styles from "../../styles/components/header/Header.module.css";
 import InfoIcon from "@mui/icons-material/Info";
 import TwitterIcon from "@mui/icons-material/Twitter";
 import LeaderboardIcon from "@mui/icons-material/Leaderboard";
 import Link from "next/link";
-import InfoDialog from "./dialogs/InfoDialog";
-import ConnectWallet from "./ConnectWallet";
-import LeaderboardDialog from "./dialogs/LeaderboardDialog";
+import InfoDialog from "../dialogs/InfoDialog";
+import ConnectWallet from "../wallet/ConnectWallet";
+import LeaderboardDialog from "../dialogs/LeaderboardDialog";
 import ToolTip from "./ToolTip";
-import VoteGauge from "./VoteGauge";
-import { Vote } from "../helpers";
+import { Vote } from "../../helpers";
 
-type HeaderProps = {
-  votes?: Vote[];
-  percentiles?: number[];
-};
+type HeaderProps = { votes?: Vote[] };
 
-const Header: NextPage<HeaderProps> = ({ votes, percentiles }) => {
+const Header: NextPage<HeaderProps> = ({ votes }) => {
   return (
     <div className={styles.header}>
       <h1 className={styles.title}>NON FUNGIBLE AI</h1>
@@ -25,13 +21,6 @@ const Header: NextPage<HeaderProps> = ({ votes, percentiles }) => {
         {votes !== undefined ? (
           <ToolTip title="My Votes">
             <h1 className={styles.votes}> {votes.length} </h1>
-          </ToolTip>
-        ) : null}
-        {percentiles && votes !== undefined ? (
-          <ToolTip title="My Voting Percentile" offset={-15}>
-            <div className={styles.iconContainer}>
-              <VoteGauge votes={votes.length} percentiles={percentiles} />
-            </div>
           </ToolTip>
         ) : null}
         <LeaderboardDialog>
