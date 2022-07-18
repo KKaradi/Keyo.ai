@@ -5,11 +5,20 @@
   border-style: solid;
 }
 
-.inputFieldChar {
+.word {
   width: fit-content;
   text-align: center;
+
+  display: flex;
+  flex-direction: row;
+}
+
+.cell {
+  width: fit-content;
+
+  text-align: center;
   border-style: solid;
-  border-color: red;
+  border-width: 1px;
   font-size: 2rem;
-  font-family: 'Times New Roman', Times, serif;
+  font-family: "Roboto", monospace;
 }

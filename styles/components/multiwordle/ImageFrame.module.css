@@ -1,0 +1,16 @@
+.image {
+  border-style: solid;
+  border-color: green;
+  margin: 0 auto;
+  width: 80%;
+
+}   
+
+.frame {
+    border-style: solid;
+    border-color: red;
+    background-color: whitesmoke;
+    padding-top: 10px;
+    padding-bottom: 10px;
+
+}

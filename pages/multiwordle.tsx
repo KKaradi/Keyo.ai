@@ -4,7 +4,7 @@ import { post, get } from "../helpers";
 import { DefinedGameMove } from "./api/post/multiwordle";
 import styles from "../styles/pages/MultiWordle.module.css";
 import InputField from "../components/multiwordle/InputField";
-
+import ImageFrame from '../components/multiwordle/ImageFrame';
 const MultiWordlePage: NextPage<{ initalGameState: DefinedGameMove }> = ({
   initalGameState: json,
 }) => {
@@ -12,16 +12,7 @@ const MultiWordlePage: NextPage<{ initalGameState: DefinedGameMove }> = ({
   return (
     <div style={{ display: "flex", flexDirection: "row" }}>
       <div className={styles.halfDiv}>
-        <Image
-          src={
-            "/prototypes/multiwordle/a_paintball_war_vivid_colors_concept_art_trending_on_artstation.png"
-          }
-          alt={""}
-          width={14}
-          height={10}
-          layout="responsive"
-          quality={100}
-        />
+        <ImageFrame path ="/prototypes/multiwordle/a_paintball_war_vivid_colors_concept_art_trending_on_artstation.png"></ImageFrame>
         <InputField input="a,night,time,cityscape,of,tokyo,harbor,chillwave,style,trending,on,artstation" />
       </div>
     </div>
