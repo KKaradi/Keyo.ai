@@ -175,7 +175,7 @@ type MultiWordleProps = {
   hiddenChunks: string[];
   trueChunks: string[];
   promptData: PromptData;
-};
+};  
 
 const MultiWordlePage: NextPage<MultiWordleProps> = ({
   hiddenChunks,
