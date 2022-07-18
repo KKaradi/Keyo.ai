@@ -13,6 +13,7 @@ type Character = {
   character: string | undefined;
   status: CharacterStatus | undefined;
 };
+
 type Word = {
   completed: boolean | undefined;
   characters: Character[] | undefined;
@@ -36,6 +37,7 @@ export type DefinedWord = {
 
 export type DefinedCharacter = {
   character: string;
+  status: CharacterStatus;
 };
 
 type ErrorMessage = { message: string };
