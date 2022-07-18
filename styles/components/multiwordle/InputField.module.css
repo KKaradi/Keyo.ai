@@ -1,0 +1,15 @@
+.body {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  border-style: solid;
+}
+
+.inputFieldChar {
+  width: fit-content;
+  text-align: center;
+  border-style: solid;
+  border-color: red;
+  font-size: 2rem;
+  font-family: 'Times New Roman', Times, serif;
+}
