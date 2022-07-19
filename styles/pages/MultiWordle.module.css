@@ -1,9 +1,26 @@
-.half {
-    width: 50%;
-    text-align: center;
+.body {
+  display: flex;
+  flex-direction: row;
+}
+.container {
+  display: flex;
+  flex-direction: row;
 }
 
-.body {
-    display: flex;
-    flex-direction: row;
+.right,
+.left {
+  flex: 1;
+}
+
+.left {
+    height: 100vh;
+}
+
+.right {
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 50px;
+  align-items: center;
 }
