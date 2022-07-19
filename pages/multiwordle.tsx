@@ -69,7 +69,7 @@ const MultiWordlePage: NextPage<{ initalGameState: ReturnGameMode }> = ({
     },
     [userInput, gameStateStack]
   );
-
+  
   useEffect(() => {
     window.addEventListener("keydown", handleUserKeyPress);
 
@@ -82,7 +82,7 @@ const MultiWordlePage: NextPage<{ initalGameState: ReturnGameMode }> = ({
     <div className={styles.body}>
       <div className={styles.half}>
         <ImageFrame path="/prototypes/multiwordle/a_nighttime_cityscape_of_tokyo_harbor_chillwave_style_trending_on_artstation.png"></ImageFrame>
-        {/* <input type='textfield' value={input} onChange={handleChange}/> */}
+        { userInput }
         <InputField
           input={userInput}
           gameState={gameStateStack[0]}
