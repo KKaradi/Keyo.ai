@@ -14,7 +14,7 @@ export type AcceptWord = {
   characters: AcceptCharacter[] | undefined;
 };
 export type AcceptGameMove = {
-  summary: number[];
+  summary: number[] | undefined;
   gameId: number | undefined;
   inputs: AcceptWord[] | undefined;
   gameStatus: GameStatus | undefined;
@@ -212,12 +212,10 @@ export default function Handler(
     res.status(200).json(generateNewGame(prompt, gameId, splits));
   } else if (gameMove.gameStatus === "finished") {
     res.status(400).json({ message: "Game is already finished." });
-  } else if (gameMove.summary === undefined) {
-    res
-      .status(400)
-      .json({ message: "Incorrect parameters: must supply summary." });
   } else if (gameMove.gameStatus === "started") {
-    if (processStartedGame(gameMove, res, splits)) {
+    if (gameMove.summary === undefined) {
+      res.status(400).json({ message: "Game summary is undefined." });
+    } else if (processStartedGame(gameMove, res, splits)) {
       res.status(200).json(gameMove);
     }
   } else {

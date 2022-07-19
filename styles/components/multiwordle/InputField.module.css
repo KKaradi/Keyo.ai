@@ -16,8 +16,8 @@
 .cell {
   width: fit-content;
   border-radius: 10px;
+  border-color: gray;
   color: whitesmoke;
-  border-color: white;
   text-align: center;
   border-style: solid;
   border-width: 1px;

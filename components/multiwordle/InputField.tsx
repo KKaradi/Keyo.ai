@@ -1,13 +1,11 @@
 import { NextPage } from "next";
 import styles from "../../styles/components/multiwordle/InputField.module.css";
 import { ReturnGameMode } from "../../pages/api/post/multiwordle";
-import { Dispatch, SetStateAction } from "react";
 
 type InputFieldProps = {
   input: string;
   gameState: ReturnGameMode;
   newDataFlag: boolean;
-  setNewDataFlag: Dispatch<SetStateAction<boolean>>;
 };
 
 const cellSize = 35;
@@ -17,17 +15,6 @@ const colorMap = {
     'green': '#6ca965',
     'yellow': '#c8b653',
     'empty': '#FFFFFF',
-}
-
-function applyInput(input: string, gameState: ReturnGameMode) {
-  for (const word of gameState.inputs) {
-    if (word.completed) {
-      continue;
-    }
-    word.characters.forEach((character, indx) => {
-      character.character = input.charAt(indx);
-    });
-  }
 }
 
 function generateWordGridFromAPI(gameState: ReturnGameMode) {
@@ -58,9 +45,10 @@ function generateWordGridFromAPI(gameState: ReturnGameMode) {
 }
 
 function generateWordGridFromInput(input: string, gameState: ReturnGameMode) {
-  applyInput(input, gameState);
+  //applyInput(input, gameState, setGameState);
 
   return gameState.inputs.map((input, indx) => {
+    const backgroundColor =  input.completed?colorMap['green']:'';
     return (
       <div
         key={indx}
@@ -68,6 +56,7 @@ function generateWordGridFromInput(input: string, gameState: ReturnGameMode) {
         style={{
           height: `${cellSize}px`,
           width: `${input.characters.length * 40}px`,
+          
         }}
       >
         {input.characters.map((character, indx) => {
@@ -75,7 +64,7 @@ function generateWordGridFromInput(input: string, gameState: ReturnGameMode) {
             <div
               key={indx}
               className={styles.cell}
-              style={{ height: `${cellSize}px`, width: `${cellSize}px` }}
+              style={{ height: `${cellSize}px`, width: `${cellSize}px`, backgroundColor: backgroundColor}}
             >
               {character.character}
             </div>
@@ -119,11 +108,9 @@ const InputField: NextPage<InputFieldProps> = ({
   input,
   gameState,
   newDataFlag,
-  setNewDataFlag,
 }) => {
   let content: JSX.Element[] = [];
   if(newDataFlag) {
-    console.log('dataflag true')
     content = generateWordGridFromAPI(gameState);
   }else{
     content = generateWordGridFromInput(input, gameState);

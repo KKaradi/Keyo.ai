@@ -6,28 +6,68 @@ import styles from "../styles/pages/MultiWordle.module.css";
 import InputField from "../components/multiwordle/InputField";
 import ImageFrame from "../components/multiwordle/ImageFrame";
 import TextField from "@mui/material/TextField/TextField";
-import { ChangeEventHandler, useCallback, useEffect, useState } from "react";
+import {
+  ChangeEventHandler,
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
+
+function applyInput(
+  input: string,
+  gameStateStack: ReturnGameMode[],
+  setGameStateStack: Dispatch<SetStateAction<ReturnGameMode[]>>
+) {
+  for (const word of gameStateStack[0].inputs) {
+    if (word.completed) {
+      continue;
+    }
+    word.characters.forEach((character, indx) => {
+      const charAt = input.charAt(indx);
+      character.character = charAt === "" ? " " : charAt;
+    });
+  }
+
+  setGameStateStack(gameStateStack);
+}
 
 const MultiWordlePage: NextPage<{ initalGameState: ReturnGameMode }> = ({
-  initalGameState: gameState,
+  initalGameState: initalGameState,
 }) => {
-  console.log(gameState)
+  //const [gameState, setGameState] = useState(initalGameState);
   const [userInput, setUserInput] = useState("");
   const [newDataFlag, setNewDataFlag] = useState(true);
+  const [gameStateStack, setGameStateStack] = useState<ReturnGameMode[]>([initalGameState]);
+
 
   const handleUserKeyPress = useCallback(
-    (event: { key: string; keyCode: number }) => {
+    async (event: { key: string; keyCode: number }) => {
       const { key, keyCode } = event;
-
+      let nextUserInput = "";
       if (keyCode >= 65 && keyCode <= 90) {
-        setUserInput((prevUserText) => `${prevUserText}${key}`);
+        nextUserInput = `${userInput}${key}`;
+        setUserInput(nextUserInput);
+        setNewDataFlag(false);
+        applyInput(nextUserInput, gameStateStack, setGameStateStack);
       } else if (keyCode === 8) {
-        setUserInput((prevUserText) => prevUserText.slice(0, -1));
+        nextUserInput = userInput.slice(0, -1);
+        setUserInput(nextUserInput);
+        setNewDataFlag(false);
+        applyInput(nextUserInput, gameStateStack, setGameStateStack);
       } else if (keyCode === 13) {
-        ("");
+        setUserInput(nextUserInput);
+        const res = await post(
+          "http://localhost:3000/api/post/multiwordle",
+          gameStateStack[0]
+        );
+        setGameStateStack([await res.json(), ...gameStateStack, ]);
+        setNewDataFlag(true);
+        return;
       }
     },
-    []
+    [userInput, gameStateStack]
   );
 
   useEffect(() => {
@@ -43,39 +83,117 @@ const MultiWordlePage: NextPage<{ initalGameState: ReturnGameMode }> = ({
       <div className={styles.half}>
         <ImageFrame path="/prototypes/multiwordle/a_nighttime_cityscape_of_tokyo_harbor_chillwave_style_trending_on_artstation.png"></ImageFrame>
         {/* <input type='textfield' value={input} onChange={handleChange}/> */}
-        <InputField input={userInput} gameState={gameState} newDataFlag={newDataFlag} setNewDataFlag={setNewDataFlag}/>
+        <InputField
+          input={userInput}
+          gameState={gameStateStack[0]}
+          newDataFlag={newDataFlag}
+        />
       </div>
     </div>
   );
 };
 
 export const getServerSideProps = async (context: NextPageContext) => {
-  // const res = await post("http://localhost:3000/api/post/multiwordle", {
-  //   gameStatus: "new",
-  // });
 
-  const dummyInput = ['a','nighttime','cityscape','of','hanoi','oceans','chillwave','style','trending','on','artstation'];
+  const dummyInput = [
+    "a",
+    "nighttime",
+    "cityscape",
+    "of",
+    "hanoi",
+    "oceans",
+    "chillwave",
+    "style",
+    "trending",
+    "on",
+    "artstation",
+  ];
 
-  const gameStatus: AcceptGameMove = {
+  let gameState: AcceptGameMove = {
     gameId: 1,
     gameStatus: "started",
     summary: dummyInput.map((word) => word.length),
     inputs: [
-      { characters: dummyInput[0].split("").map((char)=>{return {character:char, status: undefined}}), completed: false },
-      { characters: dummyInput[1].split("").map((char)=>{return {character:char, status: undefined}}), completed: false },
-      { characters: dummyInput[2].split("").map((char)=>{return {character:char, status: undefined}}), completed: false },
-      { characters: dummyInput[3].split("").map((char)=>{return {character:char, status: undefined}}), completed: false },
-      { characters: dummyInput[4].split("").map((char)=>{return {character:char, status: undefined}}), completed: false },
-      { characters: dummyInput[5].split("").map((char)=>{return {character:char, status: undefined}}), completed: false },
-      { characters: dummyInput[6].split("").map((char)=>{return {character:char, status: undefined}}), completed: false },
-      { characters: dummyInput[7].split("").map((char)=>{return {character:char, status: undefined}}), completed: false },
-      { characters: dummyInput[8].split("").map((char)=>{return {character:char, status: undefined}}), completed: false },
-      { characters: dummyInput[9].split("").map((char)=>{return {character:char, status: undefined}}), completed: false },
-      { characters: dummyInput[10].split("").map((char)=>{return {character:char, status: undefined}}), completed: false },
-    ]
+      {
+        characters: dummyInput[0].split("").map((char) => {
+          return { character: char, status: undefined };
+        }),
+        completed: false,
+      },
+      {
+        characters: dummyInput[1].split("").map((char) => {
+          return { character: char, status: undefined };
+        }),
+        completed: false,
+      },
+      {
+        characters: dummyInput[2].split("").map((char) => {
+          return { character: char, status: undefined };
+        }),
+        completed: false,
+      },
+      {
+        characters: dummyInput[3].split("").map((char) => {
+          return { character: char, status: undefined };
+        }),
+        completed: false,
+      },
+      {
+        characters: dummyInput[4].split("").map((char) => {
+          return { character: char, status: undefined };
+        }),
+        completed: false,
+      },
+      {
+        characters: dummyInput[5].split("").map((char) => {
+          return { character: char, status: undefined };
+        }),
+        completed: false,
+      },
+      {
+        characters: dummyInput[6].split("").map((char) => {
+          return { character: char, status: undefined };
+        }),
+        completed: false,
+      },
+      {
+        characters: dummyInput[7].split("").map((char) => {
+          return { character: char, status: undefined };
+        }),
+        completed: false,
+      },
+      {
+        characters: dummyInput[8].split("").map((char) => {
+          return { character: char, status: undefined };
+        }),
+        completed: false,
+      },
+      {
+        characters: dummyInput[9].split("").map((char) => {
+          return { character: char, status: undefined };
+        }),
+        completed: false,
+      },
+      {
+        characters: dummyInput[10].split("").map((char) => {
+          return { character: char, status: undefined };
+        }),
+        completed: false,
+      },
+    ],
   };
 
-  const res = await post("http://localhost:3000/api/post/multiwordle", gameStatus);
+  gameState = {
+      gameStatus: "new",
+      gameId: undefined,
+      summary: undefined,
+      inputs: undefined
+    }
+
+  const res = await post(
+    "http://localhost:3000/api/post/multiwordle",
+    gameState
+  );
 
   const initalGameState = await res.json();
   return { props: { initalGameState } };
