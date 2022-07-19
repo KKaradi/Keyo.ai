@@ -1,73 +1,72 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { authenticate, response } from "../helpers";
 
-type CharacterStatus = "green" | "yellow" | "gray";
+type CharacterStatus = "green" | "yellow" | "gray" | "empty";
 type GameStatus = "new" | "started" | "finished";
 
-type PushedCharacter = {
-  character: string;
-  status: CharacterStatus;
-};
-
-type Character = {
+export type AcceptCharacter = {
   character: string | undefined;
   status: CharacterStatus | undefined;
 };
 
-type Word = {
+export type AcceptWord = {
   completed: boolean | undefined;
-  characters: Character[] | undefined;
+  characters: AcceptCharacter[] | undefined;
 };
-type GameMove = {
+export type AcceptGameMove = {
+  summary: number[];
   gameId: number | undefined;
-  inputs: Word[] | undefined;
+  inputs: AcceptWord[] | undefined;
   gameStatus: GameStatus | undefined;
 };
 
-export type DefinedGameMove = {
+export type ReturnGameMode = {
   gameId: number;
-  inputs: DefinedWord[];
+  summary: number[];
+  inputs: ReturnWord[];
   gameStatus: GameStatus;
 };
 
-export type DefinedWord = {
+export type ReturnWord = {
   completed: boolean;
-  characters: DefinedCharacter[];
+  characters: ReturnCharacter[];
 };
 
-export type DefinedCharacter = {
+export type ReturnCharacter = {
   character: string;
   status: CharacterStatus;
 };
 
 type ErrorMessage = { message: string };
-type Response = GameMove | ErrorMessage;
-const prompt = "tokyo harbor";
+type Response = AcceptGameMove | ErrorMessage;
+const prompt =
+  "a nighttime cityscape of tokyo harbor chillwave style trending on artstation";
 const gameId = 1;
 
-function splitToWord(split: string): Word {
+function splitToEmptys(split: string): AcceptWord {
   return {
     completed: false,
-    characters: split.split("").map((character) => {
-      return { character: character };
+    characters: split.split("").map(() => {
+      return { status: "empty", character: " " };
     }),
-  } as Word;
+  } as AcceptWord;
 }
 
 function generateNewGame(
   prompt: string,
   gameId: number,
   splits: string[]
-): GameMove {
+): AcceptGameMove {
   return {
     gameId: gameId,
     gameStatus: "started",
-    inputs: splits.map(splitToWord),
-  } as GameMove;
+    inputs: splits.map(splitToEmptys),
+    summary: splits.map((split) => split.length),
+  } as AcceptGameMove;
 }
 
 function processStartedGame(
-  gameMove: GameMove,
+  gameMove: AcceptGameMove,
   res: NextApiResponse<Response>,
   splits: string[]
 ): boolean {
@@ -107,7 +106,7 @@ function processStartedGame(
 }
 
 function processSingleWord(
-  word: Word,
+  word: AcceptWord,
   split: string,
   res: NextApiResponse<Response>
 ): boolean {
@@ -142,7 +141,7 @@ function processSingleWord(
       return false;
     }
   }
-  if (handleWorlde(characters as PushedCharacter[], split)) {
+  if (handleWorlde(characters as ReturnCharacter[], split)) {
     word.completed = true;
   }
   return true;
@@ -154,7 +153,7 @@ function processSingleWord(
  * @param split
  * @returns Weather the word was completed
  */
-function handleWorlde(characters: PushedCharacter[], split: string): boolean {
+function handleWorlde(characters: ReturnCharacter[], split: string): boolean {
   const splitMap = new Map<string, number>();
   let completedFlag = true;
   for (const character of split.split("")) {
@@ -201,7 +200,7 @@ export default function Handler(
 
   if (!authenticate(req)) return response(res, "authError");
 
-  const gameMove = req.body as GameMove;
+  const gameMove = req.body as AcceptGameMove;
 
   const splits = prompt.split(" ");
 
@@ -213,6 +212,10 @@ export default function Handler(
     res.status(200).json(generateNewGame(prompt, gameId, splits));
   } else if (gameMove.gameStatus === "finished") {
     res.status(400).json({ message: "Game is already finished." });
+  } else if (gameMove.summary === undefined) {
+    res
+      .status(400)
+      .json({ message: "Incorrect parameters: must supply summary." });
   } else if (gameMove.gameStatus === "started") {
     if (processStartedGame(gameMove, res, splits)) {
       res.status(200).json(gameMove);

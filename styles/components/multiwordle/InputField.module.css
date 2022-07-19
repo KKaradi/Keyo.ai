@@ -1,6 +1,6 @@
 .body {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   flex-wrap: wrap;
   border-style: solid;
 }
@@ -8,17 +8,19 @@
 .word {
   width: fit-content;
   text-align: center;
-
   display: flex;
+  margin: 2px;
   flex-direction: row;
 }
 
 .cell {
   width: fit-content;
-
+  border-radius: 10px;
+  color: whitesmoke;
+  border-color: white;
   text-align: center;
   border-style: solid;
   border-width: 1px;
-  font-size: 2rem;
+  font-size: 1rem;
   font-family: "Roboto", monospace;
 }

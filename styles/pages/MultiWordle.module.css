@@ -1,4 +1,10 @@
-.halfDiv {
+.half {
     width: 50%;
+    text-align: center;
+}
 
+.body {
+    background-color: white;
+    display: flex;
+    flex-direction: row;
 }
