@@ -1,19 +1,18 @@
 import type { NextPage, NextPageContext } from "next";
-import Image from "next/image";
-import { post, get } from "../helpers";
+import { post } from "../helpers";
 import { AcceptGameMove, ReturnGameMode } from "./api/post/multiwordle";
 import styles from "../styles/pages/MultiWordle.module.css";
 import InputField from "../components/multiwordle/InputField";
 import ImageFrame from "../components/multiwordle/ImageFrame";
-import TextField from "@mui/material/TextField/TextField";
 import {
-  ChangeEventHandler,
   Dispatch,
   SetStateAction,
   useCallback,
   useEffect,
   useState,
 } from "react";
+import Carousel from "../components/multiwordle/Carousel";
+import Keyboard from "../components/multiwordle/Keyboard";
 
 function applyInput(
   input: string,
@@ -39,8 +38,9 @@ const MultiWordlePage: NextPage<{ initalGameState: ReturnGameMode }> = ({
   //const [gameState, setGameState] = useState(initalGameState);
   const [userInput, setUserInput] = useState("");
   const [newDataFlag, setNewDataFlag] = useState(true);
-  const [gameStateStack, setGameStateStack] = useState<ReturnGameMode[]>([initalGameState]);
-
+  const [gameStateStack, setGameStateStack] = useState<ReturnGameMode[]>([
+    initalGameState,
+  ]);
 
   const handleUserKeyPress = useCallback(
     async (event: { key: string; keyCode: number }) => {
@@ -62,7 +62,7 @@ const MultiWordlePage: NextPage<{ initalGameState: ReturnGameMode }> = ({
           "http://localhost:3000/api/post/multiwordle",
           gameStateStack[0]
         );
-        setGameStateStack([await res.json(), ...gameStateStack, ]);
+        setGameStateStack([await res.json(), ...gameStateStack]);
         setNewDataFlag(true);
         return;
       }
@@ -79,22 +79,24 @@ const MultiWordlePage: NextPage<{ initalGameState: ReturnGameMode }> = ({
   }, [handleUserKeyPress]);
 
   return (
-    <div className={styles.body}>
-      <div className={styles.half}>
+    <div className={styles.container}>
+      <div className={styles.left}>
         <ImageFrame path="/prototypes/multiwordle/a_nighttime_cityscape_of_tokyo_harbor_chillwave_style_trending_on_artstation.png"></ImageFrame>
-        {/* <input type='textfield' value={input} onChange={handleChange}/> */}
         <InputField
           input={userInput}
           gameState={gameStateStack[0]}
           newDataFlag={newDataFlag}
         />
       </div>
+      <div className={styles.right}>
+        <Carousel slides={[]} />
+        <Keyboard onPress={() => true} onSubmit={() => true} />
+      </div>
     </div>
   );
 };
 
 export const getServerSideProps = async (context: NextPageContext) => {
-
   const dummyInput = [
     "a",
     "nighttime",
@@ -184,11 +186,11 @@ export const getServerSideProps = async (context: NextPageContext) => {
   };
 
   gameState = {
-      gameStatus: "new",
-      gameId: undefined,
-      summary: undefined,
-      inputs: undefined
-    }
+    gameStatus: "new",
+    gameId: undefined,
+    summary: undefined,
+    inputs: undefined,
+  };
 
   const res = await post(
     "http://localhost:3000/api/post/multiwordle",
@@ -198,4 +200,5 @@ export const getServerSideProps = async (context: NextPageContext) => {
   const initalGameState = await res.json();
   return { props: { initalGameState } };
 };
+
 export default MultiWordlePage;
