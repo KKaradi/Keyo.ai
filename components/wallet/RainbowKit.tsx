@@ -4,6 +4,7 @@ import { chain, configureChains, createClient, WagmiConfig } from "wagmi";
 import { alchemyProvider } from "wagmi/providers/alchemy";
 import { publicProvider } from "wagmi/providers/public";
 import type { NextPage } from "next";
+import { ReactElement } from "react";
 
 const { chains, provider } = configureChains(
   [chain.mainnet, chain.polygon, chain.optimism, chain.arbitrum],
@@ -22,8 +23,7 @@ const wagmiClient = createClient({
 });
 
 type RainbowKitProps = {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  children: any;
+  children: ReactElement;
 };
 
 const RainbowKit: NextPage<RainbowKitProps> = ({ children }) => {
