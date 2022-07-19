@@ -1,13 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { authenticate, response } from "../helpers";
 
-type CharacterStatus = "green" | "yellow" | "gray";
+export type CharacterStatus = "green" | "yellow" | "gray";
 type GameStatus = "new" | "started" | "finished";
-
-type PushedCharacter = {
-  character: string;
-  status: CharacterStatus;
-};
 
 type Character = {
   character: string | undefined;
@@ -18,6 +13,7 @@ type Word = {
   completed: boolean | undefined;
   characters: Character[] | undefined;
 };
+
 type GameMove = {
   gameId: number | undefined;
   inputs: Word[] | undefined;
@@ -54,11 +50,7 @@ function splitToWord(split: string): Word {
   } as Word;
 }
 
-function generateNewGame(
-  prompt: string,
-  gameId: number,
-  splits: string[]
-): GameMove {
+function generateNewGame(gameId: number, splits: string[]): GameMove {
   return {
     gameId: gameId,
     gameStatus: "started",
@@ -142,7 +134,7 @@ function processSingleWord(
       return false;
     }
   }
-  if (handleWorlde(characters as PushedCharacter[], split)) {
+  if (handleWordle(characters as DefinedCharacter[], split)) {
     word.completed = true;
   }
   return true;
@@ -152,14 +144,16 @@ function processSingleWord(
  *
  * @param characters
  * @param split
- * @returns Weather the word was completed
+ * @returns whether the word was completed
  */
-function handleWorlde(characters: PushedCharacter[], split: string): boolean {
+function handleWordle(characters: DefinedCharacter[], split: string): boolean {
   const splitMap = new Map<string, number>();
   let completedFlag = true;
+
   for (const character of split.split("")) {
     splitMap.set(character, (splitMap.get(character) ?? 0) + 1);
   }
+
   for (let indx = 0; indx < characters.length; indx++) {
     if (characters[indx].character === split.charAt(indx)) {
       splitMap.set(
@@ -171,7 +165,7 @@ function handleWorlde(characters: PushedCharacter[], split: string): boolean {
       completedFlag = false;
     }
   }
-  console.log(splitMap);
+
   if (completedFlag) {
     return true;
   }
@@ -210,7 +204,8 @@ export default function Handler(
       .status(400)
       .json({ message: "Incorrect parameters: must supply game status." });
   } else if (gameMove.gameStatus === "new") {
-    res.status(200).json(generateNewGame(prompt, gameId, splits));
+    const newGame = generateNewGame(gameId, splits);
+    return res.status(200).json(newGame);
   } else if (gameMove.gameStatus === "finished") {
     res.status(400).json({ message: "Game is already finished." });
   } else if (gameMove.gameStatus === "started") {
