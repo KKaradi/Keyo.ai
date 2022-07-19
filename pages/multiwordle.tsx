@@ -26,6 +26,7 @@ function applyInput(
     word.characters.forEach((character, indx) => {
       const charAt = input.charAt(indx);
       character.character = charAt === "" ? " " : charAt;
+      character.status = "empty";
     });
   }
 
@@ -35,6 +36,7 @@ function applyInput(
 const MultiWordlePage: NextPage<{ initalGameState: ReturnGameMode }> = ({
   initalGameState: initalGameState,
 }) => {
+  console.log(initalGameState)
   //const [gameState, setGameState] = useState(initalGameState);
   const [userInput, setUserInput] = useState("");
   const [newDataFlag, setNewDataFlag] = useState(true);
@@ -185,12 +187,12 @@ export const getServerSideProps = async (context: NextPageContext) => {
     ],
   };
 
-  gameState = {
-    gameStatus: "new",
-    gameId: undefined,
-    summary: undefined,
-    inputs: undefined,
-  };
+  // gameState = {
+  //   gameStatus: "new",
+  //   gameId: undefined,
+  //   summary: undefined,
+  //   inputs: undefined,
+  // };
 
   const res = await post(
     "http://localhost:3000/api/post/multiwordle",

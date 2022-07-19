@@ -52,11 +52,7 @@ function splitToEmptys(split: string): AcceptWord {
   } as AcceptWord;
 }
 
-function generateNewGame(
-  prompt: string,
-  gameId: number,
-  splits: string[]
-): AcceptGameMove {
+function generateNewGame(gameId: number, splits: string[]): AcceptGameMove {
   return {
     gameId: gameId,
     gameStatus: "started",
