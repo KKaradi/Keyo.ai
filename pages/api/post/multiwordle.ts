@@ -1,8 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { authenticate, response } from "../helpers";
 
-type CharacterStatus = "green" | "yellow" | "gray" | "empty";
-type GameStatus = "new" | "started" | "finished";
+export type CharacterStatus = "green" | "yellow" | "gray" | "empty";
+export type GameStatus = "new" | "started" | "finished";
 
 export type AcceptCharacter = {
   character: string | undefined;

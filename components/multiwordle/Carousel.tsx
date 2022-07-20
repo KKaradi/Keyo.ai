@@ -1,13 +1,10 @@
 import type { NextPage } from "next/types";
-import {
-  DefinedCharacter,
-  DefinedGameMove,
-} from "../../pages/api/post/multiwordle";
+import { ReturnCharacter } from "../../pages/api/post/multiwordle";
 import styles from "../../styles/components/multiwordle/Carousel.module.css";
 import Square from "./Square";
 
 type CarouselProps = {
-  slides: DefinedCharacter[][][];
+  slides: ReturnCharacter[][][];
 };
 
 const Carousel: NextPage<CarouselProps> = ({ slides }) => {
@@ -22,11 +19,11 @@ const Carousel: NextPage<CarouselProps> = ({ slides }) => {
           >
             {slide.map((word, wordIndex) => (
               <div key={wordIndex} className={styles.word}>
-                {word.map((character, charIndex) => (
+                {word.map(({ character, status }, charIndex) => (
                   <Square
                     key={charIndex}
-                    character={character.character}
-                    color={character.status}
+                    character={character}
+                    color={status}
                   />
                 ))}
               </div>
