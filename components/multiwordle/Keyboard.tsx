@@ -2,7 +2,7 @@ import type { NextPage } from "next/types";
 import styles from "../../styles/components/multiwordle/Keyboard.module.css";
 import BackspaceIcon from "@mui/icons-material/Backspace";
 import KeyboardReturnIcon from "@mui/icons-material/KeyboardReturn";
-import { ReactElement, useEffect, useState } from "react";
+import { ReactElement, useCallback, useEffect, useState } from "react";
 
 const icons: { [key: string]: ReactElement } = {
   ":enter": <KeyboardReturnIcon />,
@@ -16,24 +16,40 @@ const defaultKeyboard = [
 ];
 
 type KeyboardProps = {
-  onPress?: (key: string) => void;
-  onSubmit?: () => void;
+  onPress?: (userInput: string) => void;
+  onSubmit?: (userInput: string) => void;
   keyboard?: string[][];
 };
 
-const isUppercaseLetter = (char: string) => {
-  return char.length == 1 && Boolean(char.match(/[A-Z]/g));
+const isLetter = (char: string) => {
+  return char.length == 1 && Boolean(char.match(/[A-Za-z]/g));
 };
 
 const Keyboard: NextPage<KeyboardProps> = ({ onPress, onSubmit, keyboard }) => {
-  const onKeyDown = (key: string) => {
-    key = key.toUpperCase().replace(/:/g, "");
+  const [userInput, setUserInput] = useState("");
 
-    if (key === "ENTER" && onSubmit) onSubmit();
+  const onKeyDown = useCallback(
+    (key: string) => {
+      key = key.replace(/:/g, "");
 
-    const isValidKey = key === "BACKSPACE" || isUppercaseLetter(key);
-    if (isValidKey && onPress) onPress(key);
-  };
+      let newUserInput = userInput;
+
+      if (key.toLowerCase() === "enter" && onSubmit) {
+        newUserInput = "";
+        onSubmit(userInput);
+      }
+
+      if (key.toLowerCase() === "backspace") {
+        newUserInput = newUserInput.slice(0, -1);
+      }
+
+      if (isLetter(key)) newUserInput = newUserInput + key;
+
+      if (newUserInput !== userInput && onPress) onPress(newUserInput);
+      setUserInput(newUserInput);
+    },
+    [onPress, onSubmit, userInput]
+  );
 
   useEffect(() => {
     const listener = ({ key }: KeyboardEvent) => onKeyDown(key);

@@ -8,9 +8,12 @@ type NextPageProps = {
   color: CharacterStatus;
 };
 
-const Square: NextPage<NextPageProps> = ({ color, character }) => {
+const Square: NextPage<NextPageProps> = ({ character, color }) => {
   return (
-    <div className={styles.container} style={{ color: colors[color] }}>
+    <div
+      className={styles.container}
+      style={{ backgroundColor: colors[color] }}
+    >
       <div className={styles.character}>{character.toUpperCase()}</div>
     </div>
   );
