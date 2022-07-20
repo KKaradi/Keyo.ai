@@ -1,13 +1,12 @@
 .image {
-  border-style: solid;
   margin: 0 auto;
   width: 60%;
-
-}   
+  border-radius: 10px;
+  overflow: hidden;
+  width: 65%;
+}
 
 .frame {
-    border-style: solid;
-    padding-top: 20px;
-    padding-bottom: 20px;
-
+  padding-top: 20px;
+  padding-bottom: 10px;
 }

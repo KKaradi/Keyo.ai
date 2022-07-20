@@ -1,6 +1,7 @@
 .body {
   display: flex;
   flex-direction: row;
+  flex-grow: 1;
 }
 .container {
   display: flex;
@@ -13,12 +14,16 @@
 }
 
 .left {
-    height: 100vh;
+  /* height: 100vh; */
+  flex-basis: 35%;
+  flex-grow: 0;
+  flex-shrink: 0;
 }
 
 .right {
   background-color: white;
   display: flex;
+  flex-grow: 1;
   flex-direction: column;
   justify-content: center;
   gap: 50px;
