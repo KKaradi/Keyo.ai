@@ -7,7 +7,7 @@ type InputFieldProps = {
   gameState: ReturnGameMode;
 };
 
-const cellSize = 30;
+const cellSize = 32;
 
 const colorMap = {
   gray: "#787c7f",
@@ -32,6 +32,7 @@ const InputField: NextPage<InputFieldProps> = ({ gameState }) => {
                       color={character.status}
                       width={`${cellSize}px`}
                       height={`${cellSize}px`}
+                      style={{margin:"3px 3px"}}
                     />
                   </a>
                 );

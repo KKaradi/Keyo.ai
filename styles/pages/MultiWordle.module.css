@@ -19,6 +19,7 @@
   flex-basis: 35%;
   flex-grow: 0;
   flex-shrink: 0;
+  border-right: 4px dashed gray;
 }
 
 .right {
