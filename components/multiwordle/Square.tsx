@@ -6,13 +6,15 @@ import { CharacterStatus } from "../../pages/api/post/multiwordle";
 type NextPageProps = {
   character: string;
   color: CharacterStatus;
+  width: string;
+  height: string;
 };
 
-const Square: NextPage<NextPageProps> = ({ character, color }) => {
+const Square: NextPage<NextPageProps> = ({ character, color, width, height }) => {
   return (
     <div
       className={styles.container}
-      style={{ backgroundColor: colors[color] }}
+      style={{ backgroundColor: colors[color], width:width, height:height }}
     >
       <div className={styles.character}>{character.toUpperCase()}</div>
     </div>

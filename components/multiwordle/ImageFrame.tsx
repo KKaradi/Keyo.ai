@@ -9,15 +9,8 @@ type ImageFrameProps = {
 const ImageFrame: NextPage<ImageFrameProps> = ({ path }) => {
   return (
     <div className={styles.frame}>
-      <div className={styles.image}>
-        <Image
-          src={path}
-          alt={""}
-          width={14}
-          height={10}
-          layout="responsive"
-          quality={100}
-        />
+      <div className = {styles.image}>
+        <Image src={path} width={14} height={10} layout="responsive" objectFit="cover" alt="" />
       </div>
     </div>
   );
