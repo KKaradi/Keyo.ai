@@ -10,19 +10,10 @@ type InputFieldProps = {
   newDataFlag: boolean;
 };
 
-// type InputFieldProps = {
-//   state:{
-//     gameStateStack: ReturnGameMode[];
-//     gameState: ReturnGameMode;
-//     newDataFlag: boolean;
-//   }
-// }
 const cellSize = 32;
 
 const InputField: NextPage<InputFieldProps> = React.memo(function InputField ({ /*state*/gameState, previousGameState, newDataFlag }) {
   gameState = newDataFlag?   previousGameState:gameState;
-  //const gameState = state.newDataFlag?state.gameStateStack[0]:state.gameState;
-  // console.log(state)
   return (
     <div className={styles.body}>
       <div>
