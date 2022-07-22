@@ -14,7 +14,7 @@ import { useState } from "react";
 import Carousel from "../components/multiwordle/Carousel";
 import Keyboard from "../components/multiwordle/Keyboard";
 
-const getNewInputs = (input: string, gameState: ReturnGameMode) => {
+function getNewInputs(input: string, gameState: ReturnGameMode) {
   return gameState.inputs.map((word) => {
     if (word.completed) return word;
     return {
@@ -28,9 +28,9 @@ const getNewInputs = (input: string, gameState: ReturnGameMode) => {
       }),
     } as ReturnWord;
   });
-};
+}
 
-const gameStackToSlides = (gameStates: ReturnGameMode[]) => {
+function gameStackToSlides(gameStates: ReturnGameMode[]) {
   const slides: ReturnCharacter[][][] = [];
   gameStates.forEach((gameState, gameStateIndex) => {
     if (gameStateIndex === gameStates.length - 1) return;
@@ -50,7 +50,7 @@ const gameStackToSlides = (gameStates: ReturnGameMode[]) => {
     });
   });
   return slides;
-};
+}
 
 const MultiWordlePage: NextPage<{ initalGameState: ReturnGameMode }> = ({
   initalGameState: initalGameState,

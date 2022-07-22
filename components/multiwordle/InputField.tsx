@@ -12,11 +12,11 @@ type InputFieldProps = {
 
 const cellSize = 32;
 
-const InputField: NextPage<InputFieldProps> = React.memo(function InputField({
+const InputField: NextPage<InputFieldProps> = ({
   gameState,
   previousGameState,
   newDataFlag,
-}) {
+}) => {
   gameState = newDataFlag ? previousGameState : gameState;
   return (
     <div className={styles.body}>
@@ -48,6 +48,6 @@ const InputField: NextPage<InputFieldProps> = React.memo(function InputField({
       </div>
     </div>
   );
-});
+};
 
 export default InputField;

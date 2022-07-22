@@ -21,9 +21,9 @@ type KeyboardProps = {
   keyboard?: string[][];
 };
 
-const isLetter = (char: string) => {
+function isLetter(char: string) {
   return char.length == 1 && Boolean(char.match(/[A-Za-z]/g));
-};
+}
 
 const Keyboard: NextPage<KeyboardProps> = ({ onPress, onSubmit, keyboard }) => {
   const [userInput, setUserInput] = useState("");

@@ -175,7 +175,7 @@ function processSingleWord(
       return false;
     }
   }
-  if (handelWorlde(characters as ReturnCharacter[], promptSplit)) {
+  if (handleWordle(characters as ReturnCharacter[], promptSplit)) {
     word.completed = true;
   }
   return true;
@@ -187,7 +187,7 @@ function processSingleWord(
  * @param promptSplit
  * @returns whether the word was completed
  */
-function handelWorlde(
+function handleWordle(
   characters: ReturnCharacter[],
   promptSplit: string
 ): boolean {
