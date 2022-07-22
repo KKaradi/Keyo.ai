@@ -3,6 +3,7 @@ import styles from "../../styles/components/multiwordle/Keyboard.module.css";
 import BackspaceIcon from "@mui/icons-material/Backspace";
 import KeyboardReturnIcon from "@mui/icons-material/KeyboardReturn";
 import { ReactElement, useCallback, useEffect, useState } from "react";
+import type { Flatten } from "../../helpers";
 
 const icons: { [key: string]: ReactElement } = {
   ":enter": <KeyboardReturnIcon />,
@@ -13,19 +14,25 @@ const defaultKeyboard = [
   ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p"],
   ["a", "s", "d", "f", "g", "h", "j", "k", "l"],
   [":enter", "z", "x", "c", "v", "b", "n", "m", ":backspace"],
-];
+] as const;
 
 type KeyboardProps = {
+  colorMap?: { [key: string]: string };
+  keyboard?: string[][];
   onPress?: (userInput: string) => void;
   onSubmit?: (userInput: string) => void;
-  keyboard?: string[][];
 };
 
 const isLetter = (char: string) => {
   return char.length == 1 && Boolean(char.match(/[A-Za-z]/g));
 };
 
-const Keyboard: NextPage<KeyboardProps> = ({ onPress, onSubmit, keyboard }) => {
+const Keyboard: NextPage<KeyboardProps> = ({
+  onPress,
+  onSubmit,
+  keyboard,
+  colorMap,
+}) => {
   const [userInput, setUserInput] = useState("");
 
   const onKeyDown = useCallback(
@@ -66,6 +73,7 @@ const Keyboard: NextPage<KeyboardProps> = ({ onPress, onSubmit, keyboard }) => {
               className={styles.button}
               onClick={() => onKeyDown(key)}
               key={keyIndex}
+              style={{ backgroundColor: colorMap ? colorMap[key] : undefined }}
             >
               {key.startsWith(":") ? icons[key] : key}
             </button>

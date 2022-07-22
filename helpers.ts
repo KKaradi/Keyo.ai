@@ -45,3 +45,12 @@ export type Vote = Omit<Prisma.Vote, "id" | "createdAt"> & {
 export const clipboard = async (text: string) => {
   await navigator?.clipboard?.writeText(text);
 };
+
+export type Flatten<T extends readonly unknown[]> = T extends [
+  infer F,
+  ...infer R
+]
+  ? F extends readonly unknown[]
+    ? [...Flatten<F>, ...Flatten<R>]
+    : [F, ...Flatten<R>]
+  : [];

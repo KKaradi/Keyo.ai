@@ -45,6 +45,7 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  gap: 10px;
 }
 
 .word {
@@ -52,6 +53,7 @@
   flex-direction: row;
   justify-content: center;
   align-items: center;
+  gap: 3px;
 }
 
 .slider > a {
@@ -73,4 +75,9 @@
 
 .slider > a:focus {
   background: #000;
+}
+
+.cell {
+  width: 40px;
+  height: 40px;
 }

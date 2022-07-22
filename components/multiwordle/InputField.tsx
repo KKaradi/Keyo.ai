@@ -1,45 +1,29 @@
 import { NextPage } from "next";
 import styles from "../../styles/components/multiwordle/InputField.module.css";
 import { ReturnGameMode } from "../../pages/api/post/multiwordle";
+import Square from "./Square";
 
 type InputFieldProps = {
   gameState: ReturnGameMode;
+  activeSlide: number;
 };
 
-const cellSize = 32;
-
-const colorMap = {
-  gray: "#787c7f",
-  green: "#6ca965",
-  yellow: "#c8b653",
-  empty: "#FFFFFF",
-};
-
-const InputField: NextPage<InputFieldProps> = ({ gameState }) => {
+const InputField: NextPage<InputFieldProps> = ({ gameState, activeSlide }) => {
   return (
     <div className={styles.body}>
       {gameState.inputs.map((input, inputIndex) => {
+        const backgroundColor = activeSlide === inputIndex ? "#ddd" : undefined;
         return (
           <div
             key={inputIndex}
             className={styles.word}
-            style={{
-              height: `${cellSize}px`,
-              width: `${input.characters.length * 40}px`,
-            }}
+            style={{ backgroundColor }}
           >
-            {input.characters.map((character, characterIndex) => {
+            {input.characters.map(({ character, status }, characterIndex) => {
               return (
                 <a href={`#slide-${inputIndex + 1}`} key={characterIndex}>
-                  <div
-                    className={styles.cell}
-                    style={{
-                      height: `${cellSize}px`,
-                      width: `${cellSize}px`,
-                      backgroundColor: colorMap[character.status],
-                    }}
-                  >
-                    {character.character}
+                  <div className={styles.cell}>
+                    <Square character={character} color={status} />
                   </div>
                 </a>
               );
