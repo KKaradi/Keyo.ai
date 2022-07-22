@@ -50,7 +50,6 @@ const gameStackToSlides = (gameStates: ReturnGameMode[]) => {
       slides[inputIndex][gameStateIndex].push(...characters);
     });
   });
-  console.log(slides)
   return slides;
 };
 
