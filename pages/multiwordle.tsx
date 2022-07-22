@@ -33,6 +33,8 @@ const getNewInputs = (input: string, gameState: ReturnGameMode) => {
 const gameStackToSlides = (gameStates: ReturnGameMode[]) => {
   const slides: ReturnCharacter[][][] = [];
   gameStates.forEach((gameState, gameStateIndex) => {
+    if(gameStateIndex === gameStates.length - 1) 
+      return;
     gameState.inputs.forEach((input, inputIndex) => {
       if (!slides[inputIndex]) slides.push([]);
       if (!slides[inputIndex][gameStateIndex]) slides[inputIndex].push([]);
@@ -48,33 +50,41 @@ const gameStackToSlides = (gameStates: ReturnGameMode[]) => {
       slides[inputIndex][gameStateIndex].push(...characters);
     });
   });
+  console.log(slides)
   return slides;
 };
 
 const MultiWordlePage: NextPage<{ initalGameState: ReturnGameMode }> = ({
   initalGameState: initalGameState,
 }) => {
-  const [gameStateStack, setGameStateStack] = useState<ReturnGameMode[]>([]);
+  const [gameStateStack, setGameStateStack] = useState<ReturnGameMode[]>([
+    initalGameState,
+  ]);
   const [gameState, setGameState] = useState(initalGameState);
+  const [newDataFlag, setNewDataFlag] = useState(true);
 
   const onPress = (userInput: string) => {
     const inputs = getNewInputs(userInput, gameState);
+    setNewDataFlag(userInput === "");
     setGameState({ ...gameState, inputs });
   };
 
   const onSubmit = async () => {
     const res = await post<ReturnGameMode>("api/post/multiwordle", gameState);
     const json = (await res.json()) as ReturnGameMode;
-
+    setNewDataFlag(true);
     setGameStateStack([json, ...gameStateStack]);
     setGameState(json);
   };
-
   return (
     <div className={styles.container}>
       <div className={styles.left}>
         <ImageFrame path="/prototypes/multiwordle/a_nighttime_cityscape_of_tokyo_harbor_chillwave_style_trending_on_artstation.png"></ImageFrame>
-        <InputField gameState={gameState} />
+        <InputField
+          gameState={gameState}
+          previousGameState={gameStateStack[0]}
+          newDataFlag={newDataFlag}
+        />
       </div>
       <div className={styles.right}>
         <Carousel slides={gameStackToSlides([gameState, ...gameStateStack])} />
@@ -100,6 +110,7 @@ export const getServerSideProps = async ({ req }: NextPageContext) => {
   const res = await post<AcceptGameMove>(url, gameState);
 
   const initalGameState = await res.json();
+
   return { props: { initalGameState } };
 };
 
