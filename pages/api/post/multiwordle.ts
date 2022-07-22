@@ -17,6 +17,7 @@ export type AcceptGameMove = {
   summary: number[] | undefined;
   gameId: number | undefined;
   inputs: AcceptWord[] | undefined;
+  imagePath: string | undefined;
   gameStatus: GameStatus | undefined;
 };
 
@@ -24,6 +25,7 @@ export type ReturnGameMode = {
   gameId: number;
   summary: number[];
   inputs: ReturnWord[];
+  imagePath: string;
   gameStatus: GameStatus;
 };
 
@@ -74,6 +76,7 @@ function splitToEmptys(promptSplits: string): AcceptWord {
 
 function generateNewGame(
   gameId: number,
+  imagePath: string,
   promptSplits: string[]
 ): AcceptGameMove {
   return {
@@ -81,6 +84,7 @@ function generateNewGame(
     gameStatus: "started",
     inputs: promptSplits.map(splitToEmptys),
     summary: promptSplits.map((split) => split.length),
+    imagePath: imagePath,
   } as AcceptGameMove;
 }
 
@@ -88,6 +92,7 @@ function processStartedGame(
   gameMove: AcceptGameMove,
   res: NextApiResponse<Response>,
   gameId: number,
+  imagePath: string,
   promptSplits: string[]
 ): boolean {
   if (gameMove.gameId != gameId) {
@@ -96,6 +101,15 @@ function processStartedGame(
     });
     return false;
   }
+
+  if (gameMove.summary === undefined) {
+    gameMove.summary = promptSplits.map((split) => split.length);
+  }
+
+  if (gameMove.imagePath === undefined) {
+    gameMove.imagePath = imagePath;
+  }
+
   const { inputs } = gameMove;
   if (!inputs) {
     res.status(400).json({ message: "Game inputs undefined" });
@@ -240,14 +254,12 @@ export default function Handler(
       .status(400)
       .json({ message: "Incorrect parameters: must supply game status." });
   } else if (gameMove.gameStatus === "new") {
-    const newGame = generateNewGame(gameId, splits);
+    const newGame = generateNewGame(gameId, imagePath, splits);
     return res.status(200).json(newGame);
   } else if (gameMove.gameStatus === "finished") {
     res.status(400).json({ message: "Game is already finished." });
   } else if (gameMove.gameStatus === "started") {
-    if (gameMove.summary === undefined) {
-      res.status(400).json({ message: "Game summary is undefined." });
-    } else if (processStartedGame(gameMove, res, gameId, splits)) {
+    if (processStartedGame(gameMove, res, gameId, imagePath, splits)) {
       res.status(200).json(gameMove);
     }
   } else {

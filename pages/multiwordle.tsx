@@ -78,7 +78,7 @@ const MultiWordlePage: NextPage<{ initalGameState: ReturnGameMode }> = ({
   return (
     <div className={styles.container}>
       <div className={styles.left}>
-        <ImageFrame path="/prototypes/multiwordle/a_nighttime_cityscape_of_tokyo_harbor_chillwave_style_trending_on_artstation.png"></ImageFrame>
+        <ImageFrame path={gameState.imagePath}></ImageFrame>
         <InputField
           gameState={gameState}
           previousGameState={gameStateStack[0]}
@@ -101,6 +101,7 @@ export const getServerSideProps = async ({ req }: NextPageContext) => {
 
   const gameState = {
     gameStatus: "new" as GameStatus,
+    imagePath: undefined,
     gameId: undefined,
     summary: undefined,
     inputs: undefined,
