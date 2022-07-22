@@ -45,7 +45,8 @@ const Keyboard: NextPage<KeyboardProps> = ({ onPress, onSubmit, keyboard }) => {
 
       if (isLetter(key)) newUserInput = newUserInput + key;
 
-      if (newUserInput !== userInput && onPress && !onSubCalledFlag) onPress(newUserInput);
+      if (newUserInput !== userInput && onPress && !onSubCalledFlag)
+        onPress(newUserInput);
       setUserInput(newUserInput);
     },
     [onPress, onSubmit, userInput]

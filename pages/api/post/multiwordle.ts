@@ -42,11 +42,11 @@ export type ReturnCharacter = {
 type ErrorMessage = { message: string };
 type Response = AcceptGameMove | ErrorMessage;
 
-function pullPrompt(): [
-  string | undefined,
-  string | undefined,
-  number | undefined
-] {
+function pullPrompt(): {
+  prompt: string | undefined;
+  imagePath: string | undefined;
+  gameId: number | undefined;
+} {
   let prompt;
   let imagePath;
   let gameId;
@@ -62,7 +62,7 @@ function pullPrompt(): [
       break;
     }
   }
-  return [prompt, imagePath, gameId];
+  return { prompt, imagePath, gameId };
 }
 
 function splitToEmptys(promptSplits: string): AcceptWord {
@@ -175,7 +175,7 @@ function processSingleWord(
       return false;
     }
   }
-  if (handleWorlde(characters as ReturnCharacter[], promptSplit)) {
+  if (handelWorlde(characters as ReturnCharacter[], promptSplit)) {
     word.completed = true;
   }
   return true;
@@ -187,7 +187,7 @@ function processSingleWord(
  * @param promptSplit
  * @returns whether the word was completed
  */
-function handleWorlde(
+function handelWorlde(
   characters: ReturnCharacter[],
   promptSplit: string
 ): boolean {
@@ -240,7 +240,7 @@ export default function Handler(
   if (!authenticate(req)) return response(res, "authError");
 
   const gameMove = req.body as AcceptGameMove;
-  const [prompt, imagePath, gameId] = pullPrompt();
+  const { prompt, imagePath, gameId } = pullPrompt();
 
   if (prompt === undefined || imagePath === undefined || gameId === undefined) {
     res.status(400).json({ message: "No game session is currently running" });

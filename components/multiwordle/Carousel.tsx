@@ -24,8 +24,8 @@ const Carousel: NextPage<CarouselProps> = ({ slides }) => {
                     key={charIndex}
                     character={character}
                     color={status}
-                    width='40px'
-                    height='40px'
+                    width="40px"
+                    height="40px"
                   />
                 ))}
               </div>

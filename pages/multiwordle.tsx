@@ -33,8 +33,7 @@ const getNewInputs = (input: string, gameState: ReturnGameMode) => {
 const gameStackToSlides = (gameStates: ReturnGameMode[]) => {
   const slides: ReturnCharacter[][][] = [];
   gameStates.forEach((gameState, gameStateIndex) => {
-    if(gameStateIndex === gameStates.length - 1) 
-      return;
+    if (gameStateIndex === gameStates.length - 1) return;
     gameState.inputs.forEach((input, inputIndex) => {
       if (!slides[inputIndex]) slides.push([]);
       if (!slides[inputIndex][gameStateIndex]) slides[inputIndex].push([]);
