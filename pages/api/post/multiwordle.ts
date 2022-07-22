@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { authenticate, response } from "../helpers";
-
+import schedule from "../../../live/schedule.json";
 export type CharacterStatus = "green" | "yellow" | "gray" | "empty";
 export type GameStatus = "new" | "started" | "finished";
 
@@ -17,6 +17,7 @@ export type AcceptGameMove = {
   summary: number[] | undefined;
   gameId: number | undefined;
   inputs: AcceptWord[] | undefined;
+  imagePath: string | undefined;
   gameStatus: GameStatus | undefined;
 };
 
@@ -24,6 +25,7 @@ export type ReturnGameMode = {
   gameId: number;
   summary: number[];
   inputs: ReturnWord[];
+  imagePath: string;
   gameStatus: GameStatus;
 };
 
@@ -39,49 +41,85 @@ export type ReturnCharacter = {
 
 type ErrorMessage = { message: string };
 type Response = AcceptGameMove | ErrorMessage;
-const prompt =
-  "a nighttime cityscape of tokyo harbor chillwave style trending on artstation";
-const gameId = 1;
 
-function splitToEmptys(split: string): AcceptWord {
+function pullPrompt(): {
+  prompt: string | undefined;
+  imagePath: string | undefined;
+  gameId: number | undefined;
+} {
+  let prompt;
+  let imagePath;
+  let gameId;
+  const now = Date.now();
+  for (let i = 0; i < schedule.length; i++) {
+    if (
+      new Date(schedule[i].start_date).getTime() <= now &&
+      now <= new Date(schedule[i].end_date).getTime()
+    ) {
+      prompt = schedule[i].prompt;
+      imagePath = schedule[i].image_path;
+      gameId = i;
+      break;
+    }
+  }
+  return { prompt, imagePath, gameId };
+}
+
+function splitToEmptys(promptSplits: string): AcceptWord {
   return {
     completed: false,
-    characters: split.split("").map(() => {
+    characters: promptSplits.split("").map(() => {
       return { status: "empty", character: " " };
     }),
   } as AcceptWord;
 }
 
-function generateNewGame(gameId: number, splits: string[]): AcceptGameMove {
+function generateNewGame(
+  gameId: number,
+  imagePath: string,
+  promptSplits: string[]
+): AcceptGameMove {
   return {
     gameId: gameId,
     gameStatus: "started",
-    inputs: splits.map(splitToEmptys),
-    summary: splits.map((split) => split.length),
+    inputs: promptSplits.map(splitToEmptys),
+    summary: promptSplits.map((split) => split.length),
+    imagePath: imagePath,
   } as AcceptGameMove;
 }
 
 function processStartedGame(
   gameMove: AcceptGameMove,
   res: NextApiResponse<Response>,
-  splits: string[]
+  gameId: number,
+  imagePath: string,
+  promptSplits: string[]
 ): boolean {
   if (gameMove.gameId != gameId) {
-    res
-      .status(400)
-      .json({ message: "Incorrect game id. Current game id is " + gameId });
+    res.status(400).json({
+      message: `Incorrect game id. Current game id is ${gameId}. A new game may have been started in the time the game was played.`,
+    });
     return false;
   }
+
+  if (gameMove.summary === undefined) {
+    gameMove.summary = promptSplits.map((split) => split.length);
+  }
+
+  if (gameMove.imagePath === undefined) {
+    gameMove.imagePath = imagePath;
+  }
+
   const { inputs } = gameMove;
   if (!inputs) {
     res.status(400).json({ message: "Game inputs undefined" });
     return false;
   }
-  if (inputs.length != splits.length) {
+  if (inputs.length != promptSplits.length) {
     res.status(400).json({
       message:
         "Number of inputted words is incorrect: Expected " +
-        splits.length +
+        promptSplits.length +
         " but got " +
         inputs.length,
     });
@@ -89,7 +127,7 @@ function processStartedGame(
   }
 
   for (let indx = 0; indx < inputs.length; indx++) {
-    if (!processSingleWord(inputs[indx], splits[indx], res)) {
+    if (!processSingleWord(inputs[indx], promptSplits[indx], res)) {
       return false;
     }
   }
@@ -103,7 +141,7 @@ function processStartedGame(
 
 function processSingleWord(
   word: AcceptWord,
-  split: string,
+  promptSplit: string,
   res: NextApiResponse<Response>
 ): boolean {
   const { characters, completed } = word;
@@ -115,11 +153,11 @@ function processSingleWord(
     res.status(400).json({ message: "Word completion is undefined" });
     return false;
   }
-  if (characters.length != split.length) {
+  if (characters.length != promptSplit.length) {
     res.status(400).json({
       message:
         "Number of inputted characters is incorrect: Expected " +
-        split.length +
+        promptSplit.length +
         " but got " +
         characters.length,
     });
@@ -137,7 +175,7 @@ function processSingleWord(
       return false;
     }
   }
-  if (handleWorlde(characters as ReturnCharacter[], split)) {
+  if (handleWordle(characters as ReturnCharacter[], promptSplit)) {
     word.completed = true;
   }
   return true;
@@ -146,22 +184,25 @@ function processSingleWord(
 /**
  *
  * @param characters
- * @param split
+ * @param promptSplit
  * @returns whether the word was completed
  */
-function handleWorlde(characters: ReturnCharacter[], split: string): boolean {
-  const splitMap = new Map<string, number>();
+function handleWordle(
+  characters: ReturnCharacter[],
+  promptSplit: string
+): boolean {
+  const promptSplitMap = new Map<string, number>();
   let completedFlag = true;
 
-  for (const character of split.split("")) {
-    splitMap.set(character, (splitMap.get(character) ?? 0) + 1);
+  for (const character of promptSplit.split("")) {
+    promptSplitMap.set(character, (promptSplitMap.get(character) ?? 0) + 1);
   }
 
   for (let indx = 0; indx < characters.length; indx++) {
-    if (characters[indx].character === split.charAt(indx)) {
-      splitMap.set(
+    if (characters[indx].character === promptSplit.charAt(indx)) {
+      promptSplitMap.set(
         characters[indx].character,
-        splitMap.get(characters[indx].character) ?? 0 - 1
+        (promptSplitMap.get(characters[indx].character) ?? 0) - 1
       );
       characters[indx].status = "green";
     } else {
@@ -177,11 +218,11 @@ function handleWorlde(characters: ReturnCharacter[], split: string): boolean {
     if (characters[indx].status === "green") {
       continue;
     }
-    if (splitMap.get(characters[indx].character) ?? 0 >= 1) {
+    if ((promptSplitMap.get(characters[indx].character) ?? 0) >= 1) {
       characters[indx].status = "yellow";
-      splitMap.set(
+      promptSplitMap.set(
         characters[indx].character,
-        splitMap.get(characters[indx].character) ?? 0 - 1
+        (promptSplitMap.get(characters[indx].character) ?? 0) - 1
       );
     } else {
       characters[indx].status = "gray";
@@ -199,6 +240,12 @@ export default function Handler(
   if (!authenticate(req)) return response(res, "authError");
 
   const gameMove = req.body as AcceptGameMove;
+  const { prompt, imagePath, gameId } = pullPrompt();
+
+  if (prompt === undefined || imagePath === undefined || gameId === undefined) {
+    res.status(400).json({ message: "No game session is currently running" });
+    return;
+  }
 
   const splits = prompt.split(" ");
 
@@ -207,14 +254,12 @@ export default function Handler(
       .status(400)
       .json({ message: "Incorrect parameters: must supply game status." });
   } else if (gameMove.gameStatus === "new") {
-    const newGame = generateNewGame(gameId, splits);
+    const newGame = generateNewGame(gameId, imagePath, splits);
     return res.status(200).json(newGame);
   } else if (gameMove.gameStatus === "finished") {
     res.status(400).json({ message: "Game is already finished." });
   } else if (gameMove.gameStatus === "started") {
-    if (gameMove.summary === undefined) {
-      res.status(400).json({ message: "Game summary is undefined." });
-    } else if (processStartedGame(gameMove, res, splits)) {
+    if (processStartedGame(gameMove, res, gameId, imagePath, splits)) {
       res.status(200).json(gameMove);
     }
   } else {

@@ -1,52 +1,51 @@
 import { NextPage } from "next";
 import styles from "../../styles/components/multiwordle/InputField.module.css";
 import { ReturnGameMode } from "../../pages/api/post/multiwordle";
+import Square from "./Square";
+import React from "react";
 
 type InputFieldProps = {
   gameState: ReturnGameMode;
+  previousGameState: ReturnGameMode;
+  newDataFlag: boolean;
 };
 
 const cellSize = 32;
 
-const colorMap = {
-  gray: "#787c7f",
-  green: "#6ca965",
-  yellow: "#c8b653",
-  empty: "#FFFFFF",
-};
-
-const InputField: NextPage<InputFieldProps> = ({ gameState }) => {
+const InputField: NextPage<InputFieldProps> = ({
+  gameState,
+  previousGameState,
+  newDataFlag,
+}) => {
+  gameState = newDataFlag ? previousGameState : gameState;
   return (
     <div className={styles.body}>
-      {gameState.inputs.map((input, inputIndex) => {
-        return (
-          <div
-            key={inputIndex}
-            className={styles.word}
-            style={{
-              height: `${cellSize}px`,
-              width: `${input.characters.length * 40}px`,
-            }}
-          >
-            {input.characters.map((character, characterIndex) => {
-              return (
-                <a href={`#slide-${inputIndex + 1}`} key={characterIndex}>
-                  <div
-                    className={styles.cell}
-                    style={{
-                      height: `${cellSize}px`,
-                      width: `${cellSize}px`,
-                      backgroundColor: colorMap[character.status],
-                    }}
-                  >
-                    {character.character}
-                  </div>
-                </a>
-              );
-            })}
-          </div>
-        );
-      })}
+      <div>
+        {gameState.inputs.map((input, inputIndex) => {
+          return (
+            <div key={inputIndex} className={styles.word}>
+              {input.characters.map((character, characterIndex) => {
+                return (
+                  <a href={`#slide-${inputIndex + 1}`} key={characterIndex}>
+                    <Square
+                      key={characterIndex}
+                      character={character.character}
+                      color={
+                        input.completed || newDataFlag
+                          ? character.status
+                          : "empty"
+                      }
+                      width={`${cellSize}px`}
+                      height={`${cellSize}px`}
+                      style={{ margin: "3px 3px" }}
+                    />
+                  </a>
+                );
+              })}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 };
