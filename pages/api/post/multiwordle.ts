@@ -22,11 +22,13 @@ export type AcceptGameMove = {
 };
 
 export type ReturnGameMode = {
-  gameId: number;
-  summary: number[];
-  inputs: ReturnWord[];
-  imagePath: string;
-  gameStatus: GameStatus;
+  gameId: number | undefined;
+  summary: number[] | undefined;
+  inputs: ReturnWord[] | undefined;
+  imagePath: string | undefined;
+  gameStatus: GameStatus | undefined;
+  error: boolean;
+  errorMessage: string | undefined;
 };
 
 export type ReturnWord = {
@@ -39,8 +41,8 @@ export type ReturnCharacter = {
   status: CharacterStatus;
 };
 
-type ErrorMessage = { message: string };
-type Response = AcceptGameMove | ErrorMessage;
+export type ErrorMessage = { message: string; error: boolean };
+export type Response = AcceptGameMove | ErrorMessage;
 
 function pullPrompt(): {
   prompt: string | undefined;
@@ -85,6 +87,7 @@ function generateNewGame(
     inputs: promptSplits.map(splitToEmptys),
     summary: promptSplits.map((split) => split.length),
     imagePath: imagePath,
+    error: false,
   } as AcceptGameMove;
 }
 
@@ -95,24 +98,26 @@ function processStartedGame(
   imagePath: string,
   promptSplits: string[]
 ): boolean {
-  if (gameMove.gameId != gameId) {
-    res.status(400).json({
-      message: `Incorrect game id. Current game id is ${gameId}. A new game may have been started in the time the game was played.`,
-    });
+  if (gameMove.gameId === undefined) {
+    res.status(400).json({ message: "GameId is undefined", error: true });
     return false;
+  }
+
+  if (gameMove.gameId != gameId) {
+    if (!schedule[gameMove.gameId]) {
+      res.status(400).json({ message: "Invalid GameId", error: true });
+      return false;
+    }
+    promptSplits = schedule[gameMove.gameId].prompt.split(" ");
   }
 
   if (gameMove.summary === undefined) {
     gameMove.summary = promptSplits.map((split) => split.length);
   }
 
-  if (gameMove.imagePath === undefined) {
-    gameMove.imagePath = imagePath;
-  }
-
   const { inputs } = gameMove;
   if (!inputs) {
-    res.status(400).json({ message: "Game inputs undefined" });
+    res.status(400).json({ message: "Game inputs undefined", error: true });
     return false;
   }
   if (inputs.length != promptSplits.length) {
@@ -122,6 +127,7 @@ function processStartedGame(
         promptSplits.length +
         " but got " +
         inputs.length,
+      error: true,
     });
     return false;
   }
@@ -146,11 +152,15 @@ function processSingleWord(
 ): boolean {
   const { characters, completed } = word;
   if (!characters) {
-    res.status(400).json({ message: "Word characters are undefined" });
+    res
+      .status(400)
+      .json({ message: "Word characters are undefined", error: true });
     return false;
   }
   if (completed === undefined) {
-    res.status(400).json({ message: "Word completion is undefined" });
+    res
+      .status(400)
+      .json({ message: "Word completion is undefined", error: true });
     return false;
   }
   if (characters.length != promptSplit.length) {
@@ -160,6 +170,7 @@ function processSingleWord(
         promptSplit.length +
         " but got " +
         characters.length,
+      error: true,
     });
     return false;
   }
@@ -169,9 +180,10 @@ function processSingleWord(
   for (const character of characters) {
     delete character.status;
     if (character.character === undefined || character.character.length != 1) {
-      res
-        .status(400)
-        .json({ message: "Character is undefined or not a single character." });
+      res.status(400).json({
+        message: "Character is undefined or not a single character.",
+        error: true,
+      });
       return false;
     }
   }
@@ -235,29 +247,36 @@ export default function Handler(
   req: NextApiRequest,
   res: NextApiResponse<Response>
 ) {
-  if (req.method !== "POST") return response(res, "onlyPost");
+  if (req.method !== "POST")
+    return res.status(405).json({ message: "Only Post Requests", error: true });
 
-  if (!authenticate(req)) return response(res, "authError");
+  if (!authenticate(req))
+    return res
+      .status(405)
+      .json({ message: "Authentication Error", error: true });
 
   const gameMove = req.body as AcceptGameMove;
   const { prompt, imagePath, gameId } = pullPrompt();
 
   if (prompt === undefined || imagePath === undefined || gameId === undefined) {
-    res.status(400).json({ message: "No game session is currently running" });
+    res
+      .status(400)
+      .json({ message: "No game session is currently running", error: true });
     return;
   }
 
   const splits = prompt.split(" ");
 
   if (!gameMove.gameStatus) {
-    res
-      .status(400)
-      .json({ message: "Incorrect parameters: must supply game status." });
+    res.status(400).json({
+      message: "Incorrect parameters: must supply game status.",
+      error: true,
+    });
   } else if (gameMove.gameStatus === "new") {
     const newGame = generateNewGame(gameId, imagePath, splits);
     return res.status(200).json(newGame);
   } else if (gameMove.gameStatus === "finished") {
-    res.status(400).json({ message: "Game is already finished." });
+    res.status(400).json({ message: "Game is already finished.", error: true });
   } else if (gameMove.gameStatus === "started") {
     if (processStartedGame(gameMove, res, gameId, imagePath, splits)) {
       res.status(200).json(gameMove);
@@ -265,6 +284,7 @@ export default function Handler(
   } else {
     res.status(400).json({
       message: "Game status is invalid. Must be new, started, finished",
+      error: true,
     });
   }
 }

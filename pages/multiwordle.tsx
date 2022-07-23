@@ -13,8 +13,12 @@ import ImageFrame from "../components/multiwordle/ImageFrame";
 import { useState } from "react";
 import Carousel from "../components/multiwordle/Carousel";
 import Keyboard from "../components/multiwordle/Keyboard";
+import ErrorFeature from "../components/multiwordle/ErrorFeature";
 
-function getNewInputs(input: string, gameState: ReturnGameMode) {
+function getNewInputs(input: string, gameState: ReturnGameMode): ReturnWord[] {
+  if (gameState.inputs === undefined) {
+    return [];
+  }
   return gameState.inputs.map((word) => {
     if (word.completed) return word;
     return {
@@ -30,9 +34,13 @@ function getNewInputs(input: string, gameState: ReturnGameMode) {
   });
 }
 
-function gameStackToSlides(gameStates: ReturnGameMode[]) {
+function gameStackToSlides(
+  gameStates: ReturnGameMode[]
+): ReturnCharacter[][][] {
   const slides: ReturnCharacter[][][] = [];
+
   gameStates.forEach((gameState, gameStateIndex) => {
+    if (gameState.inputs === undefined) return;
     if (gameStateIndex === gameStates.length - 1) return;
     gameState.inputs.forEach((input, inputIndex) => {
       if (!slides[inputIndex]) slides.push([]);
@@ -52,9 +60,9 @@ function gameStackToSlides(gameStates: ReturnGameMode[]) {
   return slides;
 }
 
-const MultiWordlePage: NextPage<{ initalGameState: ReturnGameMode }> = ({
-  initalGameState: initalGameState,
-}) => {
+const MultiWordlePage: NextPage<{
+  initalGameState: ReturnGameMode;
+}> = ({ initalGameState: initalGameState }) => {
   const [gameStateStack, setGameStateStack] = useState<ReturnGameMode[]>([
     initalGameState,
   ]);
@@ -68,27 +76,38 @@ const MultiWordlePage: NextPage<{ initalGameState: ReturnGameMode }> = ({
   };
 
   const onSubmit = async () => {
-    const res = await post<ReturnGameMode>("api/post/multiwordle", gameState);
-    const json = (await res.json()) as ReturnGameMode;
+    const res = await post<ReturnGameMode>(
+      "api/post/multiwordle",
+      gameState as ReturnGameMode
+    );
+    const json = await res.json();
     setNewDataFlag(true);
     setGameStateStack([json, ...gameStateStack]);
     setGameState(json);
   };
   return (
-    <div className={styles.container}>
-      <div className={styles.left}>
-        <ImageFrame path={gameState.imagePath}></ImageFrame>
-        <InputField
-          gameState={gameState}
-          previousGameState={gameStateStack[0]}
-          newDataFlag={newDataFlag}
-        />
+    <ErrorFeature error={gameState.error}>
+      <div className={styles.container}>
+        <div className={styles.left}>
+          {gameState.imagePath === undefined ? (
+            <div>Failed To Load</div>
+          ) : (
+            <ImageFrame path={gameState.imagePath}></ImageFrame>
+          )}
+          <InputField
+            gameState={gameState}
+            previousGameState={gameStateStack[0]}
+            newDataFlag={newDataFlag}
+          />
+        </div>
+        <div className={styles.right}>
+          <Carousel
+            slides={gameStackToSlides([gameState, ...gameStateStack])}
+          />
+          <Keyboard onPress={onPress} onSubmit={onSubmit} />
+        </div>
       </div>
-      <div className={styles.right}>
-        <Carousel slides={gameStackToSlides([gameState, ...gameStateStack])} />
-        <Keyboard onPress={onPress} onSubmit={onSubmit} />
-      </div>
-    </div>
+    </ErrorFeature>
   );
 };
 
@@ -99,7 +118,7 @@ export const getServerSideProps = async ({ req }: NextPageContext) => {
   ).toString();
 
   const gameState = {
-    gameStatus: "new" as GameStatus,
+    gameStatus: "started" as GameStatus,
     imagePath: undefined,
     gameId: undefined,
     summary: undefined,
