@@ -1,0 +1,38 @@
+.header {
+  position: absolute;
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  background-color: #eee;
+  top: 0%;
+  right: 0%;
+  width: 65%;
+  height: 8%;
+  border-bottom-left-radius: 20px;
+  box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
+}
+
+.moreInfoIcon {
+  width: 10%;
+  text-align: center;
+}
+
+.title {
+  font-size: 3rem;
+  text-align: center;
+  width: 80%;
+  color: #36393b;
+  font-family: "EduVICWANTBeginner", "Bebas Neue", "Lobster", sans-serif;
+  font-weight: normal;
+  margin-right: 1rem;
+  border-radius: 20px;
+  background: linear-gradient(
+    to right,
+    #2a9134,
+    #2a9134 33.33%,
+    white 33.33%,
+    white 66.66%,
+    #ecc30b 66.66%
+  );
+  /* background: linear-gradient(to right, #2a9134 33%, #36393b 33%, #ecc30b 33%); */
+}

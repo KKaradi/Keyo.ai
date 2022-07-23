@@ -14,6 +14,7 @@ import { useState } from "react";
 import Carousel from "../components/multiwordle/Carousel";
 import Keyboard from "../components/multiwordle/Keyboard";
 import ErrorFeature from "../components/multiwordle/ErrorFeature";
+import Header from "../components/multiwordle/Header";
 
 function getNewInputs(input: string, gameState: ReturnGameMode): ReturnWord[] {
   if (gameState.inputs === undefined) {
@@ -106,6 +107,7 @@ const MultiWordlePage: NextPage<{
           />
           <Keyboard onPress={onPress} onSubmit={onSubmit} />
         </div>
+        <Header />
       </div>
     </ErrorFeature>
   );
@@ -118,7 +120,7 @@ export const getServerSideProps = async ({ req }: NextPageContext) => {
   ).toString();
 
   const gameState = {
-    gameStatus: "started" as GameStatus,
+    gameStatus: "new" as GameStatus,
     imagePath: undefined,
     gameId: undefined,
     summary: undefined,

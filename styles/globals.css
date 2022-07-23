@@ -12,6 +12,13 @@ body {
   width: 100vw;
 }
 
+@font-face {
+  font-family: "EduVICWANTBeginner";
+  src: url("../fonts/EduVICWANTBeginner/EduVICWANTBeginner-Bold.ttf");
+  font-weight: normal;
+  font-style: normal;
+}
+
 a {
   color: inherit;
   text-decoration: none;
