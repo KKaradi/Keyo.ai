@@ -65,7 +65,7 @@ function gameStackToSlides(
 const MultiWordlePage: NextPage<{
   initalGameState: ReturnGameMove;
 }> = ({ initalGameState: initalGameState }) => {
-  const [gameStateStack, setGameStateStack] = useState<ReturnGameMove[]>([
+  const [gameStack, setGameStack] = useState<ReturnGameMove[]>([
     initalGameState,
   ]);
   const [gameState, setGameState] = useState(initalGameState);
@@ -83,13 +83,17 @@ const MultiWordlePage: NextPage<{
       gameState as ReturnGameMove
     );
     const json = await res.json();
+    console.log(json);
     setNewDataFlag(true);
-    setGameStateStack([json, ...gameStateStack]);
+    setGameStack([json, ...gameStack]);
     setGameState(json);
   };
   return (
     <ErrorFeature error={gameState.error}>
-      <WinDialogue open={false} />
+      <WinDialogue
+        open={gameState.gameStatus === "finished"}
+        gameStack={gameStack}
+      />
       <div className={styles.container}>
         <div className={styles.left}>
           {gameState.imagePath === undefined ? (
@@ -99,14 +103,12 @@ const MultiWordlePage: NextPage<{
           )}
           <InputField
             gameState={gameState}
-            previousGameState={gameStateStack[0]}
+            previousGameState={gameStack[0]}
             newDataFlag={newDataFlag}
           />
         </div>
         <div className={styles.right}>
-          <Carousel
-            slides={gameStackToSlides([gameState, ...gameStateStack])}
-          />
+          <Carousel slides={gameStackToSlides([gameState, ...gameStack])} />
           <Keyboard onPress={onPress} onSubmit={onSubmit} />
         </div>
         <Header />
@@ -128,12 +130,12 @@ export const getServerSideProps = async ({ req }: NextPageContext) => {
     summary: undefined,
     inputs: undefined,
     stats: undefined,
+    nextGameDate: undefined,
   };
 
   const res = await post<AcceptGameMove>(url, gameState);
 
   const initalGameState = await res.json();
-
   return { props: { initalGameState } };
 };
 

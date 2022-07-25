@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { authenticate, response } from "../helpers";
+import { authenticate } from "../helpers";
 import schedule from "../../../live/schedule.json";
-import { stat } from "fs";
+
 export type CharacterStatus = "green" | "yellow" | "gray" | "empty";
 export type GameStatus = "new" | "started" | "finished";
 
@@ -12,6 +12,7 @@ export type Stats = {
   grays: number;
   totalWords: number;
   hitwords: number;
+  level: number;
 };
 
 export type AcceptCharacter = {
@@ -30,6 +31,7 @@ export type AcceptGameMove = {
   imagePath: string | undefined;
   gameStatus: GameStatus | undefined;
   stats: Stats | undefined;
+  nextGameDate: string | undefined;
 };
 
 export type ReturnGameMove = {
@@ -41,6 +43,7 @@ export type ReturnGameMove = {
   error: boolean;
   errorMessage: string | undefined;
   stats: Stats | undefined;
+  nextGameDate: string;
 };
 
 export type ReturnWord = {
@@ -56,27 +59,44 @@ export type ReturnCharacter = {
 export type ErrorMessage = { message: string; error: boolean };
 export type Response = AcceptGameMove | ErrorMessage;
 
+function applyLevel(stats: Stats): void {
+  if (stats.hitwords >= 2) {
+    stats.level = 0;
+  } else if (stats.hitwords == 1) {
+    stats.level = 1;
+  } else if (stats.greens + stats.yellows / stats.totalChars >= 0.66) {
+    stats.level = 2;
+  } else if (stats.greens + stats.yellows / stats.totalChars >= 0.33) {
+    stats.level = 3;
+  } else {
+    stats.level = 4;
+  }
+}
+
 function pullPrompt(): {
   prompt: string | undefined;
   imagePath: string | undefined;
   gameId: number | undefined;
+  nextGameDate: string | undefined;
 } {
   let prompt;
   let imagePath;
   let gameId;
+  let nextGameDate;
   const now = Date.now();
   for (let i = 0; i < schedule.length; i++) {
     if (
       new Date(schedule[i].start_date).getTime() <= now &&
       now <= new Date(schedule[i].end_date).getTime()
     ) {
-      prompt = schedule[i].prompt;
-      imagePath = schedule[i].image_path;
+      prompt = schedule[i]?.prompt;
+      imagePath = schedule[i]?.image_path;
       gameId = i;
+      nextGameDate = schedule[i + 1]?.start_date;
       break;
     }
   }
-  return { prompt, imagePath, gameId };
+  return { prompt, imagePath, gameId, nextGameDate };
 }
 
 function splitToEmptys(promptSplits: string): AcceptWord {
@@ -91,16 +111,18 @@ function splitToEmptys(promptSplits: string): AcceptWord {
 function generateNewGame(
   gameId: number,
   imagePath: string,
-  promptSplits: string[]
+  promptSplits: string[],
+  nextGameDate: string | undefined
 ): AcceptGameMove {
   return {
-    gameId: gameId,
+    gameId,
     gameStatus: "started",
     inputs: promptSplits.map(splitToEmptys),
     summary: promptSplits.map((split) => split.length),
     imagePath: imagePath,
     error: false,
     stats: undefined,
+    nextGameDate,
   } as AcceptGameMove;
 }
 
@@ -151,6 +173,7 @@ function processStartedGame(
     grays: 0,
     totalWords: 0,
     hitwords: 0,
+    level: 0,
   };
 
   gameMove["stats"] = stats;
@@ -213,6 +236,8 @@ function processSingleWord(
   if (handleWordle(characters as ReturnCharacter[], promptSplit, stats)) {
     word.completed = true;
   }
+
+  applyLevel(stats);
   return true;
 }
 
@@ -286,7 +311,7 @@ export default function Handler(
       .json({ message: "Authentication Error", error: true });
 
   const gameMove = req.body as AcceptGameMove;
-  const { prompt, imagePath, gameId } = pullPrompt();
+  const { prompt, imagePath, gameId, nextGameDate } = pullPrompt();
 
   if (prompt === undefined || imagePath === undefined || gameId === undefined) {
     res
@@ -303,7 +328,7 @@ export default function Handler(
       error: true,
     });
   } else if (gameMove.gameStatus === "new") {
-    const newGame = generateNewGame(gameId, imagePath, splits);
+    const newGame = generateNewGame(gameId, imagePath, splits, nextGameDate);
     return res.status(200).json(newGame);
   } else if (gameMove.gameStatus === "finished") {
     res.status(400).json({ message: "Game is already finished.", error: true });

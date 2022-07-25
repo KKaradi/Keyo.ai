@@ -1,6 +1,6 @@
-import { useState, ReactElement } from "react";
+import { useEffect, useState } from "react";
 import Button from "@mui/material/Button";
-import styles from "../../styles/components/multiwordle/dialogue/MoreInfo.module.css";
+import styles from "../../styles/components/multiwordle/dialogue/WinDialogue.module.css";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
@@ -8,14 +8,61 @@ import DialogTitle from "@mui/material/DialogTitle";
 import type { NextPage } from "next/types";
 import SlideTransition from "../dialogs/SlideTransition";
 import { colors } from "../../constants/colors";
+import { ReturnGameMove } from "../../pages/api/post/multiwordle";
 
 type WinDialogueProps = {
-  //   children: ReactElement;
   open: boolean;
+  gameStack: ReturnGameMove[];
 };
+//🟥🟧🟨🟩🟦🟪🟫⬛⬜💠🔳🔲
+const levelToSquare = ["💠", "🟩", "⬜", "◻️", "◽"];
 
-const WinDialogue: NextPage<WinDialogueProps> = ({ open }) => {
+function msToTime(duration: number): string {
+  //const milliseconds = Math.floor((duration % 1000) / 100);
+  let seconds: number | string = Math.floor((duration / 1000) % 60);
+  let minutes: number | string = Math.floor((duration / (1000 * 60)) % 60);
+  let hours: number | string = Math.floor((duration / (1000 * 60 * 60)) % 24);
+  const days: number = Math.floor(duration / 86_400_000);
+  hours = hours < 10 ? "0" + hours : hours;
+  minutes = minutes < 10 ? "0" + minutes : minutes;
+  seconds = seconds < 10 ? "0" + seconds : seconds;
+
+  return (days +
+    " days and " +
+    hours +
+    ":" +
+    minutes +
+    ":" +
+    seconds +
+    ".") as string;
+}
+
+const WinDialogue: NextPage<WinDialogueProps> = ({ open, gameStack }) => {
   const [isOpen, setIsOpen] = useState(true);
+  const [now, setNow] = useState(new Date());
+  useEffect(() => {
+    setInterval(() => {
+      setNow(new Date());
+    }, 1000);
+  });
+
+  const statsString = gameStack
+    .map((gameState, idx) => {
+      const level = gameState.stats?.level;
+      const defaltStr =
+        idx % 5 == 0 && idx !== gameStack.length - 1 ? "\n" : "";
+      if (level !== undefined) {
+        return levelToSquare[level] + defaltStr ?? defaltStr;
+      }
+      return defaltStr;
+    })
+    .reverse()
+    .join("");
+
+  const numberOfGuesse = gameStack.length - 1;
+  const timeToNextGame = msToTime(
+    new Date(gameStack[0].nextGameDate).getTime() - now.getTime()
+  );
 
   return (
     <Dialog
@@ -32,24 +79,20 @@ const WinDialogue: NextPage<WinDialogueProps> = ({ open }) => {
       }}
     >
       <DialogTitle>
-        <h1 className={styles.dialogTitle}>How to play?</h1>
+        <h1 className={styles.dialogTitle}>🎉 You Won 🎉</h1>
       </DialogTitle>
       <DialogContent>
         <DialogContentText className={styles.dialogContent}>
+          <p>Congrats on finishing today&apos;s multiwordle</p>
           <p>
-            First we started with a sentence. Then we asked an AI to draw that
-            sentence. That&apos;s what you see on the left. Your job is guess
-            the sentence that was use to draw the image
+            Number of Guesses: {numberOfGuesse} <br />
           </p>
-          <p>
-            You can enter a guess just by typing and hitting enter. Each guess
-            applies to every word in the sentence.
+          <p className={styles.text}>
+            Game History: <br />
+            {statsString}
           </p>
-          <p>
-            For each letter green means its in the correct spot, yellow means
-            its in the wrong spot and gray means its not in the word. You can
-            find a history of your guess by click each word.
-          </p>
+          <p>Next Game:</p>
+          {timeToNextGame}
         </DialogContentText>
       </DialogContent>
 
