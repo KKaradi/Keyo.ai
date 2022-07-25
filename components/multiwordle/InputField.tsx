@@ -5,10 +5,18 @@ import Square from "./Square";
 
 type InputFieldProps = {
   gameState: ReturnGameMode;
+  previousGameState: ReturnGameMode;
+  newDataFlag: boolean;
   activeSlide: number;
 };
 
-const InputField: NextPage<InputFieldProps> = ({ gameState, activeSlide }) => {
+const InputField: NextPage<InputFieldProps> = ({
+  gameState,
+  previousGameState,
+  activeSlide,
+  newDataFlag,
+}) => {
+  gameState = newDataFlag ? previousGameState : gameState;
   return (
     <div className={styles.body}>
       {gameState.inputs.map((input, inputIndex) => {
@@ -20,10 +28,11 @@ const InputField: NextPage<InputFieldProps> = ({ gameState, activeSlide }) => {
             style={{ backgroundColor }}
           >
             {input.characters.map(({ character, status }, characterIndex) => {
+              const color = input.completed || newDataFlag ? status : "empty";
               return (
                 <a href={`#slide-${inputIndex + 1}`} key={characterIndex}>
                   <div className={styles.cell}>
-                    <Square character={character} color={status} />
+                    <Square character={character} color={color} />
                   </div>
                 </a>
               );

@@ -23,9 +23,9 @@ type KeyboardProps = {
   onSubmit?: (userInput: string) => void;
 };
 
-const isLetter = (char: string) => {
+function isLetter(char: string) {
   return char.length == 1 && Boolean(char.match(/[A-Za-z]/g));
-};
+}
 
 const Keyboard: NextPage<KeyboardProps> = ({
   onPress,
@@ -38,12 +38,12 @@ const Keyboard: NextPage<KeyboardProps> = ({
   const onKeyDown = useCallback(
     (key: string) => {
       key = key.replace(/:/g, "");
-
       let newUserInput = userInput;
-
+      let onSubCalledFlag = false;
       if (key.toLowerCase() === "enter" && onSubmit) {
         newUserInput = "";
         onSubmit(userInput);
+        onSubCalledFlag = true;
       }
 
       if (key.toLowerCase() === "backspace") {
@@ -52,7 +52,8 @@ const Keyboard: NextPage<KeyboardProps> = ({
 
       if (isLetter(key)) newUserInput = newUserInput + key;
 
-      if (newUserInput !== userInput && onPress) onPress(newUserInput);
+      if (newUserInput !== userInput && onPress && !onSubCalledFlag)
+        onPress(newUserInput);
       setUserInput(newUserInput);
     },
     [onPress, onSubmit, userInput]

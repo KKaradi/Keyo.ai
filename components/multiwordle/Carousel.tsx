@@ -1,6 +1,5 @@
-/* eslint-disable react/display-name */
 import type { NextPage } from "next/types";
-import { createRef, forwardRef } from "react";
+import { createRef, forwardRef, ForwardRefRenderFunction } from "react";
 import { ReturnCharacter } from "../../pages/api/post/multiwordle";
 import styles from "../../styles/components/multiwordle/Carousel.module.css";
 import Square from "./Square";
@@ -10,21 +9,24 @@ type SlideProps = {
   index: number;
 };
 
-const Slide = forwardRef<HTMLDivElement, SlideProps>(
-  ({ slide, index }, ref) => (
-    <div id={`slide-${index + 1}`} className={styles.slide} ref={ref}>
-      {slide.map((word, wordIndex) => (
-        <div key={wordIndex} className={styles.word}>
-          {word.map(({ character, status }, charIndex) => (
-            <div className={styles.cell} key={charIndex}>
-              <Square character={character} color={status} />
-            </div>
-          ))}
-        </div>
-      ))}
-    </div>
-  )
+const Slide: ForwardRefRenderFunction<HTMLDivElement, SlideProps> = (
+  { slide, index },
+  ref
+) => (
+  <div id={`slide-${index + 1}`} className={styles.slide} ref={ref}>
+    {slide.slice(0, -1).map((word, wordIndex) => (
+      <div key={wordIndex} className={styles.word}>
+        {word.map(({ character, status }, charIndex) => (
+          <div className={styles.cell} key={charIndex}>
+            <Square character={character} color={status} />
+          </div>
+        ))}
+      </div>
+    ))}
+  </div>
 );
+
+const ForwardedRefSlide = forwardRef(Slide);
 
 type CarouselProps = {
   slides: ReturnCharacter[][][];
@@ -54,7 +56,7 @@ const Carousel: NextPage<CarouselProps> = ({ slides, setSlide }) => {
     <div className={styles.slider} ref={ref}>
       <div className={styles.slides} onScroll={onScroll}>
         {slides.map((slide, slideIndex) => (
-          <Slide
+          <ForwardedRefSlide
             key={slideIndex}
             index={slideIndex}
             slide={slide}

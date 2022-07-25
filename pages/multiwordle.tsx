@@ -15,7 +15,7 @@ import Carousel from "../components/multiwordle/Carousel";
 import Keyboard from "../components/multiwordle/Keyboard";
 import { colors } from "../constants/colors";
 
-const getNewInputs = (input: string, gameState: ReturnGameMode) => {
+function getNewInputs(input: string, gameState: ReturnGameMode) {
   return gameState.inputs.map((word) => {
     if (word.completed) return word;
     return {
@@ -29,12 +29,12 @@ const getNewInputs = (input: string, gameState: ReturnGameMode) => {
       }),
     } as ReturnWord;
   });
-};
+}
 
-const gameStackToSlides = (gameStates: ReturnGameMode[]) => {
+function gameStackToSlides(gameStates: ReturnGameMode[]) {
   const slides: ReturnCharacter[][][] = [];
   gameStates.forEach((gameState, gameStateIndex) => {
-    gameState.inputs.forEach((input: ReturnWord, inputIndex) => {
+    gameState.inputs.forEach((input, inputIndex) => {
       if (!slides[inputIndex]) slides.push([]);
       if (!slides[inputIndex][gameStateIndex]) slides[inputIndex].push([]);
 
@@ -59,7 +59,7 @@ const gameStackToSlides = (gameStates: ReturnGameMode[]) => {
   });
 
   return slides;
-};
+}
 
 function getColorMap(gameStates: ReturnGameMode[], activeSlide: number) {
   const keyMap: { [key: string]: string } = {};
@@ -73,34 +73,39 @@ function getColorMap(gameStates: ReturnGameMode[], activeSlide: number) {
   return keyMap;
 }
 
-const imagePath =
-  "/prototypes/multiwordle/a_nighttime_cityscape_of_tokyo_harbor_chillwave_style_trending_on_artstation.png";
-
 const MultiWordlePage: NextPage<{ initalGameState: ReturnGameMode }> = ({
   initalGameState: initalGameState,
 }) => {
-  const [gameStateStack, setGameStateStack] = useState<ReturnGameMode[]>([]);
+  const [gameStateStack, setGameStateStack] = useState<ReturnGameMode[]>([
+    initalGameState,
+  ]);
   const [gameState, setGameState] = useState(initalGameState);
   const [activeSlide, setActiveSlide] = useState(0);
+  const [newDataFlag, setNewDataFlag] = useState(true);
 
   const onPress = (userInput: string) => {
     const inputs = getNewInputs(userInput, gameState);
+    setNewDataFlag(userInput === "");
     setGameState({ ...gameState, inputs });
   };
 
   const onSubmit = async () => {
     const res = await post<ReturnGameMode>("api/post/multiwordle", gameState);
     const json = (await res.json()) as ReturnGameMode;
-
+    setNewDataFlag(true);
     setGameStateStack([json, ...gameStateStack]);
     setGameState(json);
   };
-
   return (
     <div className={styles.container}>
       <div className={styles.left}>
-        <ImageFrame path={imagePath} />
-        <InputField gameState={gameState} activeSlide={activeSlide} />
+        <ImageFrame path={gameState.imagePath}></ImageFrame>
+        <InputField
+          gameState={gameState}
+          previousGameState={gameStateStack[0]}
+          newDataFlag={newDataFlag}
+          activeSlide={activeSlide}
+        />
       </div>
       <div className={styles.right}>
         <Carousel
@@ -125,6 +130,7 @@ export const getServerSideProps = async ({ req }: NextPageContext) => {
 
   const gameState = {
     gameStatus: "new" as GameStatus,
+    imagePath: undefined,
     gameId: undefined,
     summary: undefined,
     inputs: undefined,
@@ -133,6 +139,7 @@ export const getServerSideProps = async ({ req }: NextPageContext) => {
   const res = await post<AcceptGameMove>(url, gameState);
 
   const initalGameState = await res.json();
+
   return { props: { initalGameState } };
 };
 
