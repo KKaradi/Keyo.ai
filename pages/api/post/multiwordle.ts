@@ -1,8 +1,18 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { authenticate, response } from "../helpers";
 import schedule from "../../../live/schedule.json";
+import { stat } from "fs";
 export type CharacterStatus = "green" | "yellow" | "gray" | "empty";
 export type GameStatus = "new" | "started" | "finished";
+
+export type Stats = {
+  totalChars: number;
+  greens: number;
+  yellows: number;
+  grays: number;
+  totalWords: number;
+  hitwords: number;
+};
 
 export type AcceptCharacter = {
   character: string | undefined;
@@ -19,9 +29,10 @@ export type AcceptGameMove = {
   inputs: AcceptWord[] | undefined;
   imagePath: string | undefined;
   gameStatus: GameStatus | undefined;
+  stats: Stats | undefined;
 };
 
-export type ReturnGameMode = {
+export type ReturnGameMove = {
   gameId: number | undefined;
   summary: number[] | undefined;
   inputs: ReturnWord[] | undefined;
@@ -29,6 +40,7 @@ export type ReturnGameMode = {
   gameStatus: GameStatus | undefined;
   error: boolean;
   errorMessage: string | undefined;
+  stats: Stats | undefined;
 };
 
 export type ReturnWord = {
@@ -88,6 +100,7 @@ function generateNewGame(
     summary: promptSplits.map((split) => split.length),
     imagePath: imagePath,
     error: false,
+    stats: undefined,
   } as AcceptGameMove;
 }
 
@@ -95,7 +108,6 @@ function processStartedGame(
   gameMove: AcceptGameMove,
   res: NextApiResponse<Response>,
   gameId: number,
-  imagePath: string,
   promptSplits: string[]
 ): boolean {
   if (gameMove.gameId === undefined) {
@@ -132,8 +144,18 @@ function processStartedGame(
     return false;
   }
 
+  const stats: Stats = {
+    totalChars: 0,
+    greens: 0,
+    yellows: 0,
+    grays: 0,
+    totalWords: 0,
+    hitwords: 0,
+  };
+
+  gameMove["stats"] = stats;
   for (let indx = 0; indx < inputs.length; indx++) {
-    if (!processSingleWord(inputs[indx], promptSplits[indx], res)) {
+    if (!processSingleWord(inputs[indx], promptSplits[indx], res, stats)) {
       return false;
     }
   }
@@ -148,7 +170,8 @@ function processStartedGame(
 function processSingleWord(
   word: AcceptWord,
   promptSplit: string,
-  res: NextApiResponse<Response>
+  res: NextApiResponse<Response>,
+  stats: Stats
 ): boolean {
   const { characters, completed } = word;
   if (!characters) {
@@ -187,7 +210,7 @@ function processSingleWord(
       return false;
     }
   }
-  if (handleWordle(characters as ReturnCharacter[], promptSplit)) {
+  if (handleWordle(characters as ReturnCharacter[], promptSplit, stats)) {
     word.completed = true;
   }
   return true;
@@ -201,8 +224,11 @@ function processSingleWord(
  */
 function handleWordle(
   characters: ReturnCharacter[],
-  promptSplit: string
+  promptSplit: string,
+  stats: Stats
 ): boolean {
+  stats.totalWords += 1;
+  stats.totalChars += characters.length;
   const promptSplitMap = new Map<string, number>();
   let completedFlag = true;
 
@@ -217,12 +243,14 @@ function handleWordle(
         (promptSplitMap.get(characters[indx].character) ?? 0) - 1
       );
       characters[indx].status = "green";
+      stats.greens += 1;
     } else {
       completedFlag = false;
     }
   }
 
   if (completedFlag) {
+    stats.hitwords += 1;
     return true;
   }
 
@@ -236,8 +264,10 @@ function handleWordle(
         characters[indx].character,
         (promptSplitMap.get(characters[indx].character) ?? 0) - 1
       );
+      stats.yellows += 1;
     } else {
       characters[indx].status = "gray";
+      stats.grays += 1;
     }
   }
   return false;
@@ -278,7 +308,7 @@ export default function Handler(
   } else if (gameMove.gameStatus === "finished") {
     res.status(400).json({ message: "Game is already finished.", error: true });
   } else if (gameMove.gameStatus === "started") {
-    if (processStartedGame(gameMove, res, gameId, imagePath, splits)) {
+    if (processStartedGame(gameMove, res, gameId, splits)) {
       res.status(200).json(gameMove);
     }
   } else {

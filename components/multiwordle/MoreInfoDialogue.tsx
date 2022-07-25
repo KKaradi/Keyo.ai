@@ -26,7 +26,7 @@ const MoreInfo: NextPage<MoreInfoProps> = ({ children }) => {
         onClose={() => setIsOpen(false)}
         PaperProps={{
           style: {
-            backgroundColor: colors.gray,
+            backgroundColor: colors.green,
             boxShadow: "none",
             width: "100%",
           },
@@ -61,7 +61,8 @@ const MoreInfo: NextPage<MoreInfoProps> = ({ children }) => {
           onClick={() => setIsOpen(false)}
           style={{
             borderRadius: 15,
-            backgroundColor: colors.green,
+            color: colors.gray,
+            backgroundColor: colors.accent,
             fontSize: "18px",
           }}
         >

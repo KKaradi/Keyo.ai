@@ -7,8 +7,8 @@
   top: 0%;
   right: 0%;
   width: 65%;
-  height: 8%;
-  border-bottom-left-radius: 20px;
+  height: 10%;
+  border-bottom-left-radius: 10px;
   box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
 }
 
@@ -17,22 +17,23 @@
   text-align: center;
 }
 
+.keyIcon {
+  background-color: aliceblue;
+  padding: 0 10px 0 10px;
+  border-radius: 100%;
+  box-shadow: 0 3px 10px rgb(0 0 0/ 0.2);
+}
+
 .title {
-  font-size: 3rem;
+  display: flex;
+
+  align-items: flex-start;
+  width: 50%;
+  font-size: 2.7rem;
   text-align: center;
-  width: 80%;
-  color: #36393b;
+  /* width: 20%; */
   font-family: "EduVICWANTBeginner", "Bebas Neue", "Lobster", sans-serif;
   font-weight: normal;
   margin-right: 1rem;
   border-radius: 20px;
-  background: linear-gradient(
-    to right,
-    #2a9134,
-    #2a9134 33.33%,
-    white 33.33%,
-    white 66.66%,
-    #ecc30b 66.66%
-  );
-  /* background: linear-gradient(to right, #2a9134 33%, #36393b 33%, #ecc30b 33%); */
 }

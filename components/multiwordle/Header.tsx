@@ -1,7 +1,8 @@
 import ToolTip from "../misc/ToolTip";
 import { NextPage } from "next";
-import MoreInfo from "./MoreInfo";
+import MoreInfo from "./MoreInfoDialogue";
 import QuestionMarkIcon from "@mui/icons-material/QuestionMarkRounded";
+import KeyIcon from "@mui/icons-material/Key";
 import styles from "../../styles/components/multiwordle/Header.module.css";
 
 const Header: NextPage = () => (
@@ -13,7 +14,12 @@ const Header: NextPage = () => (
         </ToolTip>
       </MoreInfo>
     </div>
+
     <div className={styles.title}>Keyo&apos;s Drawdle</div>
+    <KeyIcon
+      className={styles.keyIcon}
+      sx={{ fontSize: "3.5rem", color: "yellow" }}
+    />
   </div>
 );
 

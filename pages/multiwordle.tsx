@@ -4,7 +4,7 @@ import {
   AcceptGameMove,
   GameStatus,
   ReturnCharacter,
-  ReturnGameMode,
+  ReturnGameMove,
   ReturnWord,
 } from "./api/post/multiwordle";
 import styles from "../styles/pages/MultiWordle.module.css";
@@ -15,8 +15,9 @@ import Carousel from "../components/multiwordle/Carousel";
 import Keyboard from "../components/multiwordle/Keyboard";
 import ErrorFeature from "../components/multiwordle/ErrorFeature";
 import Header from "../components/multiwordle/Header";
+import WinDialogue from "../components/multiwordle/WinDialogue";
 
-function getNewInputs(input: string, gameState: ReturnGameMode): ReturnWord[] {
+function getNewInputs(input: string, gameState: ReturnGameMove): ReturnWord[] {
   if (gameState.inputs === undefined) {
     return [];
   }
@@ -36,7 +37,7 @@ function getNewInputs(input: string, gameState: ReturnGameMode): ReturnWord[] {
 }
 
 function gameStackToSlides(
-  gameStates: ReturnGameMode[]
+  gameStates: ReturnGameMove[]
 ): ReturnCharacter[][][] {
   const slides: ReturnCharacter[][][] = [];
 
@@ -62,9 +63,9 @@ function gameStackToSlides(
 }
 
 const MultiWordlePage: NextPage<{
-  initalGameState: ReturnGameMode;
+  initalGameState: ReturnGameMove;
 }> = ({ initalGameState: initalGameState }) => {
-  const [gameStateStack, setGameStateStack] = useState<ReturnGameMode[]>([
+  const [gameStateStack, setGameStateStack] = useState<ReturnGameMove[]>([
     initalGameState,
   ]);
   const [gameState, setGameState] = useState(initalGameState);
@@ -77,9 +78,9 @@ const MultiWordlePage: NextPage<{
   };
 
   const onSubmit = async () => {
-    const res = await post<ReturnGameMode>(
+    const res = await post<ReturnGameMove>(
       "api/post/multiwordle",
-      gameState as ReturnGameMode
+      gameState as ReturnGameMove
     );
     const json = await res.json();
     setNewDataFlag(true);
@@ -88,6 +89,7 @@ const MultiWordlePage: NextPage<{
   };
   return (
     <ErrorFeature error={gameState.error}>
+      <WinDialogue open={false} />
       <div className={styles.container}>
         <div className={styles.left}>
           {gameState.imagePath === undefined ? (
@@ -125,6 +127,7 @@ export const getServerSideProps = async ({ req }: NextPageContext) => {
     gameId: undefined,
     summary: undefined,
     inputs: undefined,
+    stats: undefined,
   };
 
   const res = await post<AcceptGameMove>(url, gameState);
