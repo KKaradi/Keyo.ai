@@ -35,15 +35,13 @@ export type AcceptGameMove = {
 };
 
 export type ReturnGameMove = {
-  gameId: number | undefined;
-  summary: number[] | undefined;
-  inputs: ReturnWord[] | undefined;
-  imagePath: string | undefined;
-  gameStatus: GameStatus | undefined;
-  error: boolean;
-  errorMessage: string | undefined;
-  stats: Stats | undefined;
-  nextGameDate: string | undefined;
+  gameId?: number;
+  summary?: number[];
+  inputs?: ReturnWord[];
+  imagePath?: string;
+  gameStatus?: GameStatus;
+  stats?: Stats;
+  nextGameDate?: string;
 };
 
 export type ReturnWord = {
@@ -56,7 +54,7 @@ export type ReturnCharacter = {
   status: CharacterStatus;
 };
 
-export type ErrorMessage = { message: string; error: boolean };
+export type ErrorMessage = { message: string };
 export type Response = AcceptGameMove | ErrorMessage;
 
 function applyLevel(stats: Stats): void {
@@ -133,13 +131,13 @@ function processStartedGame(
   promptSplits: string[]
 ): boolean {
   if (gameMove.gameId === undefined) {
-    res.status(400).json({ message: "GameId is undefined", error: true });
+    res.status(400).json({ message: "GameId is undefined" });
     return false;
   }
 
   if (gameMove.gameId != gameId) {
     if (!schedule[gameMove.gameId]) {
-      res.status(400).json({ message: "Invalid GameId", error: true });
+      res.status(400).json({ message: "Invalid GameId" });
       return false;
     }
     promptSplits = schedule[gameMove.gameId].prompt.split(" ");
@@ -151,7 +149,7 @@ function processStartedGame(
 
   const { inputs } = gameMove;
   if (!inputs) {
-    res.status(400).json({ message: "Game inputs undefined", error: true });
+    res.status(400).json({ message: "Game inputs undefined" });
     return false;
   }
   if (inputs.length != promptSplits.length) {
@@ -161,7 +159,6 @@ function processStartedGame(
         promptSplits.length +
         " but got " +
         inputs.length,
-      error: true,
     });
     return false;
   }
@@ -198,15 +195,11 @@ function processSingleWord(
 ): boolean {
   const { characters, completed } = word;
   if (!characters) {
-    res
-      .status(400)
-      .json({ message: "Word characters are undefined", error: true });
+    res.status(400).json({ message: "Word characters are undefined" });
     return false;
   }
   if (completed === undefined) {
-    res
-      .status(400)
-      .json({ message: "Word completion is undefined", error: true });
+    res.status(400).json({ message: "Word completion is undefined" });
     return false;
   }
   if (characters.length != promptSplit.length) {
@@ -216,7 +209,6 @@ function processSingleWord(
         promptSplit.length +
         " but got " +
         characters.length,
-      error: true,
     });
     return false;
   }
@@ -228,7 +220,6 @@ function processSingleWord(
     if (character.character === undefined || character.character.length != 1) {
       res.status(400).json({
         message: "Character is undefined or not a single character.",
-        error: true,
       });
       return false;
     }
@@ -303,20 +294,16 @@ export default function Handler(
   res: NextApiResponse<Response>
 ) {
   if (req.method !== "POST")
-    return res.status(405).json({ message: "Only Post Requests", error: true });
+    return res.status(405).json({ message: "Only Post Requests" });
 
   if (!authenticate(req))
-    return res
-      .status(405)
-      .json({ message: "Authentication Error", error: true });
+    return res.status(405).json({ message: "Authentication Error" });
 
   const gameMove = req.body as AcceptGameMove;
   const { prompt, imagePath, gameId, nextGameDate } = pullPrompt();
 
   if (prompt === undefined || imagePath === undefined || gameId === undefined) {
-    res
-      .status(400)
-      .json({ message: "No game session is currently running", error: true });
+    res.status(400).json({ message: "No game session is currently running" });
     return;
   }
 
@@ -325,13 +312,12 @@ export default function Handler(
   if (!gameMove.gameStatus) {
     res.status(400).json({
       message: "Incorrect parameters: must supply game status.",
-      error: true,
     });
   } else if (gameMove.gameStatus === "new") {
     const newGame = generateNewGame(gameId, imagePath, splits, nextGameDate);
     return res.status(200).json(newGame);
   } else if (gameMove.gameStatus === "finished") {
-    res.status(400).json({ message: "Game is already finished.", error: true });
+    res.status(400).json({ message: "Game is already finished." });
   } else if (gameMove.gameStatus === "started") {
     if (processStartedGame(gameMove, res, gameId, splits)) {
       res.status(200).json(gameMove);
@@ -339,7 +325,6 @@ export default function Handler(
   } else {
     res.status(400).json({
       message: "Game status is invalid. Must be new, started, finished",
-      error: true,
     });
   }
 }

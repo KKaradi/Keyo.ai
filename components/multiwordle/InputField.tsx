@@ -21,7 +21,7 @@ const InputField: NextPage<InputFieldProps> = ({
   return (
     <div className={styles.body}>
       <div>
-        {gameState.inputs.map((input, inputIndex) => {
+        {gameState.inputs?.map((input, inputIndex) => {
           return (
             <div key={inputIndex} className={styles.word}>
               {input.characters.map((character, characterIndex) => {

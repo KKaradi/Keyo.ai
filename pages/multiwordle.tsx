@@ -64,10 +64,12 @@ function gameStackToSlides(
 
 const MultiWordlePage: NextPage<{
   initalGameState: ReturnGameMove;
-}> = ({ initalGameState: initalGameState }) => {
+  initalErrorState: boolean;
+}> = ({ initalGameState, initalErrorState }) => {
   const [gameStack, setGameStack] = useState<ReturnGameMove[]>([
     initalGameState,
   ]);
+  const [errorState, setErrorState] = useState(initalErrorState);
   const [gameState, setGameState] = useState(initalGameState);
   const [newDataFlag, setNewDataFlag] = useState(true);
 
@@ -78,18 +80,24 @@ const MultiWordlePage: NextPage<{
   };
 
   const onSubmit = async () => {
-    const res = await post<ReturnGameMove>(
+    const response = await post<ReturnGameMove>(
       "api/post/multiwordle",
       gameState as ReturnGameMove
     );
-    const json = await res.json();
-    console.log(json);
-    setNewDataFlag(true);
-    setGameStack([json, ...gameStack]);
-    setGameState(json);
+
+    if (response.status === 200) {
+      const newGameState = await response.json();
+      setNewDataFlag(true);
+
+      setGameStack([newGameState, ...gameStack]);
+      setGameState(newGameState);
+    } else {
+      setNewDataFlag(true);
+      setErrorState(true);
+    }
   };
   return (
-    <ErrorFeature error={gameState.error}>
+    <ErrorFeature error={errorState}>
       <WinDialogue
         open={gameState.gameStatus === "finished"}
         gameStack={gameStack}
@@ -124,7 +132,7 @@ export const getServerSideProps = async ({ req }: NextPageContext) => {
   ).toString();
 
   const gameState = {
-    gameStatus: "new" as GameStatus,
+    gameStatus: "started" as GameStatus,
     imagePath: undefined,
     gameId: undefined,
     summary: undefined,
@@ -133,11 +141,14 @@ export const getServerSideProps = async ({ req }: NextPageContext) => {
     nextGameDate: undefined,
   };
 
-  const res = await post<AcceptGameMove>(url, gameState);
+  const response = await post<AcceptGameMove>(url, gameState);
 
-  const initalGameState = await res.json();
-
-  return { props: { initalGameState } };
+  if (response.status === 200) {
+    const initalGameState = await response.json();
+    return { props: { initalGameState, initalErrorState: false } };
+  } else {
+    return { props: { initalGameState: {}, initalErrorState: true } };
+  }
 };
 
 export default MultiWordlePage;
