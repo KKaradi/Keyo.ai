@@ -43,7 +43,7 @@ export type ReturnGameMove = {
   error: boolean;
   errorMessage: string | undefined;
   stats: Stats | undefined;
-  nextGameDate: string;
+  nextGameDate: string | undefined;
 };
 
 export type ReturnWord = {

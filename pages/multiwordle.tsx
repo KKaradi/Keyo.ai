@@ -136,6 +136,7 @@ export const getServerSideProps = async ({ req }: NextPageContext) => {
   const res = await post<AcceptGameMove>(url, gameState);
 
   const initalGameState = await res.json();
+
   return { props: { initalGameState } };
 };
 

@@ -60,6 +60,7 @@ const WinDialogue: NextPage<WinDialogueProps> = ({ open, gameStack }) => {
     .join("");
 
   const numberOfGuesse = gameStack.length - 1;
+
   const timeToNextGame = msToTime(
     new Date(gameStack[0].nextGameDate).getTime() - now.getTime()
   );
