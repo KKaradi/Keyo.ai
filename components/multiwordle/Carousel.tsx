@@ -2,7 +2,7 @@ import type { NextPage } from "next/types";
 import { createRef, forwardRef, ForwardRefRenderFunction } from "react";
 import { ReturnCharacter } from "../../pages/api/post/multiwordle";
 import styles from "../../styles/components/multiwordle/Carousel.module.css";
-import Square from "./Square";
+import Square from "../misc/Square";
 import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 

@@ -1,6 +1,6 @@
 import type { NextPage } from "next/types";
 import Link from "next/link";
-import styles from "../../styles/components/TwitterShare.module.css";
+import styles from "../../styles/components/misc/TwitterShare.module.css";
 import { ReactElement } from "react";
 
 type TwitterShareProps = {

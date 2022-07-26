@@ -50,7 +50,7 @@
   transform: scale(1);
   transition: transform 0.5s;
   position: relative;
-
+  margin-top: 40px;
   display: flex;
   flex-direction: column;
   justify-content: center;

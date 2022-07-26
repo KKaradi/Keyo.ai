@@ -1,10 +1,10 @@
 import { NextPage } from "next";
 import styles from "../../styles/components/multiwordle/InputField.module.css";
-import { ReturnGameMode, ReturnWord } from "../../pages/api/post/multiwordle";
-import Square from "./Square";
+import { ReturnGameMove, ReturnWord } from "../../pages/api/post/multiwordle";
+import Square from "../misc/Square";
 
 type InputFieldProps = {
-  gameState: ReturnGameMode;
+  gameState: ReturnGameMove;
   activeSlide: number;
   bestGuesses?: ReturnWord[];
 };
@@ -16,7 +16,7 @@ const InputField: NextPage<InputFieldProps> = ({
 }) => {
   return (
     <div className={styles.body}>
-      {(bestGuesses ?? gameState.inputs).map((input, inputIndex) => {
+      {(bestGuesses ?? gameState.inputs ?? []).map((input, inputIndex) => {
         const backgroundColor = activeSlide === inputIndex ? "#ddd" : undefined;
         return (
           <div

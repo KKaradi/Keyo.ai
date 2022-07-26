@@ -1,51 +1,26 @@
-import { NextPage } from "next";
-import styles from "../../styles/components/Header.module.css";
-import InfoIcon from "@mui/icons-material/Info";
-import TwitterIcon from "@mui/icons-material/Twitter";
-import LeaderboardIcon from "@mui/icons-material/Leaderboard";
-import Link from "next/link";
-import InfoDialog from "../dialogs/InfoDialog";
-import ConnectWallet from "./ConnectWallet";
-import LeaderboardDialog from "../dialogs/LeaderboardDialog";
 import ToolTip from "../misc/ToolTip";
-import { Vote } from "../../helpers";
+import { NextPage } from "next";
+import MoreInfo from "../dialogs/InfoDialog";
+import QuestionMarkIcon from "@mui/icons-material/QuestionMarkRounded";
+import KeyIcon from "@mui/icons-material/Key";
+import styles from "../../styles/components/header/Header.module.css";
 
-type HeaderProps = {
-  votes?: Vote[];
-  percentiles?: number[];
-};
-
-const Header: NextPage<HeaderProps> = ({ votes }) => {
-  return (
-    <div className={styles.header}>
-      <h1 className={styles.title}>NON FUNGIBLE AI</h1>
-      <ConnectWallet />
-      <div className={styles.iconsContainer}>
-        {votes !== undefined ? (
-          <ToolTip title="My Votes">
-            <h1 className={styles.votes}> {votes.length} </h1>
-          </ToolTip>
-        ) : null}
-        <LeaderboardDialog>
-          <ToolTip title="Voting Leaderboard">
-            <LeaderboardIcon className={styles.info} sx={{ fontSize: 40 }} />
-          </ToolTip>
-        </LeaderboardDialog>
-        <InfoDialog>
-          <ToolTip title="More Info">
-            <InfoIcon className={styles.info} sx={{ fontSize: 40 }} />
-          </ToolTip>
-        </InfoDialog>
-        <Link href={"https://twitter.com/nonfungedai"}>
-          <a target="_blank">
-            <ToolTip title="Our Twitter">
-              <TwitterIcon className={styles.twitter} sx={{ fontSize: 40 }} />
-            </ToolTip>
-          </a>
-        </Link>
-      </div>
+const Header: NextPage = () => (
+  <div className={styles.header}>
+    <div className={styles.moreInfoIcon}>
+      <MoreInfo>
+        <ToolTip title="How To Play">
+          <QuestionMarkIcon className={styles.info} sx={{ fontSize: "%30" }} />
+        </ToolTip>
+      </MoreInfo>
     </div>
-  );
-};
+
+    <div className={styles.title}>Keyo&apos;s Drawdle</div>
+    <KeyIcon
+      className={styles.keyIcon}
+      sx={{ fontSize: "3.5rem", color: "yellow" }}
+    />
+  </div>
+);
 
 export default Header;

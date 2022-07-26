@@ -3,7 +3,6 @@ import styles from "../../styles/components/multiwordle/Keyboard.module.css";
 import BackspaceIcon from "@mui/icons-material/Backspace";
 import KeyboardReturnIcon from "@mui/icons-material/KeyboardReturn";
 import { ReactElement, useCallback, useEffect, useState } from "react";
-import type { Flatten } from "../../helpers";
 
 const icons: { [key: string]: ReactElement } = {
   ":enter": <KeyboardReturnIcon />,

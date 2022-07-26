@@ -1,0 +1,26 @@
+.page {
+  background-color: #fff;
+}
+
+.errorBar {
+  background-color: rgb(222, 78, 78);
+  position: relative;
+  top: 35%;
+  transform: translateY(-50%);
+  height: 50%;
+  color: white;
+  text-align: center;
+}
+
+.h1 {
+  margin: 0;
+  font-size: 5em;
+}
+
+.topParagraph {
+  padding-top: 25px;
+}
+
+.bottomParagraph {
+  padding-bottom: 50px;
+}
