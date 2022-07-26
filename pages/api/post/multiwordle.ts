@@ -59,7 +59,7 @@ function generateNewGame(
   gameId: number,
   imagePath: string,
   promptSplits: string[],
-  nextGameDate: string | undefined
+  nextGameDate: string
 ): GameMove {
   return {
     gameId,
@@ -67,10 +67,9 @@ function generateNewGame(
     inputs: promptSplits.map(splitToEmptys),
     summary: promptSplits.map((split) => split.length),
     imagePath: imagePath,
-    error: false,
     stats: undefined,
     nextGameDate,
-  } as GameMove;
+  };
 }
 
 function processStartedGame(
@@ -194,47 +193,37 @@ function handleWordle(
   stats.totalWords += 1;
   stats.totalChars += characters.length;
   const promptSplitMap = new Map<string, number>();
-  let completedFlag = true;
 
   for (const character of promptSplit.split("")) {
     promptSplitMap.set(character, (promptSplitMap.get(character) ?? 0) + 1);
   }
 
-  for (let indx = 0; indx < characters.length; indx++) {
-    if (characters[indx].character === promptSplit.charAt(indx)) {
-      promptSplitMap.set(
-        characters[indx].character,
-        (promptSplitMap.get(characters[indx].character) ?? 0) - 1
-      );
-      characters[indx].status = "green";
+  const greens: number[] = [];
+
+  const completed = characters.reduce((prev, { character }, index) => {
+    if (character === promptSplit.charAt(index)) {
+      promptSplitMap.set(character, (promptSplitMap.get(character) ?? 0) - 1);
+      greens.push(index);
+      return prev;
+    }
+    return false;
+  }, true);
+
+  characters.forEach(({ character }, index) => {
+    if (greens.includes(index)) {
+      characters[index].status = "green";
       stats.greens += 1;
-    } else {
-      completedFlag = false;
-    }
-  }
-
-  if (completedFlag) {
-    stats.hitWords += 1;
-    return true;
-  }
-
-  for (let indx = 0; indx < characters.length; indx++) {
-    if (characters[indx].status === "green") {
-      continue;
-    }
-    if ((promptSplitMap.get(characters[indx].character) ?? 0) >= 1) {
-      characters[indx].status = "yellow";
-      promptSplitMap.set(
-        characters[indx].character,
-        (promptSplitMap.get(characters[indx].character) ?? 0) - 1
-      );
+    } else if ((promptSplitMap.get(character) ?? 0) >= 1) {
+      characters[index].status = "yellow";
+      promptSplitMap.set(character, (promptSplitMap.get(character) ?? 0) - 1);
       stats.yellows += 1;
     } else {
-      characters[indx].status = "gray";
+      characters[index].status = "gray";
       stats.grays += 1;
     }
-  }
-  return false;
+  });
+
+  return completed;
 }
 
 export const RequestSchema = z.union([GameMoveSchema, GameStartSchema]);

@@ -1,4 +1,4 @@
-import { useState, ReactElement } from "react";
+import { ReactElement } from "react";
 import Button from "@mui/material/Button";
 import styles from "../../styles/components/dialogs/InfoDialog.module.css";
 import Dialog from "@mui/material/Dialog";
@@ -9,13 +9,17 @@ import type { NextPage } from "next/types";
 import SlideTransition from "./SlideTransition";
 import { colors } from "../../constants/colors";
 
-type MoreInfoProps = {
+type InfoDialogProps = {
   children: ReactElement;
+  isOpen: boolean;
+  setIsOpen: (value: boolean) => void;
 };
 
-const MoreInfo: NextPage<MoreInfoProps> = ({ children }) => {
-  const [isOpen, setIsOpen] = useState(false);
-
+const InfoDialog: NextPage<InfoDialogProps> = ({
+  children,
+  isOpen,
+  setIsOpen,
+}) => {
   return (
     <div>
       <div onClick={() => setIsOpen(true)}>{children}</div>
@@ -33,7 +37,7 @@ const MoreInfo: NextPage<MoreInfoProps> = ({ children }) => {
         }}
       >
         <DialogTitle>
-          <h1 className={styles.dialogTitle}>How to play?</h1>
+          <h1 className={styles.dialogTitle}>How to play</h1>
         </DialogTitle>
         <DialogContent>
           <DialogContentText className={styles.dialogContent}>
@@ -73,4 +77,4 @@ const MoreInfo: NextPage<MoreInfoProps> = ({ children }) => {
   );
 };
 
-export default MoreInfo;
+export default InfoDialog;
