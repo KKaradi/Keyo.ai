@@ -72,7 +72,7 @@ const MultiWordlePage: NextPage<{
   const [errorState, setErrorState] = useState(initalErrorState);
   const [gameState, setGameState] = useState(initalGameState);
   const [newDataFlag, setNewDataFlag] = useState(true);
-
+  console.log(initalGameState);
   const onPress = (userInput: string) => {
     const inputs = getNewInputs(userInput, gameState);
     setNewDataFlag(userInput === "");
@@ -80,28 +80,34 @@ const MultiWordlePage: NextPage<{
   };
 
   const onSubmit = async () => {
-    const response = await post<ReturnGameMove>(
-      "api/post/multiwordle",
-      gameState as ReturnGameMove
-    );
+    if (gameState.gameStatus !== "finished") {
+      const response = await post<ReturnGameMove>(
+        "api/post/multiwordle",
+        gameState as ReturnGameMove
+      );
 
-    if (response.status === 200) {
-      const newGameState = await response.json();
-      setNewDataFlag(true);
+      if (response.status === 200) {
+        const newGameState = await response.json();
+        setNewDataFlag(true);
 
-      setGameStack([newGameState, ...gameStack]);
-      setGameState(newGameState);
-    } else {
-      setNewDataFlag(true);
-      setErrorState(true);
+        setGameStack([newGameState, ...gameStack]);
+        setGameState(newGameState);
+      } else {
+        setNewDataFlag(true);
+        setErrorState(true);
+      }
     }
   };
   return (
     <ErrorFeature error={errorState}>
-      <WinDialogue
-        open={gameState.gameStatus === "finished"}
-        gameStack={gameStack}
-      />
+      {gameState.gameStatus === "finished" ? (
+        <WinDialogue
+          open={gameState.gameStatus === "finished"}
+          gameStack={gameStack}
+        />
+      ) : (
+        <></>
+      )}
       <div className={styles.container}>
         <div className={styles.left}>
           {gameState.imagePath === undefined ? (
@@ -132,7 +138,7 @@ export const getServerSideProps = async ({ req }: NextPageContext) => {
   ).toString();
 
   const gameState = {
-    gameStatus: "started" as GameStatus,
+    gameStatus: "new" as GameStatus,
     imagePath: undefined,
     gameId: undefined,
     summary: undefined,

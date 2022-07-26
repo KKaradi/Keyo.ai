@@ -17,8 +17,7 @@ type WinDialogueProps = {
 //🟥🟧🟨🟩🟦🟪🟫⬛⬜💠🔳🔲
 const levelToSquare = ["💠", "🟩", "⬜", "◻️", "◽"];
 
-function msToTime(duration: number): string {
-  //const milliseconds = Math.floor((duration % 1000) / 100);
+function msToTimeString(duration: number): string {
   let seconds: number | string = Math.floor((duration / 1000) % 60);
   let minutes: number | string = Math.floor((duration / (1000 * 60)) % 60);
   let hours: number | string = Math.floor((duration / (1000 * 60 * 60)) % 24);
@@ -33,44 +32,49 @@ function msToTime(duration: number): string {
     ":" +
     minutes +
     ":" +
-    seconds +
-    ".") as string;
+    seconds) as string;
 }
 
 const WinDialogue: NextPage<WinDialogueProps> = ({ open, gameStack }) => {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(open);
   const [now, setNow] = useState(new Date());
+
   useEffect(() => {
     setInterval(() => {
       setNow(new Date());
-    }, 1000);
+    }, 10000);
   });
 
   const statsString = gameStack
-    .map((gameState, idx) => {
+    .map((gameState) => {
       const level = gameState.stats?.level;
-      const defaltStr =
-        idx % 5 == 0 && idx !== gameStack.length - 1 ? "\n" : "";
       if (level !== undefined) {
-        return levelToSquare[level] + defaltStr ?? defaltStr;
+        return levelToSquare[level] ?? "";
       }
-      return defaltStr;
+      return "";
     })
     .reverse()
     .join("");
 
   const numberOfGuesse = gameStack.length - 1;
+  const nextGameDate = gameStack[0].nextGameDate;
 
-  const timeToNextGame = msToTime(
-    new Date(gameStack[0].nextGameDate).getTime() - now.getTime()
-  );
+  let timeToNextGame = "Error";
+  if (nextGameDate !== undefined) {
+    timeToNextGame = msToTimeString(
+      new Date(nextGameDate).getTime() - now.getTime()
+    );
+  }
 
   return (
     <Dialog
-      open={open}
+      open={isOpen}
       TransitionComponent={SlideTransition}
       keepMounted
-      onClose={() => setIsOpen(false)}
+      onClose={() => {
+        setIsOpen(false);
+        console.log("switch");
+      }}
       PaperProps={{
         style: {
           backgroundColor: colors.green,
@@ -84,16 +88,12 @@ const WinDialogue: NextPage<WinDialogueProps> = ({ open, gameStack }) => {
       </DialogTitle>
       <DialogContent>
         <DialogContentText className={styles.dialogContent}>
-          <p>Congrats on finishing today&apos;s multiwordle</p>
-          <p>
-            Number of Guesses: {numberOfGuesse} <br />
-          </p>
           <p className={styles.text}>
-            Game History: <br />
-            {statsString}
+            Congrats on finishing today&apos;s multiwordle
           </p>
-          <p>Next Game:</p>
-          {timeToNextGame}
+          <p className={styles.text}>Number of Guesses: {numberOfGuesse}</p>
+          <p className={styles.text}>Game History: {statsString}</p>
+          <p className={styles.text}>Next Game: {timeToNextGame}</p>
         </DialogContentText>
       </DialogContent>
 
