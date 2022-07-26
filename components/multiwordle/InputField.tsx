@@ -1,12 +1,12 @@
 import { NextPage } from "next";
 import styles from "../../styles/components/multiwordle/InputField.module.css";
-import { ReturnGameMode } from "../../pages/api/post/multiwordle";
+import { ReturnGameMove } from "../../pages/api/post/multiwordle";
 import Square from "./Square";
 import React from "react";
 
 type InputFieldProps = {
-  gameState: ReturnGameMode;
-  previousGameState: ReturnGameMode;
+  gameState: ReturnGameMove;
+  previousGameState: ReturnGameMove;
   newDataFlag: boolean;
 };
 
@@ -21,7 +21,7 @@ const InputField: NextPage<InputFieldProps> = ({
   return (
     <div className={styles.body}>
       <div>
-        {gameState.inputs.map((input, inputIndex) => {
+        {gameState.inputs?.map((input, inputIndex) => {
           return (
             <div key={inputIndex} className={styles.word}>
               {input.characters.map((character, characterIndex) => {

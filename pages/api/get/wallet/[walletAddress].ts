@@ -37,7 +37,6 @@ export default async function storeVote(
 
     percentileArray = await getPercentileArray();
   } catch (error) {
-    console.error(error);
     return response(res, "DBError");
   }
 
