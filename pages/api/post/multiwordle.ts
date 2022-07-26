@@ -13,6 +13,7 @@ export type AcceptWord = {
   completed: boolean | undefined;
   characters: AcceptCharacter[] | undefined;
 };
+
 export type AcceptGameMove = {
   summary: number[] | undefined;
   gameId: number | undefined;

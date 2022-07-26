@@ -1,3 +1,10 @@
+.carousel {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
 .slider {
   width: 500px;
   text-align: center;
@@ -32,9 +39,12 @@
   scroll-snap-align: start;
   flex-shrink: 0;
   width: 100%;
-  height: 400px;
+  min-height: 400px;
   margin-right: 50px;
   border-radius: 10px;
+
+  overflow-y: scroll;
+
   background: #eee;
   transform-origin: center center;
   transform: scale(1);

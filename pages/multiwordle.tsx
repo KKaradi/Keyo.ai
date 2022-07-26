@@ -14,6 +14,8 @@ import { useState } from "react";
 import Carousel from "../components/multiwordle/Carousel";
 import Keyboard from "../components/multiwordle/Keyboard";
 import { colors } from "../constants/colors";
+import DICTIONARY from "../dictionary.json";
+import ErrorDialog from "../components/dialogs/ErrorDialog";
 
 function getNewInputs(input: string, gameState: ReturnGameMode) {
   return gameState.inputs.map((word) => {
@@ -40,9 +42,6 @@ function gameStackToSlides(gameStates: ReturnGameMode[]) {
 
       let { characters } = input;
 
-      const filtered = characters.filter(({ status }) => status === "green");
-      if (filtered.length === characters.length) characters = [];
-
       if (gameStateIndex === 0) {
         characters = characters.map(({ character }) => {
           return { status: "empty", character };
@@ -66,12 +65,24 @@ function getColorMap(gameStates: ReturnGameMode[], activeSlide: number) {
   gameStates.forEach((gameState) => {
     gameState.inputs[activeSlide].characters.forEach(
       ({ character, status }) => {
-        keyMap[character] = colors[status];
+        if (status !== "green") keyMap[character] = colors[status];
+      }
+    );
+  });
+
+  gameStates.forEach((gameState) => {
+    gameState.inputs[activeSlide].characters.forEach(
+      ({ character, status }) => {
+        if (status === "green") keyMap[character] = colors[status];
       }
     );
   });
   return keyMap;
 }
+
+const warnings = {
+  dictionary: "That word was not in our dictionary.",
+};
 
 const MultiWordlePage: NextPage<{ initalGameState: ReturnGameMode }> = ({
   initalGameState: initalGameState,
@@ -81,42 +92,91 @@ const MultiWordlePage: NextPage<{ initalGameState: ReturnGameMode }> = ({
   ]);
   const [gameState, setGameState] = useState(initalGameState);
   const [activeSlide, setActiveSlide] = useState(0);
-  const [newDataFlag, setNewDataFlag] = useState(true);
+  const [displayBest, setDisplayBest] = useState(true);
+  const [warning, setWarning] = useState<string | undefined>();
 
   const onPress = (userInput: string) => {
     const inputs = getNewInputs(userInput, gameState);
-    setNewDataFlag(userInput === "");
+    setDisplayBest(userInput === "");
     setGameState({ ...gameState, inputs });
   };
 
-  const onSubmit = async () => {
+  const onSubmit = async (userInput: string) => {
+    if (!(DICTIONARY as string[]).includes(userInput)) {
+      setWarning(warnings.dictionary);
+      return setDisplayBest(true);
+    }
+
     const res = await post<ReturnGameMode>("api/post/multiwordle", gameState);
     const json = (await res.json()) as ReturnGameMode;
-    setNewDataFlag(true);
+    setDisplayBest(true);
     setGameStateStack([json, ...gameStateStack]);
     setGameState(json);
   };
+
+  const getSimilarityScore = (word: ReturnCharacter[]) => {
+    let total = 0;
+
+    const points = word.reduce((prev, { status }) => {
+      total += 2;
+      if (status == "green") return prev + 2;
+      if (status == "yellow") return prev + 1;
+      return prev;
+    }, 0);
+
+    const score = points / total;
+    const completed = total === points;
+
+    return { word, score, completed };
+  };
+
+  const getBestGuesses = (slides: ReturnCharacter[][][]) => {
+    if (!displayBest) return undefined;
+
+    const bestGuesses: ReturnWord[] = [];
+
+    slides.forEach((slide) => {
+      let bestWord = getSimilarityScore(slide[1]);
+      slide.slice(2).forEach((word) => {
+        const newWord = getSimilarityScore(word);
+        if (newWord.score > bestWord.score) bestWord = newWord;
+      });
+
+      bestGuesses.push({
+        characters: bestWord.word,
+        completed: bestWord.completed,
+      });
+    });
+
+    return bestGuesses;
+  };
+
+  const slides = gameStackToSlides([gameState, ...gameStateStack]);
+  const colorMap = getColorMap(gameStateStack, activeSlide);
+  const bestGuesses = getBestGuesses(slides);
+
   return (
     <div className={styles.container}>
+      <ErrorDialog
+        setIsOpen={() => setWarning(undefined)}
+        isOpen={Boolean(warning)}
+        text={warning ?? ""}
+      />
       <div className={styles.left}>
         <ImageFrame path={gameState.imagePath}></ImageFrame>
         <InputField
           gameState={gameState}
-          previousGameState={gameStateStack[0]}
-          newDataFlag={newDataFlag}
+          bestGuesses={bestGuesses}
           activeSlide={activeSlide}
         />
       </div>
       <div className={styles.right}>
         <Carousel
-          slides={gameStackToSlides([gameState, ...gameStateStack])}
-          setSlide={setActiveSlide}
+          slides={slides}
+          slideState={[activeSlide, setActiveSlide]}
+          displayBest={displayBest}
         />
-        <Keyboard
-          onPress={onPress}
-          onSubmit={onSubmit}
-          colorMap={getColorMap(gameStateStack, activeSlide)}
-        />
+        <Keyboard onPress={onPress} onSubmit={onSubmit} colorMap={colorMap} />
       </div>
     </div>
   );

@@ -1,25 +1,22 @@
 import { NextPage } from "next";
 import styles from "../../styles/components/multiwordle/InputField.module.css";
-import { ReturnGameMode } from "../../pages/api/post/multiwordle";
+import { ReturnGameMode, ReturnWord } from "../../pages/api/post/multiwordle";
 import Square from "./Square";
 
 type InputFieldProps = {
   gameState: ReturnGameMode;
-  previousGameState: ReturnGameMode;
-  newDataFlag: boolean;
   activeSlide: number;
+  bestGuesses?: ReturnWord[];
 };
 
 const InputField: NextPage<InputFieldProps> = ({
   gameState,
-  previousGameState,
   activeSlide,
-  newDataFlag,
+  bestGuesses,
 }) => {
-  gameState = newDataFlag ? previousGameState : gameState;
   return (
     <div className={styles.body}>
-      {gameState.inputs.map((input, inputIndex) => {
+      {(bestGuesses ?? gameState.inputs).map((input, inputIndex) => {
         const backgroundColor = activeSlide === inputIndex ? "#ddd" : undefined;
         return (
           <div
@@ -28,7 +25,7 @@ const InputField: NextPage<InputFieldProps> = ({
             style={{ backgroundColor }}
           >
             {input.characters.map(({ character, status }, characterIndex) => {
-              const color = input.completed || newDataFlag ? status : "empty";
+              const color = input.completed || bestGuesses ? status : "empty";
               return (
                 <a href={`#slide-${inputIndex + 1}`} key={characterIndex}>
                   <div className={styles.cell}>
