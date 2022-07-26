@@ -4,7 +4,7 @@ import {
   AcceptGameMove,
   GameStatus,
   ReturnCharacter,
-  ReturnGameMode,
+  ReturnGameMove,
   ReturnWord,
 } from "./api/post/multiwordle";
 import styles from "../styles/pages/MultiWordle.module.css";
@@ -13,8 +13,14 @@ import ImageFrame from "../components/multiwordle/ImageFrame";
 import { useState } from "react";
 import Carousel from "../components/multiwordle/Carousel";
 import Keyboard from "../components/multiwordle/Keyboard";
+import ErrorFeature from "../components/multiwordle/ErrorFeature";
+import Header from "../components/multiwordle/Header";
+import WinDialogue from "../components/multiwordle/WinDialogue";
 
-function getNewInputs(input: string, gameState: ReturnGameMode) {
+function getNewInputs(input: string, gameState: ReturnGameMove): ReturnWord[] {
+  if (gameState.inputs === undefined) {
+    return [];
+  }
   return gameState.inputs.map((word) => {
     if (word.completed) return word;
     return {
@@ -30,9 +36,13 @@ function getNewInputs(input: string, gameState: ReturnGameMode) {
   });
 }
 
-function gameStackToSlides(gameStates: ReturnGameMode[]) {
+function gameStackToSlides(
+  gameStates: ReturnGameMove[]
+): ReturnCharacter[][][] {
   const slides: ReturnCharacter[][][] = [];
+
   gameStates.forEach((gameState, gameStateIndex) => {
+    if (gameState.inputs === undefined) return;
     if (gameStateIndex === gameStates.length - 1) return;
     gameState.inputs.forEach((input, inputIndex) => {
       if (!slides[inputIndex]) slides.push([]);
@@ -52,15 +62,17 @@ function gameStackToSlides(gameStates: ReturnGameMode[]) {
   return slides;
 }
 
-const MultiWordlePage: NextPage<{ initalGameState: ReturnGameMode }> = ({
-  initalGameState: initalGameState,
-}) => {
-  const [gameStateStack, setGameStateStack] = useState<ReturnGameMode[]>([
+const MultiWordlePage: NextPage<{
+  initalGameState: ReturnGameMove;
+  initalErrorState: boolean;
+}> = ({ initalGameState, initalErrorState }) => {
+  const [gameStack, setGameStack] = useState<ReturnGameMove[]>([
     initalGameState,
   ]);
+  const [errorState, setErrorState] = useState(initalErrorState);
   const [gameState, setGameState] = useState(initalGameState);
   const [newDataFlag, setNewDataFlag] = useState(true);
-
+  console.log(initalGameState);
   const onPress = (userInput: string) => {
     const inputs = getNewInputs(userInput, gameState);
     setNewDataFlag(userInput === "");
@@ -68,27 +80,54 @@ const MultiWordlePage: NextPage<{ initalGameState: ReturnGameMode }> = ({
   };
 
   const onSubmit = async () => {
-    const res = await post<ReturnGameMode>("api/post/multiwordle", gameState);
-    const json = (await res.json()) as ReturnGameMode;
-    setNewDataFlag(true);
-    setGameStateStack([json, ...gameStateStack]);
-    setGameState(json);
+    if (gameState.gameStatus !== "finished") {
+      const response = await post<ReturnGameMove>(
+        "api/post/multiwordle",
+        gameState as ReturnGameMove
+      );
+
+      if (response.status === 200) {
+        const newGameState = await response.json();
+        setNewDataFlag(true);
+
+        setGameStack([newGameState, ...gameStack]);
+        setGameState(newGameState);
+      } else {
+        setNewDataFlag(true);
+        setErrorState(true);
+      }
+    }
   };
   return (
-    <div className={styles.container}>
-      <div className={styles.left}>
-        <ImageFrame path={gameState.imagePath}></ImageFrame>
-        <InputField
-          gameState={gameState}
-          previousGameState={gameStateStack[0]}
-          newDataFlag={newDataFlag}
+    <ErrorFeature error={errorState}>
+      {gameState.gameStatus === "finished" ? (
+        <WinDialogue
+          open={gameState.gameStatus === "finished"}
+          gameStack={gameStack}
         />
+      ) : (
+        <></>
+      )}
+      <div className={styles.container}>
+        <div className={styles.left}>
+          {gameState.imagePath === undefined ? (
+            <div>Failed To Load</div>
+          ) : (
+            <ImageFrame path={gameState.imagePath}></ImageFrame>
+          )}
+          <InputField
+            gameState={gameState}
+            previousGameState={gameStack[0]}
+            newDataFlag={newDataFlag}
+          />
+        </div>
+        <div className={styles.right}>
+          <Carousel slides={gameStackToSlides([gameState, ...gameStack])} />
+          <Keyboard onPress={onPress} onSubmit={onSubmit} />
+        </div>
+        <Header />
       </div>
-      <div className={styles.right}>
-        <Carousel slides={gameStackToSlides([gameState, ...gameStateStack])} />
-        <Keyboard onPress={onPress} onSubmit={onSubmit} />
-      </div>
-    </div>
+    </ErrorFeature>
   );
 };
 
@@ -104,13 +143,18 @@ export const getServerSideProps = async ({ req }: NextPageContext) => {
     gameId: undefined,
     summary: undefined,
     inputs: undefined,
+    stats: undefined,
+    nextGameDate: undefined,
   };
 
-  const res = await post<AcceptGameMove>(url, gameState);
+  const response = await post<AcceptGameMove>(url, gameState);
 
-  const initalGameState = await res.json();
-
-  return { props: { initalGameState } };
+  if (response.status === 200) {
+    const initalGameState = await response.json();
+    return { props: { initalGameState, initalErrorState: false } };
+  } else {
+    return { props: { initalGameState: {}, initalErrorState: true } };
+  }
 };
 
 export default MultiWordlePage;
