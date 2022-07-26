@@ -1,25 +1,20 @@
 import ToolTip from "../misc/ToolTip";
 import { NextPage } from "next";
-import MoreInfo from "../dialogs/InfoDialog";
-import QuestionMarkIcon from "@mui/icons-material/QuestionMarkRounded";
-import KeyIcon from "@mui/icons-material/Key";
+import InfoDialog from "../dialogs/InfoDialog";
 import styles from "../../styles/components/header/Header.module.css";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import InfoIcon from "@mui/icons-material/Info";
 
 const Header: NextPage = () => (
   <div className={styles.header}>
-    <div className={styles.moreInfoIcon}>
-      <MoreInfo>
-        <ToolTip title="How To Play">
-          <QuestionMarkIcon className={styles.info} sx={{ fontSize: "%30" }} />
-        </ToolTip>
-      </MoreInfo>
-    </div>
-
-    <div className={styles.title}>Keyo&apos;s Drawdle</div>
-    <KeyIcon
-      className={styles.keyIcon}
-      sx={{ fontSize: "3.5rem", color: "yellow" }}
-    />
+    <InfoDialog>
+      <ToolTip title="How To Play">
+        <InfoIcon fontSize="large" />
+      </ToolTip>
+    </InfoDialog>
+    <ToolTip title="My Profile">
+      <AccountCircleIcon fontSize="large" />
+    </ToolTip>
   </div>
 );
 

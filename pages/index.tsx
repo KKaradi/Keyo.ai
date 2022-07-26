@@ -3,14 +3,7 @@ import { useState } from "react";
 import { colors } from "../constants/colors";
 import DICTIONARY from "../dictionary.json";
 import { post } from "../helpers";
-import {
-  AcceptGameMove,
-  GameStatus,
-  ReturnCharacter,
-  ReturnGameMove,
-  ReturnWord,
-} from "./api/post/multiwordle";
-
+import { GameMove, Word, Character, GameMoveSchema } from "./api/schemas";
 import InputField from "../components/multiwordle/InputField";
 import ImageFrame from "../components/misc/ImageFrame";
 import Carousel from "../components/multiwordle/Carousel";
@@ -18,10 +11,12 @@ import Keyboard from "../components/multiwordle/Keyboard";
 import ErrorDialog from "../components/dialogs/ErrorDialog";
 import WinDialog from "../components/dialogs/WinDialog";
 import ErrorPage from "../components/misc/ErrorPage";
+import Header from "../components/header/Header";
 
 import styles from "../styles/pages/MultiWordle.module.css";
+import { Request } from "./api/post/multiwordle";
 
-function getNewInputs(input: string, gameState: ReturnGameMove): ReturnWord[] {
+function getNewInputs(input: string, gameState: GameMove): Word[] {
   if (gameState.inputs === undefined) {
     return [];
   }
@@ -36,14 +31,12 @@ function getNewInputs(input: string, gameState: ReturnGameMove): ReturnWord[] {
           status,
         };
       }),
-    } as ReturnWord;
+    } as Word;
   });
 }
 
-function gameStackToSlides(
-  gameStates: ReturnGameMove[]
-): ReturnCharacter[][][] {
-  const slides: ReturnCharacter[][][] = [];
+function gameStackToSlides(gameStates: GameMove[]): Character[][][] {
+  const slides: Character[][][] = [];
 
   gameStates.forEach((gameState, gameStateIndex) => {
     gameState.inputs.forEach((input, inputIndex) => {
@@ -70,7 +63,7 @@ function gameStackToSlides(
   return slides;
 }
 
-function getColorMap(gameStates: ReturnGameMove[], activeSlide: number) {
+function getColorMap(gameStates: GameMove[], activeSlide: number) {
   const keyMap: { [key: string]: string } = {};
   gameStates.forEach((gameState) => {
     gameState.inputs[activeSlide].characters.forEach(
@@ -94,10 +87,12 @@ const warnings = {
   dictionary: "That word was not in our dictionary.",
 };
 
-const MultiWordlePage: NextPage<{ initalGameState: ReturnGameMove }> = ({
-  initalGameState: initalGameState,
-}) => {
-  const [history, setHistory] = useState<ReturnGameMove[]>([initalGameState]);
+type MultiWordleProps = {
+  initalGameState: GameMove;
+};
+
+const MultiWordlePage: NextPage<MultiWordleProps> = ({ initalGameState }) => {
+  const [history, setHistory] = useState<GameMove[]>([initalGameState]);
   const [error, setError] = useState(false);
   const [gameState, setGameState] = useState(initalGameState);
   const [activeSlide, setActiveSlide] = useState(0);
@@ -105,6 +100,8 @@ const MultiWordlePage: NextPage<{ initalGameState: ReturnGameMove }> = ({
 
   const [warning, setWarning] = useState<string | undefined>();
   const [hasWon, setHasWon] = useState(false);
+
+  if (initalGameState.gameId === undefined || error) return <ErrorPage />;
 
   const onPress = (userInput: string) => {
     const inputs = getNewInputs(userInput, gameState);
@@ -118,17 +115,19 @@ const MultiWordlePage: NextPage<{ initalGameState: ReturnGameMove }> = ({
       return setDisplayBest(true);
     }
 
-    const res = await post<ReturnGameMove>("api/post/multiwordle", gameState);
-    const newGameMove = (await res.json()) as ReturnGameMove;
+    const res = await post<GameMove>("api/post/multiwordle", gameState);
+    const parsedResponse = GameMoveSchema.safeParse(await res.json());
+    if (!parsedResponse.success) return setError(true);
 
-    if (!newGameMove) return setError(true);
+    const newGameMove = parsedResponse.data;
+    console.log(newGameMove);
 
     setDisplayBest(true);
     setHistory([newGameMove, ...history]);
     setGameState(newGameMove);
   };
 
-  const getSimilarityScore = (word: ReturnCharacter[]) => {
+  const getSimilarityScore = (word: Character[]) => {
     let total = 0;
 
     const points = word.reduce((prev, { status }) => {
@@ -144,10 +143,10 @@ const MultiWordlePage: NextPage<{ initalGameState: ReturnGameMove }> = ({
     return { word, score, completed };
   };
 
-  const getBestGuesses = (slides: ReturnCharacter[][][]) => {
+  const getBestGuesses = (slides: Character[][][]) => {
     if (!displayBest) return undefined;
 
-    const bestGuesses: ReturnWord[] = [];
+    const bestGuesses: Word[] = [];
 
     slides.forEach((slide) => {
       let bestWord = getSimilarityScore(slide[1]);
@@ -169,8 +168,6 @@ const MultiWordlePage: NextPage<{ initalGameState: ReturnGameMove }> = ({
   const colorMap = getColorMap(history, activeSlide);
   const bestGuesses = getBestGuesses(slides);
 
-  if (error) return <ErrorPage />;
-
   return (
     <div className={styles.container}>
       <ErrorDialog
@@ -188,41 +185,38 @@ const MultiWordlePage: NextPage<{ initalGameState: ReturnGameMove }> = ({
         />
       </div>
       <div className={styles.right}>
-        <Carousel
-          slides={slides}
-          slideState={[activeSlide, setActiveSlide]}
-          displayBest={displayBest}
-        />
-        <Keyboard onPress={onPress} onSubmit={onSubmit} colorMap={colorMap} />
+        <Header />
+        <div className={styles.game}>
+          <Carousel
+            slides={slides}
+            slideState={[activeSlide, setActiveSlide]}
+            displayBest={displayBest}
+          />
+          <Keyboard onPress={onPress} onSubmit={onSubmit} colorMap={colorMap} />
+        </div>
       </div>
     </div>
   );
 };
 
-export const getServerSideProps = async ({ req }: NextPageContext) => {
+export const getServerSideProps = async ({
+  req,
+}: NextPageContext): Promise<{ props: MultiWordleProps }> => {
   const url = new URL(
     "api/post/multiwordle",
     `http://${req?.headers.host}`
   ).toString();
 
-  const gameState = {
-    gameStatus: "new" as GameStatus,
-    imagePath: undefined,
-    gameId: undefined,
-    summary: undefined,
-    inputs: undefined,
-    stats: undefined,
-    nextGameDate: undefined,
-  };
-
-  const response = await post<AcceptGameMove>(url, gameState);
+  const response = await post<Request>(url, { gameStatus: "new" });
 
   if (response.status === 200) {
-    const initalGameState = await response.json();
-    return { props: { initalGameState, initalErrorState: false } };
-  } else {
-    return { props: { initalGameState: {}, initalErrorState: true } };
+    const parsedResponse = GameMoveSchema.safeParse(await response.json());
+    if (parsedResponse.success) {
+      return { props: { initalGameState: parsedResponse.data } };
+    }
   }
+
+  return { props: { initalGameState: {} } as MultiWordleProps };
 };
 
 export default MultiWordlePage;

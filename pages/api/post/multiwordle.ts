@@ -1,67 +1,25 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { authenticate } from "../helpers";
+import { authenticate, response } from "../helpers";
 import schedule from "../../../schedule.json";
-
-export type CharacterStatus = "green" | "yellow" | "gray" | "empty";
-export type GameStatus = "new" | "started" | "finished";
-
-export type Stats = {
-  totalChars: number;
-  greens: number;
-  yellows: number;
-  grays: number;
-  totalWords: number;
-  hitwords: number;
-  level: number;
-};
-
-export type AcceptCharacter = {
-  character: string | undefined;
-  status: CharacterStatus | undefined;
-};
-
-export type AcceptWord = {
-  completed: boolean | undefined;
-  characters: AcceptCharacter[] | undefined;
-};
-
-export type AcceptGameMove = {
-  summary: number[] | undefined;
-  gameId: number | undefined;
-  inputs: AcceptWord[] | undefined;
-  imagePath: string | undefined;
-  gameStatus: GameStatus | undefined;
-  stats: Stats | undefined;
-  nextGameDate: string | undefined;
-};
-
-export type ReturnGameMove = {
-  gameId: number;
-  summary: number[];
-  inputs: ReturnWord[];
-  imagePath: string;
-  gameStatus: GameStatus;
-  stats: Stats;
-  nextGameDate: string;
-};
-
-export type ReturnWord = {
-  completed: boolean;
-  characters: ReturnCharacter[];
-};
-
-export type ReturnCharacter = {
-  character: string;
-  status: CharacterStatus;
-};
+import {
+  Character,
+  GameData,
+  GameDataSchema,
+  GameMove,
+  GameMoveSchema,
+  GameStartSchema,
+  Stats,
+  Word,
+} from "../schemas";
+import { z } from "zod";
 
 export type ErrorMessage = { message: string };
-export type Response = AcceptGameMove | ErrorMessage;
+export type Response = GameMove | ErrorMessage;
 
 function applyLevel(stats: Stats): void {
-  if (stats.hitwords >= 2) {
+  if (stats.hitWords >= 2) {
     stats.level = 0;
-  } else if (stats.hitwords == 1) {
+  } else if (stats.hitWords == 1) {
     stats.level = 1;
   } else if (stats.greens + stats.yellows / stats.totalChars >= 0.66) {
     stats.level = 2;
@@ -72,39 +30,29 @@ function applyLevel(stats: Stats): void {
   }
 }
 
-function pullPrompt(): {
-  prompt: string | undefined;
-  imagePath: string | undefined;
-  gameId: number | undefined;
-  nextGameDate: string | undefined;
-} {
-  let prompt;
-  let imagePath;
-  let gameId;
-  let nextGameDate;
+function pullPrompt(): GameData | undefined {
   const now = Date.now();
   for (let i = 0; i < schedule.length; i++) {
-    if (
-      new Date(schedule[i].start_date).getTime() <= now &&
-      now <= new Date(schedule[i].end_date).getTime()
-    ) {
-      prompt = schedule[i]?.prompt;
-      imagePath = schedule[i]?.image_path;
-      gameId = i;
-      nextGameDate = schedule[i + 1]?.start_date;
-      break;
+    const afterStart = new Date(schedule[i].start_date).getTime() <= now;
+    const beforeEnd = now <= new Date(schedule[i].end_date).getTime();
+    if (afterStart && beforeEnd) {
+      return {
+        prompt: schedule[i].prompt,
+        imagePath: schedule[i].image_path,
+        gameId: i,
+        nextGameDate: schedule[i + 1].start_date,
+      };
     }
   }
-  return { prompt, imagePath, gameId, nextGameDate };
 }
 
-function splitToEmptys(promptSplits: string): AcceptWord {
+function splitToEmptys(promptSplits: string): Word {
   return {
     completed: false,
     characters: promptSplits.split("").map(() => {
       return { status: "empty", character: " " };
     }),
-  } as AcceptWord;
+  } as Word;
 }
 
 function generateNewGame(
@@ -112,7 +60,7 @@ function generateNewGame(
   imagePath: string,
   promptSplits: string[],
   nextGameDate: string | undefined
-): AcceptGameMove {
+): GameMove {
   return {
     gameId,
     gameStatus: "started",
@@ -122,11 +70,11 @@ function generateNewGame(
     error: false,
     stats: undefined,
     nextGameDate,
-  } as AcceptGameMove;
+  } as GameMove;
 }
 
 function processStartedGame(
-  gameMove: AcceptGameMove,
+  gameMove: GameMove,
   res: NextApiResponse<Response>,
   gameId: number,
   promptSplits: string[]
@@ -170,7 +118,7 @@ function processStartedGame(
     yellows: 0,
     grays: 0,
     totalWords: 0,
-    hitwords: 0,
+    hitWords: 0,
     level: 0,
   };
 
@@ -189,7 +137,7 @@ function processStartedGame(
 }
 
 function processSingleWord(
-  word: AcceptWord,
+  word: Word,
   promptSplit: string,
   res: NextApiResponse<Response>,
   stats: Stats
@@ -217,7 +165,6 @@ function processSingleWord(
     return true;
   }
   for (const character of characters) {
-    delete character.status;
     if (character.character === undefined || character.character.length != 1) {
       res.status(400).json({
         message: "Character is undefined or not a single character.",
@@ -225,7 +172,7 @@ function processSingleWord(
       return false;
     }
   }
-  if (handleWordle(characters as ReturnCharacter[], promptSplit, stats)) {
+  if (handleWordle(characters as Character[], promptSplit, stats)) {
     word.completed = true;
   }
 
@@ -240,7 +187,7 @@ function processSingleWord(
  * @returns whether the word was completed
  */
 function handleWordle(
-  characters: ReturnCharacter[],
+  characters: Character[],
   promptSplit: string,
   stats: Stats
 ): boolean {
@@ -267,7 +214,7 @@ function handleWordle(
   }
 
   if (completedFlag) {
-    stats.hitwords += 1;
+    stats.hitWords += 1;
     return true;
   }
 
@@ -290,42 +237,35 @@ function handleWordle(
   return false;
 }
 
+export const RequestSchema = z.union([GameMoveSchema, GameStartSchema]);
+export type Request = z.infer<typeof RequestSchema>;
+
 export default function Handler(
   req: NextApiRequest,
   res: NextApiResponse<Response>
 ) {
-  if (req.method !== "POST")
-    return res.status(405).json({ message: "Only Post Requests" });
+  if (req.method !== "POST") return response(res, "onlyPost");
+  if (!authenticate(req)) return response(res, "authError");
 
-  if (!authenticate(req))
-    return res.status(405).json({ message: "Authentication Error" });
+  const parsedBody = RequestSchema.safeParse(req.body);
+  if (!parsedBody.success) return response(res, "incorrectParams");
 
-  const gameMove = req.body as AcceptGameMove;
-  const { prompt, imagePath, gameId, nextGameDate } = pullPrompt();
+  const parsedPromptData = GameDataSchema.safeParse(pullPrompt());
+  if (!parsedPromptData.success) return response(res, "internalError");
 
-  if (prompt === undefined || imagePath === undefined || gameId === undefined) {
-    res.status(400).json({ message: "No game session is currently running" });
-    return;
-  }
+  const gameMove = parsedBody.data;
+  const { prompt, gameId, imagePath, nextGameDate } = parsedPromptData.data;
 
   const splits = prompt.split(" ");
 
-  if (!gameMove.gameStatus) {
-    res.status(400).json({
-      message: "Incorrect parameters: must supply game status.",
-    });
-  } else if (gameMove.gameStatus === "new") {
+  if (gameMove.gameStatus === "new") {
     const newGame = generateNewGame(gameId, imagePath, splits, nextGameDate);
     return res.status(200).json(newGame);
-  } else if (gameMove.gameStatus === "finished") {
-    res.status(400).json({ message: "Game is already finished." });
   } else if (gameMove.gameStatus === "started") {
     if (processStartedGame(gameMove, res, gameId, splits)) {
-      res.status(200).json(gameMove);
+      return res.status(200).json(gameMove);
     }
-  } else {
-    res.status(400).json({
-      message: "Game status is invalid. Must be new, started, finished",
-    });
+  } else if (gameMove.gameStatus === "finished") {
+    return res.status(400).json({ message: "Game is already finished." });
   }
 }

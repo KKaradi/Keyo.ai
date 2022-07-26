@@ -11,6 +11,7 @@ type ToolTipProps = {
 const ToolTip: NextPage<ToolTipProps> = ({ title, children, offset }) => {
   return (
     <Tooltip
+      style={{ cursor: "pointer" }}
       title={title}
       PopperProps={{
         modifiers: [
