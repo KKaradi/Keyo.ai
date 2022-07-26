@@ -71,10 +71,7 @@ const WinDialogue: NextPage<WinDialogueProps> = ({ open, gameStack }) => {
       open={isOpen}
       TransitionComponent={SlideTransition}
       keepMounted
-      onClose={() => {
-        setIsOpen(false);
-        console.log("switch");
-      }}
+      onClose={() => setIsOpen(false)}
       PaperProps={{
         style: {
           backgroundColor: colors.green,

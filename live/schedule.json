@@ -8,8 +8,8 @@
   },
   {
     "game_id": 1,
-    "prompt": "apple",
-    "diprompt": "a night time cityscape of tokyo harbor chillwave style trending on artstation",
+    "tempprompt": "apple apple lemon orange peach",
+    "prompt": "a night time cityscape of tokyo harbor chillwave style trending on artstation",
     "image_path": "/multiwordle/1.png",
     "start_date": "2022-07-22T22:11:00+00:00",
     "end_date": "2023-07-22T22:07:00+00:00"
