@@ -35,6 +35,16 @@ export const WordSchema = z.object({
   characters: z.array(CharacterSchema),
 });
 
+export const AccountTypeSchema = z.union([
+  z.literal("wallet"),
+  z.literal("gmail"),
+]);
+
+export const AccountSchema = z.object({
+  id: z.string(),
+  type: AccountTypeSchema,
+});
+
 export const GameMoveSchema = z.object({
   gameId: z.number(),
   summary: z.array(z.number()),
@@ -43,7 +53,10 @@ export const GameMoveSchema = z.object({
   gameStatus: GameStatusSchema,
   stats: z.union([StatsSchema, z.undefined()]),
   nextGameDate: z.string(),
+  account: z.union([AccountSchema, z.undefined()]),
 });
+
+export const GameMovesSchema = z.array(GameMoveSchema);
 
 export const GameStartSchema = z.object({
   gameStatus: z.literal("new"),
@@ -56,13 +69,36 @@ export const GameDataSchema = z.object({
   nextGameDate: z.string(),
 });
 
+export const GmailCredentialSchema = z.object({
+  aud: z.string(),
+  azp: z.string(),
+  email: z.string(),
+  email_verified: z.boolean(),
+  exp: z.number(),
+  family_name: z.string(),
+  given_name: z.string(),
+  iat: z.number(),
+  iss: z.string(),
+  jti: z.string(),
+  name: z.string(),
+  nbf: z.number(),
+  picture: z.string(),
+  sub: z.string(),
+});
+
 export type CharacterStatus = z.infer<typeof CharacterStatusSchema>;
 export type GameStatus = z.infer<typeof GameStatusSchema>;
 export type Stats = z.infer<typeof StatsSchema>;
 
 export type GameStart = z.infer<typeof GameStartSchema>;
 export type GameMove = z.infer<typeof GameMoveSchema>;
+export type GameMoves = z.infer<typeof GameMovesSchema>;
 export type Word = z.infer<typeof WordSchema>;
 export type Character = z.infer<typeof CharacterSchema>;
 
+export type AccountType = z.infer<typeof AccountTypeSchema>;
+export type Account = z.infer<typeof AccountSchema>;
+
 export type GameData = z.infer<typeof GameDataSchema>;
+
+export type GmailCredential = z.infer<typeof GmailCredentialSchema>;

@@ -11,29 +11,45 @@ datasource db {
 }
 
 model Wallet {
-  address String @unique
-  votes Vote[]
-  voteCount Int @default(0)
-   ens String?
+  address String  @unique
+  ens     String?
+  Guess   Guess[]
 }
 
-model Vote {
-  id String @default(cuid()) @id
-  createdAt DateTime @default(now())
-
-  day Int
-  imageset Int
-
-  chosen String
-  denied String
-
-  walletAddress String
-  wallet Wallet @relation(fields: [walletAddress], references: [address], onDelete: Cascade)
+model Gmail {
+  email String  @unique
+  Guess Guess[]
 }
 
-model Prompt {
-  id String @default(cuid()) @id
-  createdAt DateTime @default(now())
-  prompt String @unique
-  dayIndex Int
+enum Color {
+  green
+  yellow
+  gray
+  empty
+}
+
+enum GameStatus {
+  new
+  started
+  finished
+}
+
+model Guess {
+  id   String   @id @default(cuid())
+  time DateTime @default(now())
+
+  letters    String[]
+  colors     Color[]
+
+  gameId       Int
+  imagePath    String
+  nextGameDate String
+  gameStatus   GameStatus
+  prompt       String
+
+  wallet  Wallet? @relation(fields: [address], references: [address], onDelete: Cascade)
+  address String?
+
+  gmail Gmail?  @relation(fields: [email], references: [email], onDelete: Cascade)
+  email String? 
 }

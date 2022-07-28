@@ -7,13 +7,13 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import type { NextPage } from "next/types";
 import SlideTransition from "./SlideTransition";
+import { GameMove } from "../../pages/api/schemas";
 import { colors } from "../../constants/colors";
-import { ReturnGameMove } from "../../pages/api/post/multiwordle";
 
 type WinDialogProps = {
   isOpen: boolean;
   setIsOpen: (value: boolean) => void;
-  gameStack: ReturnGameMove[];
+  gameStack: GameMove[];
 };
 
 //🟥🟧🟨🟩🟦🟪🟫⬛⬜💠🔳🔲

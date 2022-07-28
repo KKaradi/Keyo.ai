@@ -12,6 +12,8 @@ import {
   Word,
 } from "../schemas";
 import { z } from "zod";
+import prisma from "../../../lib/prisma";
+import { Color } from "@prisma/client";
 
 export type ErrorMessage = { message: string };
 export type Response = GameMove | ErrorMessage;
@@ -55,7 +57,7 @@ function splitToEmptys(promptSplits: string): Word {
   } as Word;
 }
 
-function generateNewGame(
+export function generateNewGame(
   gameId: number,
   imagePath: string,
   promptSplits: string[],
@@ -226,10 +228,32 @@ function handleWordle(
   return completed;
 }
 
+const addGuessToDatabase = async (gameMove: GameMove, prompt: string) => {
+  const colors: Color[] = [];
+  const letters: string[] = [];
+
+  gameMove.inputs.forEach((input) =>
+    input.characters.forEach(({ status, character }) => {
+      colors.push(status);
+      letters.push(character);
+    })
+  );
+
+  const { account, gameId, gameStatus, nextGameDate, imagePath } = gameMove;
+  const game = { colors, letters, gameId, gameStatus, prompt, imagePath };
+
+  const address = account?.type === "wallet" ? account.id : undefined;
+  const email = account?.type === "gmail" ? account.id : undefined;
+
+  await prisma.guess.create({
+    data: { address, email, nextGameDate, ...game },
+  });
+};
+
 export const RequestSchema = z.union([GameMoveSchema, GameStartSchema]);
 export type Request = z.infer<typeof RequestSchema>;
 
-export default function Handler(
+export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<Response>
 ) {
@@ -252,6 +276,7 @@ export default function Handler(
     return res.status(200).json(newGame);
   } else if (gameMove.gameStatus === "started") {
     if (processStartedGame(gameMove, res, gameId, splits)) {
+      addGuessToDatabase(gameMove, prompt);
       return res.status(200).json(gameMove);
     }
   } else if (gameMove.gameStatus === "finished") {

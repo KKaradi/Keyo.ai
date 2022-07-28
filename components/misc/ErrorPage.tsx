@@ -8,13 +8,13 @@ const ErrorFeature: NextPage = () => {
   return (
     <div className={styles.page}>
       <div className={styles.errorBar}>
-        <h1 className={styles.h1}>Error</h1>
+        <h1 className={styles.h1}>ERROR</h1>
         <p className={styles.topParagraph}>
           Seem&apos;s like something went wrong on our end.
         </p>
-        <p>Try refreshing to start up a new game or try again later.</p>
+        <p>Refresh to start up a new game or try again later.</p>
         <p className={styles.bottomParagraph}>
-          If that dosen&apos;t work you can try tweeting at us.
+          If that doesn&apos;t work, try tweeting at us!
         </p>
         <Link href={"https://twitter.com/intent/tweet?text=@nonfungedai"}>
           <a target="_blank">

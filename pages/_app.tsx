@@ -3,6 +3,7 @@ import type { AppProps } from "next/app";
 import { useEffect } from "react";
 import { colors } from "../constants/colors";
 import RainbowKit from "../components/misc/RainbowKit";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 const App = ({ Component, pageProps }: AppProps) => {
   useEffect(() => {
@@ -10,9 +11,11 @@ const App = ({ Component, pageProps }: AppProps) => {
   }, []);
 
   return (
-    <RainbowKit>
-      <Component {...pageProps} />
-    </RainbowKit>
+    <GoogleOAuthProvider clientId={process.env.GOOGLE_CLIENT_ID ?? ""}>
+      <RainbowKit>
+        <Component {...pageProps} />
+      </RainbowKit>
+    </GoogleOAuthProvider>
   );
 };
 

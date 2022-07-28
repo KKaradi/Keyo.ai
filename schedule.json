@@ -1,14 +1,14 @@
 [
   {
     "game_id": 0,
-    "prompt": "a overgrown wooden magic bicycle concept art trending on artstation",
+    "prompt": "a overgrown wooden magic bicycle concept art",
     "image_path": "/multiwordle/2.png",
     "start_date": "2021-01-01T00:00:00+00:00",
     "end_date": "2022-07-22T22:11:00+00:00"
   },
   {
     "game_id": 1,
-    "prompt": "a nighttime cityscape of tokyo harbor chillwave style trending on artstation",
+    "prompt": "a nighttime cityscape of tokyo harbor chillwave style",
     "image_path": "/multiwordle/1.png",
     "start_date": "2022-07-22T22:11:00+00:00",
     "end_date": "2023-07-22T22:07:00+00:00"

@@ -1,9 +1,17 @@
 import type { NextPage, NextPageContext } from "next";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { colors } from "../constants/colors";
 import DICTIONARY from "../dictionary.json";
-import { post } from "../helpers";
-import { GameMove, Word, Character, GameMoveSchema } from "./api/schemas";
+import { get, post } from "../helpers";
+import {
+  GameMove,
+  Word,
+  Character,
+  GameMoveSchema,
+  Account,
+  AccountType,
+  GameMovesSchema,
+} from "./api/schemas";
 import InputField from "../components/multiwordle/InputField";
 import ImageFrame from "../components/misc/ImageFrame";
 import Carousel from "../components/multiwordle/Carousel";
@@ -15,21 +23,18 @@ import Header from "../components/header/Header";
 
 import styles from "../styles/pages/MultiWordle.module.css";
 import { Request } from "./api/post/multiwordle";
+import { useAccount } from "wagmi";
 
 function getNewInputs(input: string, gameState: GameMove): Word[] {
-  if (gameState.inputs === undefined) {
-    return [];
-  }
+  if (gameState.inputs === undefined) return [];
   return gameState.inputs.map((word) => {
     if (word.completed) return word;
     return {
       completed: false,
       characters: word.characters.map(({ status }, index) => {
         const charAt = input.charAt(index);
-        return {
-          character: charAt === "" ? " " : charAt,
-          status,
-        };
+        const character = charAt === "" ? " " : charAt;
+        return { character, status };
       }),
     } as Word;
   });
@@ -83,25 +88,50 @@ function getColorMap(gameStates: GameMove[], activeSlide: number) {
   return keyMap;
 }
 
+export type SignIn = (id: string, type: AccountType) => Promise<void>;
+
 const warnings = {
   dictionary: "That word was not in our dictionary.",
 };
 
 type MultiWordleProps = {
-  initalGameState: GameMove;
+  initialGameState: GameMove;
 };
 
-const MultiWordlePage: NextPage<MultiWordleProps> = ({ initalGameState }) => {
-  const [history, setHistory] = useState<GameMove[]>([initalGameState]);
+const MultiWordlePage: NextPage<MultiWordleProps> = ({ initialGameState }) => {
+  const [history, setHistory] = useState<GameMove[]>([initialGameState]);
   const [error, setError] = useState(false);
-  const [gameState, setGameState] = useState(initalGameState);
+  const [gameState, setGameState] = useState(initialGameState);
   const [activeSlide, setActiveSlide] = useState(0);
   const [displayBest, setDisplayBest] = useState(true);
 
   const [warning, setWarning] = useState<string | undefined>();
   const [hasWon, setHasWon] = useState(false);
 
-  if (initalGameState.gameId === undefined || error) return <ErrorPage />;
+  const [account, setAccount] = useState<Account | undefined>();
+
+  const signIn: SignIn = useCallback(
+    async (id, type) => {
+      setAccount({ id, type });
+      const response = await get(`api/get/account/${id}`);
+      if (response.status === 200) {
+        const res = GameMovesSchema.safeParse(await response.json());
+        if (!res.success) return;
+        setHistory([...res.data, initialGameState]);
+        setGameState(res.data[0] ?? initialGameState);
+        setDisplayBest(true);
+      }
+    },
+    [initialGameState]
+  );
+
+  const address = useAccount().data?.address;
+
+  useEffect(() => {
+    if (address) signIn(address, "wallet");
+  }, [address, signIn]);
+
+  if (initialGameState.gameId === undefined || error) return <ErrorPage />;
 
   const onPress = (userInput: string) => {
     const inputs = getNewInputs(userInput, gameState);
@@ -115,16 +145,23 @@ const MultiWordlePage: NextPage<MultiWordleProps> = ({ initalGameState }) => {
       return setDisplayBest(true);
     }
 
-    const res = await post<GameMove>("api/post/multiwordle", gameState);
-    const parsedResponse = GameMoveSchema.safeParse(await res.json());
-    if (!parsedResponse.success) return setError(true);
+    const res = await post<GameMove>("api/post/multiwordle", {
+      ...gameState,
+      account,
+    });
 
-    const newGameMove = parsedResponse.data;
-    console.log(newGameMove);
+    if (res.status === 200) {
+      const parsedResponse = GameMoveSchema.safeParse(await res.json());
+      if (parsedResponse.success) {
+        const newGameMove = parsedResponse.data;
 
-    setDisplayBest(true);
-    setHistory([newGameMove, ...history]);
-    setGameState(newGameMove);
+        setHistory([newGameMove, ...history]);
+        setGameState(newGameMove);
+        return setDisplayBest(true);
+      }
+    }
+
+    return setError(true);
   };
 
   const getSimilarityScore = (word: Character[]) => {
@@ -185,7 +222,7 @@ const MultiWordlePage: NextPage<MultiWordleProps> = ({ initalGameState }) => {
         />
       </div>
       <div className={styles.right}>
-        <Header />
+        <Header signIn={signIn} />
         <div className={styles.game}>
           <Carousel
             slides={slides}
@@ -212,11 +249,11 @@ export const getServerSideProps = async ({
   if (response.status === 200) {
     const parsedResponse = GameMoveSchema.safeParse(await response.json());
     if (parsedResponse.success) {
-      return { props: { initalGameState: parsedResponse.data } };
+      return { props: { initialGameState: parsedResponse.data } };
     }
   }
 
-  return { props: { initalGameState: {} } as MultiWordleProps };
+  return { props: { initialGameState: {} } as MultiWordleProps };
 };
 
 export default MultiWordlePage;

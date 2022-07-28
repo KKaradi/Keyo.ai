@@ -5,7 +5,8 @@ const nextConfig = {
   env: {
     AUTH_KEY: process.env.AUTH_KEY,
     IMAGESETS_PER_DAY: process.env.IMAGESETS_PER_DAY,
-    ETHERSCAN_KEY: process.env.ETHERSCAN_KEY
+    ETHERSCAN_KEY: process.env.ETHERSCAN_KEY,
+    GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID
   },
   images:{
     domains:[""]
