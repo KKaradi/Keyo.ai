@@ -3,9 +3,6 @@
   flex-direction: row;
 }
 
-@media only screen and (max-device-width: 480px) {
-}
-
 .right,
 .left {
   flex: 1;
@@ -25,6 +22,7 @@
 }
 
 .game {
+  margin-top: 30px;
   display: flex;
   width: 100%;
   flex-direction: column;

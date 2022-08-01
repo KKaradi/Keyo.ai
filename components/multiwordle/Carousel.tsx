@@ -1,13 +1,13 @@
 import type { NextPage } from "next/types";
 import { createRef, forwardRef, ForwardRefRenderFunction } from "react";
-import { ReturnCharacter } from "../../pages/api/post/multiwordle";
 import styles from "../../styles/components/multiwordle/Carousel.module.css";
 import Square from "../misc/Square";
 import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
+import { Character } from "../../pages/api/schemas";
 
 type SlideProps = {
-  slide: ReturnCharacter[][];
+  slide: Character[][];
   index: number;
   displayBest: boolean;
 };
@@ -16,7 +16,7 @@ const Slide: ForwardRefRenderFunction<HTMLDivElement, SlideProps> = (
   { slide, index, displayBest },
   ref
 ) => {
-  let completed: ReturnCharacter[] | null = null;
+  let completed: Character[] | null = null;
 
   const words = slide.slice(0, -1).filter((word) => {
     const filtered = word.filter(({ status }) => status === "green");
@@ -31,13 +31,14 @@ const Slide: ForwardRefRenderFunction<HTMLDivElement, SlideProps> = (
 
   return (
     <div id={`slide-${index + 1}`} className={styles.slide} ref={ref}>
-      {words.map((word, wordIndex) => (
+      {words.reverse().map((word, wordIndex) => (
         <div key={wordIndex} className={styles.word}>
           {word.map(({ character, status }, charIndex) => {
-            const isEmpty = wordIndex === 0 && displayBest && !completed;
+            const last = words.length - 1;
+            const empty = wordIndex == last && displayBest && !completed;
             return (
               <div className={styles.cell} key={charIndex}>
-                <Square character={isEmpty ? "" : character} color={status} />
+                <Square character={empty ? "" : character} color={status} />
               </div>
             );
           })}
@@ -50,7 +51,7 @@ const Slide: ForwardRefRenderFunction<HTMLDivElement, SlideProps> = (
 const ForwardedRefSlide = forwardRef(Slide);
 
 type CarouselProps = {
-  slides: ReturnCharacter[][][];
+  slides: Character[][][];
   slideState: [number, (value: number) => void];
   displayBest: boolean;
 };

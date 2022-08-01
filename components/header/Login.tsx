@@ -1,54 +1,99 @@
 import { NextPage } from "next";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
-import { GmailCredentialSchema } from "../../pages/api/schemas";
+import { TokenResponse } from "@react-oauth/google";
+import { Account, GmailCredentialSchema } from "../../pages/api/schemas";
 import { SignIn } from "../../pages";
+import { Popper } from "@mui/material";
+import Image from "next/image";
 
-const parseJWT = (token: string) => {
-  const raw = Buffer.from(token.split(".")[1], "base64").toString();
-  const parsed = GmailCredentialSchema.safeParse(JSON.parse(raw));
-  return parsed.success ? parsed.data : null;
-};
+import styles from "../../styles/components/header/Login.module.css";
 
-const accountStatus = {
-  smallScreen: "address",
-  largeScreen: "address",
-} as const;
-
-const chainStatus = {
-  smallScreen: "none",
-  largeScreen: "none",
-} as const;
+import DoNotDisturbIcon from "@mui/icons-material/DoNotDisturb";
+import { useGoogleLogin } from "@react-oauth/google";
+import google from "../../public/logins/google.svg";
+import ethereum from "../../public/logins/ethereum.svg";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 type LoginProps = {
   signIn?: SignIn;
+  anchorState: [HTMLElement | null, (el: null) => void];
+  account?: Account;
+  disconnect?: () => void;
 };
 
-const Login: NextPage<LoginProps> = ({ signIn }) => {
-  const onGmailSuccess = ({ credential }: CredentialResponse) => {
-    if (!credential) return;
-    const parsed = parseJWT(credential);
-    if (parsed && signIn) signIn(parsed.email, "gmail");
+type GoogleResult = Omit<
+  TokenResponse,
+  "error" | "error_description" | "error_uri"
+>;
+
+const Login: NextPage<LoginProps> = ({
+  signIn,
+  anchorState,
+  account,
+  disconnect,
+}) => {
+  const [anchor, setAnchor] = anchorState;
+
+  const onSuccess = async ({ access_token }: GoogleResult) => {
+    const url = "https://www.googleapis.com/oauth2/v3/userinfo";
+    const headers = { Authorization: `Bearer ${access_token}` };
+    const res = await fetch(url, { headers });
+    if (res.status !== 200) return;
+
+    const parsed = GmailCredentialSchema.safeParse(await res.json());
+    if (parsed.success && signIn) {
+      signIn(parsed.data.email, "gmail");
+      setAnchor(null);
+    }
   };
 
-  const onGmailError = () => {
-    console.log("Login Failed");
-  };
+  const login = useGoogleLogin({ onSuccess, flow: "implicit" });
 
   return (
-    <div style={{ display: "flex", flexDirection: "row", gap: 10 }}>
-      <ConnectButton
-        showBalance={false}
-        accountStatus={accountStatus}
-        chainStatus={chainStatus}
-      />
-      <GoogleLogin
-        onSuccess={onGmailSuccess}
-        onError={onGmailError}
-        auto_select
-        useOneTap
-      />
-    </div>
+    <ConnectButton.Custom>
+      {({ openConnectModal, openAccountModal }) => {
+        const content = account ? (
+          <div className={styles.loginContainer}>
+            <div
+              className={styles.ethLogin}
+              onClick={() => {
+                const { type } = account;
+                if (type === "wallet") openAccountModal();
+                if (type === "gmail" && disconnect) disconnect();
+              }}
+            >
+              <DoNotDisturbIcon />
+            </div>
+          </div>
+        ) : (
+          <div className={styles.loginContainer}>
+            <div onClick={() => login()} className={styles.googleLogin}>
+              <Image
+                src={google}
+                width={30}
+                height={30}
+                alt={"Login with Google"}
+                priority
+              />
+            </div>
+            <div className={styles.ethLogin}>
+              <Image
+                src={ethereum}
+                onClick={openConnectModal}
+                width={37}
+                height={37}
+                alt={"Connect ETH Wallet"}
+                priority
+              />
+            </div>
+          </div>
+        );
+        return (
+          <Popper open={Boolean(anchor)} anchorEl={anchor}>
+            {content}
+          </Popper>
+        );
+      }}
+    </ConnectButton.Custom>
   );
 };
 

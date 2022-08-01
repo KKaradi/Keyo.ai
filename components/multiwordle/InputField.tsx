@@ -1,12 +1,12 @@
 import { NextPage } from "next";
+import { GameMove, Word } from "../../pages/api/schemas";
 import styles from "../../styles/components/multiwordle/InputField.module.css";
-import { ReturnGameMove, ReturnWord } from "../../pages/api/post/multiwordle";
 import Square from "../misc/Square";
 
 type InputFieldProps = {
-  gameState: ReturnGameMove;
+  gameState: GameMove;
   activeSlide: number;
-  bestGuesses?: ReturnWord[];
+  bestGuesses?: Word[];
 };
 
 const InputField: NextPage<InputFieldProps> = ({

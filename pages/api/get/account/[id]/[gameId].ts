@@ -1,8 +1,8 @@
 import { Prisma } from "@prisma/client";
 import type { NextApiRequest, NextApiResponse } from "next";
-import prisma from "../../../../lib/prisma";
-import { authenticate, response } from "../../helpers";
-import { AccountType, Character, GameMove, Word } from "../../schemas";
+import prisma from "../../../../../lib/prisma";
+import { authenticate, response } from "../../../helpers";
+import { AccountType, Character, GameMove, Word } from "../../../schemas";
 
 export type Response = { message: string } | GameMove[];
 
@@ -20,11 +20,12 @@ const upsertGmail = async (email: string) => {
 
 const getGameMoves = async (
   id: string,
-  type: AccountType
+  type: AccountType,
+  game: number
 ): Promise<GameMove[]> => {
   let where: Prisma.GuessWhereInput = {};
-  if (type === "wallet") where = { address: id };
-  else if (type === "gmail") where = { email: id };
+  if (type === "wallet") where = { address: id, gameId: game };
+  else if (type === "gmail") where = { email: id, gameId: game };
   else return [];
 
   const find = { where, orderBy: { time: "desc" } } as const;
@@ -59,17 +60,17 @@ export default async function handler(
   if (!authenticate(req)) return response(res, "authError");
   if (req.method != "GET") return response(res, "onlyGet");
 
-  const { id } = req.query as { id: string };
-  if (!id) return response(res, "incorrectParams");
+  const { id, gameId } = req.query as { id: string; gameId: string };
+  if (!id || !gameId) return response(res, "incorrectParams");
 
   let gameMoves: GameMove[] = [];
 
   if (id.startsWith("0x")) {
     await upsertWallet(id);
-    gameMoves = await getGameMoves(id, "wallet");
+    gameMoves = await getGameMoves(id, "wallet", Number(gameId));
   } else if (id.endsWith("@gmail.com")) {
     await upsertGmail(id);
-    gameMoves = await getGameMoves(id, "gmail");
+    gameMoves = await getGameMoves(id, "gmail", Number(gameId));
   } else return response(res, "incorrectParams");
 
   res.status(200).json(gameMoves);

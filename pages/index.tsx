@@ -113,7 +113,9 @@ const MultiWordlePage: NextPage<MultiWordleProps> = ({ initialGameState }) => {
   const signIn: SignIn = useCallback(
     async (id, type) => {
       setAccount({ id, type });
-      const response = await get(`api/get/account/${id}`);
+      const response = await get(
+        `api/get/account/${id}/${initialGameState.gameId}`
+      );
       if (response.status === 200) {
         const res = GameMovesSchema.safeParse(await response.json());
         if (!res.success) return;
@@ -125,10 +127,15 @@ const MultiWordlePage: NextPage<MultiWordleProps> = ({ initialGameState }) => {
     [initialGameState]
   );
 
+  const disconnect = () => {
+    setAccount(undefined);
+  };
+
   const address = useAccount().data?.address;
 
   useEffect(() => {
     if (address) signIn(address, "wallet");
+    else disconnect();
   }, [address, signIn]);
 
   if (initialGameState.gameId === undefined || error) return <ErrorPage />;
@@ -222,7 +229,7 @@ const MultiWordlePage: NextPage<MultiWordleProps> = ({ initialGameState }) => {
         />
       </div>
       <div className={styles.right}>
-        <Header signIn={signIn} />
+        <Header signIn={signIn} account={account} disconnect={disconnect} />
         <div className={styles.game}>
           <Carousel
             slides={slides}

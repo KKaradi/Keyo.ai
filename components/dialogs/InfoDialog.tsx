@@ -8,6 +8,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import type { NextPage } from "next/types";
 import SlideTransition from "./SlideTransition";
 import { colors } from "../../constants/colors";
+import Timelapse from "../misc/Timelapse";
 
 type InfoDialogProps = {
   children: ReactElement;
@@ -28,34 +29,21 @@ const InfoDialog: NextPage<InfoDialogProps> = ({
         TransitionComponent={SlideTransition}
         keepMounted
         onClose={() => setIsOpen(false)}
-        PaperProps={{
-          style: {
-            backgroundColor: colors.green,
-            boxShadow: "none",
-            width: "100%",
-          },
-        }}
       >
         <DialogTitle>
-          <h1 className={styles.dialogTitle}>How to play</h1>
+          <h1>How To Play</h1>
         </DialogTitle>
         <DialogContent>
-          <DialogContentText className={styles.dialogContent}>
-            <p>
-              First we started with a sentence. Then we asked an AI to draw that
-              sentence. That&apos;s what you see on the left. Your job is guess
-              the sentence that was use to draw the image
-            </p>
-            <p>
-              You can enter a guess just by typing and hitting enter. Each guess
-              applies to every word in the sentence.
-            </p>
-            <p>
-              For each letter green means its in the correct spot, yellow means
-              its in the wrong spot and gray means its not in the word. You can
-              find a history of your guess by click each word.
-            </p>
+          <DialogContentText>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam
+            venenatis nisi non justo egestas interdum. Nam venenatis bibendum
+            neque, vel ullamcorper eros malesuada ornare. Pellentesque lectus
+            risus, lacinia sed vehicula sed, fermentum id ex. Aenean vel est ut
+            nunc hendrerit pellentesque. Suspendisse eu tincidunt urna, a
+            pretium nisi.
           </DialogContentText>
+          <br />
+          <Timelapse />
         </DialogContent>
 
         <Button
@@ -66,7 +54,7 @@ const InfoDialog: NextPage<InfoDialogProps> = ({
           style={{
             borderRadius: 15,
             color: colors.gray,
-            backgroundColor: colors.accent,
+            backgroundColor: "white",
             fontSize: "18px",
           }}
         >
