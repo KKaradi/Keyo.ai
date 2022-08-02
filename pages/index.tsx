@@ -13,7 +13,6 @@ import SETTINGS from "../settings.json";
 
 const GamePage: NextPage = () => {
   const [voteArray, setVotes] = useState<Vote[] | undefined>();
-  const [percentiles, setPercentiles] = useState<number[] | undefined>();
   const [imageset, setImageset] = useState(1);
 
   const [isVoting, setIsVoting] = useState(true);
@@ -32,11 +31,8 @@ const GamePage: NextPage = () => {
 
       const result = await get(`/api/get/wallet/${address}`);
 
-      const { votes, percentileArray } = (await result.json()) as Response;
-
-      if (!votes || !percentileArray) return;
-
-      setPercentiles(percentileArray);
+      const { votes } = (await result.json()) as Response;
+      if (!votes) return;
       setVotes(votes);
 
       const day = getDay();
@@ -102,7 +98,7 @@ const GamePage: NextPage = () => {
       </Head>
 
       <div className={styles.header}>
-        <Header votes={voteArray} percentiles={percentiles} />
+        <Header votes={voteArray} />
         {voteArray ? <History votes={voteArray} /> : null}
       </div>
 
