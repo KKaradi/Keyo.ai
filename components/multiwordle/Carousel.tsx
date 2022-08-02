@@ -4,7 +4,7 @@ import styles from "../../styles/components/multiwordle/Carousel.module.css";
 import Square from "../misc/Square";
 import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
-import { Character } from "../../pages/api/schemas";
+import { Character } from "../../schemas";
 
 type SlideProps = {
   slide: Character[][];

@@ -10,7 +10,7 @@ import {
   GameStartSchema,
   Stats,
   Word,
-} from "../schemas";
+} from "../../../schemas";
 import { z } from "zod";
 import prisma from "../../../lib/prisma";
 import { Color } from "@prisma/client";

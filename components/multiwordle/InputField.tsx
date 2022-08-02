@@ -1,5 +1,5 @@
 import { NextPage } from "next";
-import { GameMove, Word } from "../../pages/api/schemas";
+import { GameMove, Word } from "../../schemas";
 import styles from "../../styles/components/multiwordle/InputField.module.css";
 import Square from "../misc/Square";
 

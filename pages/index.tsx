@@ -11,7 +11,7 @@ import {
   Account,
   AccountType,
   GameMovesSchema,
-} from "./api/schemas";
+} from "../schemas";
 import InputField from "../components/multiwordle/InputField";
 import ImageFrame from "../components/misc/ImageFrame";
 import Carousel from "../components/multiwordle/Carousel";
@@ -101,6 +101,7 @@ type MultiWordleProps = {
 const MultiWordlePage: NextPage<MultiWordleProps> = ({ initialGameState }) => {
   const [history, setHistory] = useState<GameMove[]>([initialGameState]);
   const [error, setError] = useState(false);
+  const [won, setWon] = useState(false);
   const [gameState, setGameState] = useState(initialGameState);
   const [activeSlide, setActiveSlide] = useState(0);
   const [displayBest, setDisplayBest] = useState(true);
@@ -214,6 +215,7 @@ const MultiWordlePage: NextPage<MultiWordleProps> = ({ initialGameState }) => {
 
   return (
     <div className={styles.container}>
+      <WinDialog setIsOpen={setWon} isOpen={won} gameStack={history} />
       <ErrorDialog
         setIsOpen={() => setWarning(undefined)}
         isOpen={Boolean(warning)}

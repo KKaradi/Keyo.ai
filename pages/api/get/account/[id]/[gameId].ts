@@ -2,7 +2,7 @@ import { Prisma } from "@prisma/client";
 import type { NextApiRequest, NextApiResponse } from "next";
 import prisma from "../../../../../lib/prisma";
 import { authenticate, response } from "../../../helpers";
-import { AccountType, Character, GameMove, Word } from "../../../schemas";
+import { AccountType, Character, GameMove, Word } from "../../../../../schemas";
 
 export type Response = { message: string } | GameMove[];
 

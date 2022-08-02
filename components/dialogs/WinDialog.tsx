@@ -7,7 +7,7 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import type { NextPage } from "next/types";
 import SlideTransition from "./SlideTransition";
-import { GameMove } from "../../pages/api/schemas";
+import { GameMove } from "../../schemas";
 import { colors } from "../../constants/colors";
 
 type WinDialogProps = {

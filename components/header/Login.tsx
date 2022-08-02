@@ -1,6 +1,6 @@
 import { NextPage } from "next";
 import { TokenResponse } from "@react-oauth/google";
-import { Account, GmailCredentialSchema } from "../../pages/api/schemas";
+import { Account, GmailCredentialSchema } from "../../schemas";
 import { SignIn } from "../../pages";
 import { Popper } from "@mui/material";
 import Image from "next/image";

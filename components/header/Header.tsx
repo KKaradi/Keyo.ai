@@ -8,7 +8,7 @@ import MenuBookIcon from "@mui/icons-material/MenuBook";
 import React, { useState } from "react";
 import Login from "./Login";
 import { SignIn } from "../../pages";
-import { Account } from "../../pages/api/schemas";
+import { Account } from "../../schemas";
 
 type HeaderProps = {
   signIn?: SignIn;

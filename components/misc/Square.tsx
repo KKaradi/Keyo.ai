@@ -1,7 +1,7 @@
 import type { NextPage } from "next/types";
 import styles from "../../styles/components/misc/Square.module.css";
 import { colors } from "../../constants/colors";
-import { CharacterStatus } from "../../pages/api/post/multiwordle";
+import { CharacterStatus } from "../../schemas";
 
 type NextPageProps = {
   character: string;
