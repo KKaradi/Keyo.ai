@@ -31,3 +31,16 @@ export const useScroll = () => {
 export const clipboard = async (text: string) => {
   await navigator?.clipboard?.writeText(text);
 };
+
+export const shuffle = <T>(array: T[]) => {
+  let currIndex = array.length;
+  let randIndex;
+
+  while (currIndex != 0) {
+    randIndex = Math.floor(Math.random() * currIndex);
+    currIndex--;
+    [array[currIndex], array[randIndex]] = [array[randIndex], array[currIndex]];
+  }
+
+  return array;
+};
