@@ -38,7 +38,12 @@ const Slide: ForwardRefRenderFunction<HTMLDivElement, SlideProps> = (
             const empty = wordIndex == last && displayBest && !completed;
             return (
               <div className={styles.cell} key={charIndex}>
-                <Square character={empty ? "" : character} color={status} />
+                <Square
+                  character={empty ? "" : character}
+                  color={status}
+                  isAnimated={false}
+                  setIsAnimated={undefined}
+                />
               </div>
             );
           })}
@@ -67,6 +72,7 @@ const Carousel: NextPage<CarouselProps> = ({
   const refs = slides.map(() => createRef<HTMLDivElement>());
 
   const onScroll = () => {
+    console.log("scrolling");
     if (!ref.current) return;
     const { x } = ref.current.getBoundingClientRect();
 
@@ -83,7 +89,6 @@ const Carousel: NextPage<CarouselProps> = ({
 
   const left = slide === 0 ? 0 : slide - 1;
   const right = slide === slides.length - 1 ? slides.length - 1 : slide + 1;
-
   return (
     <div className={styles.carousel}>
       <a href={`#slide-${left + 1}`}>

@@ -19,7 +19,7 @@ type KeyboardProps = {
   colorMap?: { [key: string]: string };
   keyboard?: string[][];
   onPress?: (userInput: string) => void;
-  onSubmit?: (userInput: string) => void;
+  onSubmit?: (userInput: string) => Promise<boolean>;
 };
 
 function isLetter(char: string) {
@@ -35,13 +35,14 @@ const Keyboard: NextPage<KeyboardProps> = ({
   const [userInput, setUserInput] = useState("");
 
   const onKeyDown = useCallback(
-    (key: string) => {
+    async (key: string) => {
       key = key.replace(/:/g, "");
       let newUserInput = userInput;
       let onSubCalledFlag = false;
       if (key.toLowerCase() === "enter" && onSubmit) {
-        newUserInput = "";
-        onSubmit(userInput);
+        if (await onSubmit(userInput)) {
+          newUserInput = "";
+        }
         onSubCalledFlag = true;
       }
 

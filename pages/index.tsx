@@ -105,12 +105,11 @@ const MultiWordlePage: NextPage<MultiWordleProps> = ({ initialGameState }) => {
   const [gameState, setGameState] = useState(initialGameState);
   const [activeSlide, setActiveSlide] = useState(0);
   const [displayBest, setDisplayBest] = useState(true);
-
+  const [isAnimated, setIsAnimated] = useState(false);
   const [warning, setWarning] = useState<string | undefined>();
   const [hasWon, setHasWon] = useState(false);
 
   const [account, setAccount] = useState<Account | undefined>();
-
   const signIn: SignIn = useCallback(
     async (id, type) => {
       setAccount({ id, type });
@@ -143,21 +142,24 @@ const MultiWordlePage: NextPage<MultiWordleProps> = ({ initialGameState }) => {
 
   const onPress = (userInput: string) => {
     const inputs = getNewInputs(userInput, gameState);
+
     setDisplayBest(userInput === "");
     setGameState({ ...gameState, inputs });
   };
 
   const onSubmit = async (userInput: string) => {
     if (!(DICTIONARY as string[]).includes(userInput)) {
-      setWarning(warnings.dictionary);
-      return setDisplayBest(true);
+      setIsAnimated(true);
+      //setDisplayBest(true);
+      return false;
     }
 
+    console.log("looking for api");
     const res = await post<GameMove>("api/post/multiwordle", {
       ...gameState,
       account,
     });
-
+    console.log("got the for api");
     if (res.status === 200) {
       const parsedResponse = GameMoveSchema.safeParse(await res.json());
       if (parsedResponse.success) {
@@ -165,11 +167,12 @@ const MultiWordlePage: NextPage<MultiWordleProps> = ({ initialGameState }) => {
 
         setHistory([newGameMove, ...history]);
         setGameState(newGameMove);
-        return setDisplayBest(true);
+        setDisplayBest(true);
+        return true;
       }
     }
-
-    return setError(true);
+    setError(true);
+    return true;
   };
 
   const getSimilarityScore = (word: Character[]) => {
@@ -212,7 +215,6 @@ const MultiWordlePage: NextPage<MultiWordleProps> = ({ initialGameState }) => {
   const slides = gameStackToSlides([gameState, ...history]);
   const colorMap = getColorMap(history, activeSlide);
   const bestGuesses = getBestGuesses(slides);
-
   return (
     <div className={styles.container}>
       <WinDialog setIsOpen={setWon} isOpen={won} gameStack={history} />
@@ -228,6 +230,8 @@ const MultiWordlePage: NextPage<MultiWordleProps> = ({ initialGameState }) => {
           gameState={gameState}
           activeSlide={activeSlide}
           bestGuesses={bestGuesses}
+          setIsAnimated={setIsAnimated}
+          isAnimated={isAnimated}
         />
       </div>
       <div className={styles.right}>

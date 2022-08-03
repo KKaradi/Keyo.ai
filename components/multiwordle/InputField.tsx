@@ -1,4 +1,5 @@
 import { NextPage } from "next";
+import { Dispatch, SetStateAction, useState } from "react";
 import { GameMove, Word } from "../../schemas";
 import styles from "../../styles/components/multiwordle/InputField.module.css";
 import Square from "../misc/Square";
@@ -7,12 +8,16 @@ type InputFieldProps = {
   gameState: GameMove;
   activeSlide: number;
   bestGuesses?: Word[];
+  isAnimated: boolean;
+  setIsAnimated: Dispatch<SetStateAction<boolean>>;
 };
 
 const InputField: NextPage<InputFieldProps> = ({
   gameState,
   activeSlide,
   bestGuesses,
+  isAnimated,
+  setIsAnimated,
 }) => {
   return (
     <div className={styles.body}>
@@ -29,7 +34,12 @@ const InputField: NextPage<InputFieldProps> = ({
               return (
                 <a href={`#slide-${inputIndex + 1}`} key={characterIndex}>
                   <div className={styles.cell}>
-                    <Square character={character} color={color} />
+                    <Square
+                      character={character}
+                      color={color}
+                      isAnimated={isAnimated}
+                      setIsAnimated={setIsAnimated}
+                    />
                   </div>
                 </a>
               );

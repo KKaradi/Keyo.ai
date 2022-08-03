@@ -45,11 +45,12 @@ const HowToPlayDialogue: NextPage<HowToPlayDialogProps> = ({
         <DialogContent>
           <h1>How To Play</h1>
           <hr className={styles.rule} />
-          We started with a mystery sentence and generated an image. Your goal
-          is the guess the sentence using wordle. Enter a guess by typing a word
-          and hitting enter. That word is going to fill out each word so guess
-          carefully. After you enter your guess you can see your results. If you
-          want to see the results of past guesses click on a word.
+          We got an AI to create an image using a mystery caption (Click the
+          learn icon if you want to find out more). Your goal is the guess that
+          caption using wordle. Enter a guess by typing a word and hitting
+          enter. Our caption is a sentence so every guess fills out every word.
+          After you enter your guess you can see your results. If you want to
+          see the results of past guesses click on a word.
           <br />
           <h2>What do your results mean?</h2>
           <hr className={styles.rule} />
