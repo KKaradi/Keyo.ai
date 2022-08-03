@@ -17,6 +17,7 @@ const ImageFrame: NextPage<ImageFrameProps> = ({ path }) => {
           layout="responsive"
           objectFit="cover"
           alt="Hint Image"
+          priority
         />
       </div>
     </div>

@@ -86,16 +86,15 @@ const WinDialog: NextPage<WinDialogProps> = ({
       }}
     >
       <DialogTitle>
-        <h1 className={styles.dialogTitle}>🎉 You Won 🎉</h1>
+        🎉 You Won 🎉
       </DialogTitle>
       <DialogContent>
         <DialogContentText className={styles.dialogContent}>
-          <p className={styles.text}>
-            Congrats on finishing today&apos;s multiwordle
-          </p>
-          <p className={styles.text}>Number of Guesses: {numberOfGuesse}</p>
-          <p className={styles.text}>Game History: {statsString}</p>
-          <p className={styles.text}>Next Game: {timeToNextGame}</p>
+          Congrats on finishing today&apos;s multiwordle
+          
+          Number of Guesses: {numberOfGuesse}
+          Game History: {statsString}
+          Next Game: {timeToNextGame}
         </DialogContentText>
       </DialogContent>
 

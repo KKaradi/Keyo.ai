@@ -4,6 +4,9 @@
   justify-content: center;
   gap: 20;
   margin-top: 20;
+  padding: 10px;
+  border-radius: 25px;
+  box-shadow: 2px 2px 5px rgb(159, 159, 159);
 }
 
 .googleLogin {
@@ -11,6 +14,7 @@
   justify-content: center;
   align-items: center;
   cursor: pointer;
+  padding: 0 0 10px 0;
 }
 
 .ethLogin {
@@ -18,4 +22,5 @@
   justify-content: center;
   align-items: center;
   cursor: pointer;
+  padding: 10px 0 0 0;
 }

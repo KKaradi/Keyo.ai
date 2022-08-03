@@ -30,9 +30,7 @@ const InfoDialog: NextPage<InfoDialogProps> = ({
         keepMounted
         onClose={() => setIsOpen(false)}
       >
-        <DialogTitle>
-          <h1>How To Play</h1>
-        </DialogTitle>
+        <DialogTitle>How To Play</DialogTitle>
         <DialogContent>
           <DialogContentText>
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam

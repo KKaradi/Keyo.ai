@@ -4,15 +4,13 @@ import { Account, GmailCredentialSchema } from "../../schemas";
 import { SignIn } from "../../pages";
 import { Popper } from "@mui/material";
 import Image from "next/image";
-
 import styles from "../../styles/components/header/Login.module.css";
-
 import DoNotDisturbIcon from "@mui/icons-material/DoNotDisturb";
 import { useGoogleLogin } from "@react-oauth/google";
 import google from "../../public/logins/google.svg";
 import ethereum from "../../public/logins/ethereum.svg";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-
+import GoogleIcon from "@mui/icons-material/Google";
 type LoginProps = {
   signIn?: SignIn;
   anchorState: [HTMLElement | null, (el: null) => void];
