@@ -1,6 +1,6 @@
 import Image from "next/image";
 import type { NextPage } from "next/types";
-import styles from "../../styles/components/dialogs/InfoDialog.module.css";
+import styles from "../../styles/components/dialogs/HowToPlayDialog.module.css";
 
 import brutalist from "../../public/timelapses/brutalist.gif";
 import space from "../../public/timelapses/space.gif";
