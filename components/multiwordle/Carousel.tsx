@@ -1,5 +1,11 @@
 import type { NextPage } from "next/types";
-import { createRef, forwardRef, ForwardRefRenderFunction } from "react";
+import {
+  createRef,
+  forwardRef,
+  ForwardRefRenderFunction,
+  useEffect,
+  useState,
+} from "react";
 import styles from "../../styles/components/multiwordle/Carousel.module.css";
 import Square from "../misc/Square";
 import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
@@ -71,8 +77,9 @@ const Carousel: NextPage<CarouselProps> = ({
   const ref = createRef<HTMLDivElement>();
   const refs = slides.map(() => createRef<HTMLDivElement>());
 
+  const [waiting, setWaiting] = useState(true);
+
   const onScroll = () => {
-    console.log("scrolling");
     if (!ref.current) return;
     const { x } = ref.current.getBoundingClientRect();
 

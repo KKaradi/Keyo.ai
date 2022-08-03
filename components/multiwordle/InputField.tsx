@@ -22,7 +22,7 @@ const InputField: NextPage<InputFieldProps> = ({
   return (
     <div className={styles.body}>
       {(bestGuesses ?? gameState.inputs ?? []).map((input, inputIndex) => {
-        const backgroundColor = activeSlide === inputIndex ? "#ddd" : undefined;
+        const backgroundColor = activeSlide === inputIndex ? "#ccc" : undefined;
         return (
           <div
             key={inputIndex}

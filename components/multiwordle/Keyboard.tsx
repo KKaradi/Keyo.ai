@@ -18,6 +18,7 @@ const defaultKeyboard = [
 type KeyboardProps = {
   colorMap?: { [key: string]: string };
   keyboard?: string[][];
+  maxLength: number;
   onPress?: (userInput: string) => void;
   onSubmit?: (userInput: string) => Promise<boolean>;
 };
@@ -31,6 +32,7 @@ const Keyboard: NextPage<KeyboardProps> = ({
   onSubmit,
   keyboard,
   colorMap,
+  maxLength,
 }) => {
   const [userInput, setUserInput] = useState("");
 
@@ -50,7 +52,8 @@ const Keyboard: NextPage<KeyboardProps> = ({
         newUserInput = newUserInput.slice(0, -1);
       }
 
-      if (isLetter(key)) newUserInput = newUserInput + key;
+      if (isLetter(key) && newUserInput.length < maxLength)
+        newUserInput = newUserInput + key;
 
       if (newUserInput !== userInput && onPress && !onSubCalledFlag)
         onPress(newUserInput);

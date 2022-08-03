@@ -108,8 +108,10 @@ const MultiWordlePage: NextPage<MultiWordleProps> = ({ initialGameState }) => {
   const [isAnimated, setIsAnimated] = useState(false);
   const [warning, setWarning] = useState<string | undefined>();
   const [hasWon, setHasWon] = useState(false);
-
   const [account, setAccount] = useState<Account | undefined>();
+
+  const maxLength = Math.max(...gameState.summary);
+
   const signIn: SignIn = useCallback(
     async (id, type) => {
       setAccount({ id, type });
@@ -150,7 +152,6 @@ const MultiWordlePage: NextPage<MultiWordleProps> = ({ initialGameState }) => {
   const onSubmit = async (userInput: string) => {
     if (!(DICTIONARY as string[]).includes(userInput)) {
       setIsAnimated(true);
-      //setDisplayBest(true);
       return false;
     }
 
@@ -242,7 +243,12 @@ const MultiWordlePage: NextPage<MultiWordleProps> = ({ initialGameState }) => {
             slideState={[activeSlide, setActiveSlide]}
             displayBest={displayBest}
           />
-          <Keyboard onPress={onPress} onSubmit={onSubmit} colorMap={colorMap} />
+          <Keyboard
+            onPress={onPress}
+            onSubmit={onSubmit}
+            colorMap={colorMap}
+            maxLength={maxLength}
+          />
         </div>
       </div>
     </div>

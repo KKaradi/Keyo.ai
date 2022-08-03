@@ -44,11 +44,11 @@ const WinDialog: NextPage<WinDialogProps> = ({
 }) => {
   const [now, setNow] = useState(new Date());
 
-  useEffect(() => {
-    setInterval(() => {
-      setNow(new Date());
-    }, 10000);
-  });
+  // useEffect(() => {
+  //   setInterval(() => {
+  //     setNow(new Date());
+  //   }, 10000);
+  // });
 
   const statsString = gameStack
     .map((gameState) => {
@@ -85,14 +85,11 @@ const WinDialog: NextPage<WinDialogProps> = ({
         },
       }}
     >
-      <DialogTitle>
-        🎉 You Won 🎉
-      </DialogTitle>
+      <DialogTitle>🎉 You Won 🎉</DialogTitle>
       <DialogContent>
         <DialogContentText className={styles.dialogContent}>
-          Congrats on finishing today&apos;s multiwordle
-          
-          Number of Guesses: {numberOfGuesse}
+          Congrats on finishing today&apos;s multiwordle Number of Guesses:{" "}
+          {numberOfGuesse}
           Game History: {statsString}
           Next Game: {timeToNextGame}
         </DialogContentText>
