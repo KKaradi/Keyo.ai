@@ -17,13 +17,13 @@ import ImageFrame from "../components/misc/ImageFrame";
 import Carousel from "../components/multiwordle/Carousel";
 import Keyboard from "../components/multiwordle/Keyboard";
 import ErrorDialog from "../components/dialogs/ErrorDialog";
-import WinDialog from "../components/dialogs/WinDialog";
 import ErrorPage from "../components/misc/ErrorPage";
 import Header from "../components/header/Header";
 
 import styles from "../styles/pages/MultiWordle.module.css";
 import { Request } from "./api/post/multiwordle";
 import { useAccount } from "wagmi";
+import { AnimationKeys } from "../constants/animationModes";
 
 function getNewInputs(input: string, gameState: GameMove): Word[] {
   if (gameState.inputs === undefined) return [];
@@ -90,10 +90,6 @@ function getColorMap(gameStates: GameMove[], activeSlide: number) {
 
 export type SignIn = (id: string, type: AccountType) => Promise<void>;
 
-const warnings = {
-  dictionary: "That word was not in our dictionary.",
-};
-
 type MultiWordleProps = {
   initialGameState: GameMove;
 };
@@ -109,6 +105,7 @@ const MultiWordlePage: NextPage<MultiWordleProps> = ({ initialGameState }) => {
   const [warning, setWarning] = useState<string | undefined>();
   const [hasWon, setHasWon] = useState(false);
   const [account, setAccount] = useState<Account | undefined>();
+  const [animationMode, setAnimationMode] = useState<AnimationKeys>("error");
 
   const maxLength = Math.max(...gameState.summary);
 
@@ -152,6 +149,8 @@ const MultiWordlePage: NextPage<MultiWordleProps> = ({ initialGameState }) => {
   const onSubmit = async (userInput: string) => {
     if (!(DICTIONARY as string[]).includes(userInput)) {
       setIsAnimated(true);
+      // setAnimationMode("error");
+      setAnimationMode("error");
       return false;
     }
 
@@ -169,6 +168,7 @@ const MultiWordlePage: NextPage<MultiWordleProps> = ({ initialGameState }) => {
         setHistory([newGameMove, ...history]);
         setGameState(newGameMove);
         setDisplayBest(true);
+        setAnimationMode("input");
         return true;
       }
     }
@@ -216,23 +216,22 @@ const MultiWordlePage: NextPage<MultiWordleProps> = ({ initialGameState }) => {
   const slides = gameStackToSlides([gameState, ...history]);
   const colorMap = getColorMap(history, activeSlide);
   const bestGuesses = getBestGuesses(slides);
+
   return (
     <div className={styles.container}>
-      <WinDialog setIsOpen={setWon} isOpen={won} gameStack={history} />
       <ErrorDialog
         setIsOpen={() => setWarning(undefined)}
         isOpen={Boolean(warning)}
         text={warning ?? ""}
       />
-      <WinDialog gameStack={history} isOpen={hasWon} setIsOpen={setHasWon} />
       <div className={styles.left}>
         <ImageFrame path={gameState.imagePath} />
         <InputField
           gameState={gameState}
           activeSlide={activeSlide}
           bestGuesses={bestGuesses}
-          setIsAnimated={setIsAnimated}
-          isAnimated={isAnimated}
+          animationMode={animationMode}
+          setAnimationMode={setAnimationMode}
         />
       </div>
       <div className={styles.right}>

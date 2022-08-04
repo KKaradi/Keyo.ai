@@ -47,8 +47,8 @@ const Slide: ForwardRefRenderFunction<HTMLDivElement, SlideProps> = (
                 <Square
                   character={empty ? "" : character}
                   color={status}
-                  isAnimated={false}
-                  setIsAnimated={undefined}
+                  animationMode="none"
+                  setAnimationMode={undefined}
                 />
               </div>
             );

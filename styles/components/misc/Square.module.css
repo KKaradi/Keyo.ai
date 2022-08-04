@@ -10,7 +10,7 @@
   box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
 }
 
-.animatedContainer {
+.containerErrorAnimation {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -21,6 +21,19 @@
   border-radius: 20%;
   box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
   animation: jump-shaking 0.5s 1;
+}
+
+.containerInputAnimation {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  height: 100%;
+  width: 100%;
+
+  border-radius: 20%;
+  box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
+  animation: vertical-jump 0.4s 1;
 }
 
 .character {
@@ -44,6 +57,25 @@
   }
   100% {
     transform: translate(0, 0) rotate(0deg);
+  }
+}
+
+@keyframes vertical-jump {
+  0% {
+    transform: translateY(0);
+  }
+  10% {
+    transform: scaleX(110%) translateY(0);
+  }
+  20% {
+    transform: scale(100%) translateY(-2);
+  }
+  70% {
+    transform: translateY(-10px);
+  }
+
+  100% {
+    transform: translateY(0);
   }
 }
 

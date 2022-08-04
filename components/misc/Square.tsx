@@ -3,26 +3,29 @@ import styles from "../../styles/components/misc/Square.module.css";
 import { colors } from "../../constants/colors";
 import { CharacterStatus } from "../../schemas";
 import { Dispatch, SetStateAction, useState } from "react";
+import { AnimationKeys, animationModes } from "../../constants/animationModes";
 
 type NextPageProps = {
   character: string;
   color: CharacterStatus;
-  isAnimated: boolean;
-  setIsAnimated: Dispatch<SetStateAction<boolean>> | undefined;
+  animationMode?: AnimationKeys;
+  setAnimationMode?: Dispatch<SetStateAction<AnimationKeys>> | undefined;
 };
 
 const Square: NextPage<NextPageProps> = ({
   character,
   color,
-  isAnimated,
-  setIsAnimated,
+  animationMode,
+  setAnimationMode,
 }) => {
   return (
     <div
-      className={isAnimated ? styles.animatedContainer : styles.container}
-      style={{ backgroundColor: colors[color] }}
+      className={animationModes[animationMode ?? "none"]}
+      style={{
+        backgroundColor: colors[color],
+      }}
       onAnimationEnd={() => {
-        if (setIsAnimated !== undefined) setIsAnimated(false);
+        if (setAnimationMode !== undefined) setAnimationMode("none");
       }}
     >
       <div className={styles.character}>{character.toUpperCase()}</div>
