@@ -101,11 +101,10 @@ const MultiWordlePage: NextPage<MultiWordleProps> = ({ initialGameState }) => {
   const [gameState, setGameState] = useState(initialGameState);
   const [activeSlide, setActiveSlide] = useState(0);
   const [displayBest, setDisplayBest] = useState(true);
-  const [isAnimated, setIsAnimated] = useState(false);
   const [warning, setWarning] = useState<string | undefined>();
   const [hasWon, setHasWon] = useState(false);
   const [account, setAccount] = useState<Account | undefined>();
-  const [animationMode, setAnimationMode] = useState<AnimationKeys>("error");
+  const [animationMode, setAnimationMode] = useState<AnimationKeys>("none");
 
   const maxLength = Math.max(...gameState.summary);
 
@@ -148,18 +147,14 @@ const MultiWordlePage: NextPage<MultiWordleProps> = ({ initialGameState }) => {
 
   const onSubmit = async (userInput: string) => {
     if (!(DICTIONARY as string[]).includes(userInput)) {
-      setIsAnimated(true);
-      // setAnimationMode("error");
       setAnimationMode("error");
       return false;
     }
 
-    console.log("looking for api");
     const res = await post<GameMove>("api/post/multiwordle", {
       ...gameState,
       account,
     });
-    console.log("got the for api");
     if (res.status === 200) {
       const parsedResponse = GameMoveSchema.safeParse(await res.json());
       if (parsedResponse.success) {

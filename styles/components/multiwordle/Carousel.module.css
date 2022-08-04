@@ -6,7 +6,7 @@
 }
 
 .slider {
-  width: 550px;
+  width: 568px;
   height: 400px;
 
   text-align: center;
@@ -18,8 +18,10 @@
   height: 100%;
 
   display: flex;
-
-  overflow-y: none;
+  /* flex-direction: row;
+  align-items: center;
+  justify-content: center; */
+  /* overflow-y: none; */
   overflow-x: auto;
 
   scroll-snap-type: x mandatory;
@@ -35,7 +37,7 @@
   width: 550px;
   min-height: 400px;
 
-  overflow-y: scroll;
+  overflow-y: hidden;
 
   margin-right: 50px;
   border-radius: 10px;
@@ -54,6 +56,8 @@
   justify-content: center;
   align-items: center;
   gap: 10px;
+
+  background: rgb(220, 220, 220);
 }
 
 .word {
