@@ -8,7 +8,7 @@ import Square from "../misc/Square";
 type InputFieldProps = {
   gameState: GameMove;
   activeSlide: number;
-  bestGuesses?: Word[];
+  displayBest: boolean;
   animationMode: AnimationKeys;
   setAnimationMode: Dispatch<SetStateAction<AnimationKeys>>;
 };
@@ -16,13 +16,14 @@ type InputFieldProps = {
 const InputField: NextPage<InputFieldProps> = ({
   gameState,
   activeSlide,
-  bestGuesses,
+  displayBest,
+
   animationMode,
   setAnimationMode,
 }) => {
   return (
     <div className={styles.body}>
-      {(bestGuesses ?? gameState.inputs ?? []).map((input, inputIndex) => {
+      {(gameState.inputs ?? []).map((input, inputIndex) => {
         const backgroundColor = activeSlide === inputIndex ? "#ccc" : undefined;
         return (
           <div
@@ -31,7 +32,7 @@ const InputField: NextPage<InputFieldProps> = ({
             style={{ backgroundColor }}
           >
             {input.characters.map(({ character, status }, characterIndex) => {
-              const color = input.completed || bestGuesses ? status : "empty";
+              const color = input.completed || displayBest ? status : "empty";
               return (
                 <a href={`#slide-${inputIndex + 1}`} key={characterIndex}>
                   <div className={styles.cell}>

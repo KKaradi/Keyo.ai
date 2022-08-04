@@ -192,31 +192,8 @@ const MultiWordlePage: NextPage<MultiWordleProps> = ({ initialGameState }) => {
     return { word, score, completed };
   };
 
-  const getBestGuesses = (slides: Character[][][]) => {
-    if (!displayBest) return undefined;
-
-    const bestGuesses: Word[] = [];
-
-    slides.forEach((slide) => {
-      let bestWord = getSimilarityScore(slide[1]);
-      slide.slice(2).forEach((word) => {
-        const newWord = getSimilarityScore(word);
-        if (newWord.score > bestWord.score) bestWord = newWord;
-      });
-
-      bestGuesses.push({
-        characters: bestWord.word,
-        completed: bestWord.completed,
-      });
-    });
-
-    return bestGuesses;
-  };
-
   const slides = gameStackToSlides([gameState, ...history]);
   const colorMap = getColorMap(history, activeSlide);
-  const bestGuesses = getBestGuesses(slides);
-
   return (
     <div className={styles.container}>
       <ErrorDialog
@@ -227,9 +204,9 @@ const MultiWordlePage: NextPage<MultiWordleProps> = ({ initialGameState }) => {
       <div className={styles.left}>
         <ImageFrame path={gameState.imagePath} />
         <InputField
-          gameState={gameState}
+          gameState={displayBest ? history[0] : gameState}
           activeSlide={activeSlide}
-          bestGuesses={bestGuesses}
+          displayBest={displayBest}
           animationMode={animationMode}
           setAnimationMode={setAnimationMode}
         />
