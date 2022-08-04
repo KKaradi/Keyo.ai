@@ -24,6 +24,7 @@ import styles from "../styles/pages/MultiWordle.module.css";
 import { Request } from "./api/post/multiwordle";
 import { useAccount } from "wagmi";
 import { AnimationKeys } from "../constants/animationModes";
+import WinDialog from "../components/dialogs/WinDialog";
 
 function getNewInputs(input: string, gameState: GameMove): Word[] {
   if (gameState.inputs === undefined) return [];
@@ -73,15 +74,26 @@ function getColorMap(gameStates: GameMove[], activeSlide: number) {
   gameStates.forEach((gameState) => {
     gameState.inputs[activeSlide].characters.forEach(
       ({ character, status }) => {
-        if (status !== "green") keyMap[character] = colors[status];
-      }
-    );
-  });
-
-  gameStates.forEach((gameState) => {
-    gameState.inputs[activeSlide].characters.forEach(
-      ({ character, status }) => {
-        if (status === "green") keyMap[character] = colors[status];
+        if (keyMap[character] === undefined) {
+          keyMap[character] = colors[status];
+          return;
+        }
+        if (status === "green") {
+          keyMap[character] = colors[status];
+          return;
+        }
+        if (status === "yellow") {
+          keyMap[character] = colors[status];
+          return;
+        }
+        if (status === "gray") {
+          keyMap[character] = colors[status];
+          return;
+        }
+        if (status === "empty") {
+          keyMap[character] = colors[status];
+          return;
+        }
       }
     );
   });
@@ -164,6 +176,9 @@ const MultiWordlePage: NextPage<MultiWordleProps> = ({ initialGameState }) => {
         setGameState(newGameMove);
         setDisplayBest(true);
         setAnimationMode("input");
+        if (newGameMove.gameStatus === "finished") {
+          setWon(true);
+        }
         return true;
       }
     }
@@ -171,26 +186,11 @@ const MultiWordlePage: NextPage<MultiWordleProps> = ({ initialGameState }) => {
     return true;
   };
 
-  const getSimilarityScore = (word: Character[]) => {
-    let total = 0;
-
-    const points = word.reduce((prev, { status }) => {
-      total += 2;
-      if (status == "green") return prev + 2;
-      if (status == "yellow") return prev + 1;
-      return prev;
-    }, 0);
-
-    const score = points / total;
-    const completed = total === points;
-
-    return { word, score, completed };
-  };
-
   const slides = gameStackToSlides([gameState, ...history]);
   const colorMap = getColorMap(history, activeSlide);
   return (
     <div className={styles.container}>
+      <WinDialog setIsOpen={setWon} isOpen={won} gameStack={history} />
       <ErrorDialog
         setIsOpen={() => setWarning(undefined)}
         isOpen={Boolean(warning)}
@@ -207,7 +207,7 @@ const MultiWordlePage: NextPage<MultiWordleProps> = ({ initialGameState }) => {
         />
       </div>
       <div className={styles.right}>
-        <Header signIn={signIn} account={account} disconnect={disconnect} />
+        {/* <Header signIn={signIn} account={account} disconnect={disconnect} /> */}
         <div className={styles.game}>
           <Carousel
             slides={slides}

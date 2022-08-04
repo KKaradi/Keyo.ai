@@ -42,14 +42,6 @@ const WinDialog: NextPage<WinDialogProps> = ({
   setIsOpen,
   gameStack,
 }) => {
-  const [now, setNow] = useState(new Date());
-
-  // useEffect(() => {
-  //   setInterval(() => {
-  //     setNow(new Date());
-  //   }, 10000);
-  // });
-
   const statsString = gameStack
     .map((gameState) => {
       const level = gameState.stats?.level;
@@ -64,13 +56,6 @@ const WinDialog: NextPage<WinDialogProps> = ({
   const numberOfGuesse = gameStack.length - 1;
   const nextGameDate = gameStack[0].nextGameDate;
 
-  let timeToNextGame = "Error";
-  if (nextGameDate !== undefined) {
-    timeToNextGame = msToTimeString(
-      new Date(nextGameDate).getTime() - now.getTime()
-    );
-  }
-
   return (
     <Dialog
       open={isOpen}
@@ -82,16 +67,19 @@ const WinDialog: NextPage<WinDialogProps> = ({
           backgroundColor: colors.green,
           boxShadow: "none",
           width: "100%",
+          textAlign: "center",
         },
       }}
     >
-      <DialogTitle>🎉 You Won 🎉</DialogTitle>
+      {/* <DialogTitle>🎉 You Won 🎉</DialogTitle> */}
       <DialogContent>
+        <h1>🎉 You Won 🎉</h1>
         <DialogContentText className={styles.dialogContent}>
-          Congrats on finishing today&apos;s multiwordle Number of Guesses:{" "}
-          {numberOfGuesse}
+          Congrats on finishing today&apos;s multiwordle <br />
+          Number of Guesses: {numberOfGuesse}
+          <br />
           Game History: {statsString}
-          Next Game: {timeToNextGame}
+          {/* Next Game: {timeToNextGame} */}
         </DialogContentText>
       </DialogContent>
 
