@@ -1,7 +1,7 @@
 import Dialog from "@mui/material/Dialog";
 import type { NextPage } from "next/types";
 
-import styles from "../../styles/components/multiwordle/PopUp.module.css";
+import styles from "../../styles/components/misc/PopUp.module.css";
 import WarningIcon from "@mui/icons-material/Warning";
 import { Dispatch, SetStateAction } from "react";
 // styles\components\multiwordle\PopUp.modules.css

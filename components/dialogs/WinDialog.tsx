@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import Button from "@mui/material/Button";
 import styles from "../../styles/components/dialogs/WinDialog.module.css";
 import Dialog from "@mui/material/Dialog";
@@ -8,7 +8,8 @@ import SlideTransition from "./SlideTransition";
 import { GameMove, GameStatusSchema, Stats } from "../../schemas";
 import { colors } from "../../constants/colors";
 import ShareIcon from "@mui/icons-material/Share";
-import PopUp from "../multiwordle/PopUp";
+import PopUp from "../misc/PopUp";
+import DateDisplay from "../misc/DateDisplay";
 type WinDialogProps = {
   isOpen: boolean;
   setIsOpen: (value: boolean) => void;
@@ -78,6 +79,14 @@ const statToScoreString = (gameMove: GameMove | undefined): string => {
   return "⬛";
 };
 
+function updateTimeToNextGame(
+  setMillisToNextGame: Dispatch<SetStateAction<number>>,
+  nextGameUTC: number
+) {
+  const now = Date.now();
+  setMillisToNextGame(nextGameUTC - now);
+}
+
 const WinDialog: NextPage<WinDialogProps> = ({
   isOpen,
   setIsOpen,
@@ -89,7 +98,14 @@ const WinDialog: NextPage<WinDialogProps> = ({
   );
   const [openPopUp, setOpenPopUp] = useState(false);
   const numberOfGuesse = gameStack.length - 1;
-  const nextGameDate = gameStack[0].nextGameDate;
+  const nextGameUTC = new Date(gameStack[0].nextGameDate).getTime();
+  const [millisToNextGame, setMillisToNextGame] = useState(0);
+
+  useEffect(() => {
+    setInterval(() => {
+      updateTimeToNextGame(setMillisToNextGame, nextGameUTC);
+    }, 1000);
+  }, []);
 
   return (
     <Dialog
@@ -123,7 +139,24 @@ const WinDialog: NextPage<WinDialogProps> = ({
             Number of Guesses: {numberOfGuesse}
           </div>
           <div className={styles.chunk}>History: {scoreString}</div>
-          <div className={styles.chunk}>Next Game: 21:03:12</div>
+          {millisToNextGame > 0 ? (
+            <div className={styles.chunk}>
+              <DateDisplay millis={millisToNextGame} />
+            </div>
+          ) : (
+            <div className={styles.chunk}>
+              <DateDisplay
+                millis={millisToNextGame > 0 ? millisToNextGame : 0}
+              />
+              <div
+                className={styles.nextGameButton}
+                onClick={() => window.location.reload()}
+              >
+                Click for next game
+              </div>
+            </div>
+          )}
+
           <div
             className={styles.shareButton}
             onClick={() => {

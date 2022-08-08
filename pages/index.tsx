@@ -25,7 +25,7 @@ import { Request } from "./api/post/multiwordle";
 import { useAccount } from "wagmi";
 import { AnimationKeys } from "../constants/animationModes";
 import WinDialog from "../components/dialogs/WinDialog";
-import PopUp from "../components/multiwordle/PopUp";
+import PopUp from "../components/misc/PopUp";
 
 function getNewInputs(input: string, gameState: GameMove): Word[] {
   if (gameState.inputs === undefined) return [];
