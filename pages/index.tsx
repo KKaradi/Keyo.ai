@@ -25,6 +25,7 @@ import { Request } from "./api/post/multiwordle";
 import { useAccount } from "wagmi";
 import { AnimationKeys } from "../constants/animationModes";
 import WinDialog from "../components/dialogs/WinDialog";
+import PopUp from "../components/multiwordle/PopUp";
 
 function getNewInputs(input: string, gameState: GameMove): Word[] {
   if (gameState.inputs === undefined) return [];
@@ -114,10 +115,10 @@ const MultiWordlePage: NextPage<MultiWordleProps> = ({ initialGameState }) => {
   const [activeSlide, setActiveSlide] = useState(0);
   const [displayBest, setDisplayBest] = useState(true);
   const [warning, setWarning] = useState<string | undefined>();
-  const [hasWon, setHasWon] = useState(false);
+  const [openWinDialogue, setOpenWinDialogue] = useState(false);
   const [account, setAccount] = useState<Account | undefined>();
   const [animationMode, setAnimationMode] = useState<AnimationKeys>("none");
-
+  const [openPopUp, setOpenPopUp] = useState(false);
   const maxLength = Math.max(...gameState.summary);
 
   const signIn: SignIn = useCallback(
@@ -158,8 +159,13 @@ const MultiWordlePage: NextPage<MultiWordleProps> = ({ initialGameState }) => {
   };
 
   const onSubmit = async (userInput: string) => {
+    if (won) {
+      setOpenWinDialogue(true);
+      return false;
+    }
     if (!(DICTIONARY as string[]).includes(userInput)) {
       setAnimationMode("error");
+      setOpenPopUp(true);
       return false;
     }
 
@@ -178,6 +184,7 @@ const MultiWordlePage: NextPage<MultiWordleProps> = ({ initialGameState }) => {
         setAnimationMode("input");
         if (newGameMove.gameStatus === "finished") {
           setWon(true);
+          setOpenWinDialogue(true);
         }
         return true;
       }
@@ -190,7 +197,17 @@ const MultiWordlePage: NextPage<MultiWordleProps> = ({ initialGameState }) => {
   const colorMap = getColorMap(history, activeSlide);
   return (
     <div className={styles.container}>
-      <WinDialog setIsOpen={setWon} isOpen={won} gameStack={history} />
+      <WinDialog
+        setIsOpen={setOpenWinDialogue}
+        isOpen={openWinDialogue}
+        gameStack={history}
+      />
+      <PopUp
+        text={"Not a valid word"}
+        alertLevel={"warning"}
+        open={openPopUp}
+        setOpen={setOpenPopUp}
+      />
       <ErrorDialog
         setIsOpen={() => setWarning(undefined)}
         isOpen={Boolean(warning)}
@@ -207,7 +224,7 @@ const MultiWordlePage: NextPage<MultiWordleProps> = ({ initialGameState }) => {
         />
       </div>
       <div className={styles.right}>
-        {/* <Header signIn={signIn} account={account} disconnect={disconnect} /> */}
+        <Header signIn={signIn} account={account} disconnect={disconnect} />
         <div className={styles.game}>
           <Carousel
             slides={slides}

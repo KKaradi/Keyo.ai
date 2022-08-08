@@ -18,20 +18,6 @@ import { Color } from "@prisma/client";
 export type ErrorMessage = { message: string };
 export type Response = GameMove | ErrorMessage;
 
-function applyLevel(stats: Stats): void {
-  if (stats.hitWords >= 2) {
-    stats.level = 0;
-  } else if (stats.hitWords == 1) {
-    stats.level = 1;
-  } else if (stats.greens + stats.yellows / stats.totalChars >= 0.66) {
-    stats.level = 2;
-  } else if (stats.greens + stats.yellows / stats.totalChars >= 0.33) {
-    stats.level = 3;
-  } else {
-    stats.level = 4;
-  }
-}
-
 function pullPrompt(): GameData | undefined {
   const now = Date.now();
   for (let i = 0; i < schedule.length; i++) {
@@ -120,7 +106,6 @@ function processStartedGame(
     grays: 0,
     totalWords: 0,
     hitWords: 0,
-    level: 0,
   };
 
   gameMove["stats"] = stats;
@@ -175,9 +160,9 @@ function processSingleWord(
   }
   if (handleWordle(characters as Character[], promptSplit, stats)) {
     word.completed = true;
+    stats.hitWords++;
   }
 
-  applyLevel(stats);
   return true;
 }
 

@@ -22,7 +22,6 @@ export const StatsSchema = z.object({
   grays: z.number(),
   totalWords: z.number(),
   hitWords: z.number(),
-  level: z.number(),
 });
 
 export const CharacterSchema = z.object({
