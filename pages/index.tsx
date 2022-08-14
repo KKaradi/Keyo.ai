@@ -26,6 +26,8 @@ import { useAccount } from "wagmi";
 import { AnimationKeys } from "../constants/animationModes";
 import WinDialog from "../components/dialogs/WinDialog";
 import PopUp from "../components/misc/PopUp";
+import TutorialProps from "../components/multiwordle/Tutorial";
+import Tutorial from "../components/multiwordle/Tutorial";
 
 function getNewInputs(input: string, gameState: GameMove): Word[] {
   if (gameState.inputs === undefined) return [];
@@ -120,6 +122,8 @@ const MultiWordlePage: NextPage<MultiWordleProps> = ({ initialGameState }) => {
   const [animationMode, setAnimationMode] = useState<AnimationKeys>("none");
   const [openPopUp, setOpenPopUp] = useState(false);
   const maxLength = Math.max(...gameState.summary);
+  const [inTutorial, setInTutorial] = useState(true);
+  const fadeTutorialDialogue = useState(false);
 
   const signIn: SignIn = useCallback(
     async (id, type) => {
@@ -168,6 +172,9 @@ const MultiWordlePage: NextPage<MultiWordleProps> = ({ initialGameState }) => {
       setOpenPopUp(true);
       return false;
     }
+    if (inTutorial) {
+      setInTutorial(false);
+    }
 
     const res = await post<GameMove>("api/post/multiwordle", {
       ...gameState,
@@ -196,50 +203,54 @@ const MultiWordlePage: NextPage<MultiWordleProps> = ({ initialGameState }) => {
   const slides = gameStackToSlides([gameState, ...history]);
   const colorMap = getColorMap(history, activeSlide);
   return (
-    <div className={styles.container}>
-      <WinDialog
-        setIsOpen={setOpenWinDialogue}
-        isOpen={openWinDialogue}
-        gameStack={history}
-      />
-      <PopUp
-        text={"Not a valid word"}
-        alertLevel={"warning"}
-        open={openPopUp}
-        setOpen={setOpenPopUp}
-      />
-      <ErrorDialog
-        setIsOpen={() => setWarning(undefined)}
-        isOpen={Boolean(warning)}
-        text={warning ?? ""}
-      />
-      <div className={styles.left}>
-        <ImageFrame path={gameState.imagePath} />
-        <InputField
-          gameState={displayBest ? history[0] : gameState}
-          activeSlide={activeSlide}
-          displayBest={displayBest}
-          animationMode={animationMode}
-          setAnimationMode={setAnimationMode}
+    <Tutorial inTutorial={inTutorial}>
+      <div className={styles.container}>
+        <WinDialog
+          setIsOpen={setOpenWinDialogue}
+          isOpen={openWinDialogue}
+          gameStack={history}
         />
-      </div>
-      <div className={styles.right}>
-        <Header signIn={signIn} account={account} disconnect={disconnect} />
-        <div className={styles.game}>
-          <Carousel
-            slides={slides}
-            slideState={[activeSlide, setActiveSlide]}
+        <PopUp
+          text={"Not a valid word"}
+          alertLevel={"warning"}
+          open={openPopUp}
+          setOpen={setOpenPopUp}
+        />
+        <ErrorDialog
+          setIsOpen={() => setWarning(undefined)}
+          isOpen={Boolean(warning)}
+          text={warning ?? ""}
+        />
+        <div className={styles.left}>
+          <ImageFrame path={gameState.imagePath} />
+          <InputField
+            fadeTutorialDialogue={fadeTutorialDialogue}
+            inTutorial={inTutorial}
+            gameState={displayBest ? history[0] : gameState}
+            activeSlide={activeSlide}
             displayBest={displayBest}
-          />
-          <Keyboard
-            onPress={onPress}
-            onSubmit={onSubmit}
-            colorMap={colorMap}
-            maxLength={maxLength}
+            animationMode={animationMode}
+            setAnimationMode={setAnimationMode}
           />
         </div>
+        <div className={styles.right}>
+          <Header signIn={signIn} account={account} disconnect={disconnect} />
+          <div className={styles.game}>
+            <Carousel
+              slides={slides}
+              slideState={[activeSlide, setActiveSlide]}
+              displayBest={displayBest}
+            />
+            <Keyboard
+              onPress={onPress}
+              onSubmit={onSubmit}
+              colorMap={colorMap}
+              maxLength={maxLength}
+            />
+          </div>
+        </div>
       </div>
-    </div>
+    </Tutorial>
   );
 };
 

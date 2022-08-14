@@ -41,11 +41,11 @@ const Header: NextPage<HeaderProps> = ({ signIn, account, disconnect }) => {
         </ToolTip>
       </HowToPlayDialogue>
 
-      <div onClick={onLoginClick}>
+      {/* <div onClick={onLoginClick}>
         <ToolTip title="My Profile" placement={loginAnchor ? "top" : undefined}>
           <AccountCircleIcon fontSize="large" />
         </ToolTip>
-      </div>
+      </div> */}
 
       <Login
         signIn={signIn}

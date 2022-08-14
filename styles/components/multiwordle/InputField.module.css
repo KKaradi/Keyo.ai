@@ -5,6 +5,7 @@
   justify-content: center;
   flex-wrap: wrap;
   gap: 10px;
+  z-index: 2;
 }
 
 .word {
@@ -15,6 +16,7 @@
   gap: 5px;
   padding: 5px;
   border-radius: 5%;
+  z-index: 2;
 }
 
 .cell {

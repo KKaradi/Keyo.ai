@@ -10,60 +10,25 @@ import { colors } from "../../constants/colors";
 import ShareIcon from "@mui/icons-material/Share";
 import PopUp from "../misc/PopUp";
 import DateDisplay from "../misc/DateDisplay";
+import Tooltip from "@mui/material/Tooltip";
+
 type WinDialogProps = {
   isOpen: boolean;
   setIsOpen: (value: boolean) => void;
   gameStack: GameMove[];
 };
 
+const positionToSufix = {
+  1: "st",
+  2: "nd",
+  3: "rd",
+} as { [key: number]: string };
+
 //🟥🟧🟨🟩🟦🟪🟫⬛⬜💠🔳🔲
 const levelToSquare = ["💠", "🟩", "⬜", "◻️", "◽"];
 
-// function msToTimeString(duration: number): string {
-//   let seconds: number | string = Math.floor((duration / 1000) % 60);
-//   let minutes: number | string = Math.floor((duration / (1000 * 60)) % 60);
-//   let hours: number | string = Math.floor((duration / (1000 * 60 * 60)) % 24);
-//   const days: number = Math.floor(duration / 86_400_000);
-//   hours = hours < 10 ? "0" + hours : hours;
-//   minutes = minutes < 10 ? "0" + minutes : minutes;
-//   seconds = seconds < 10 ? "0" + seconds : seconds;
-
-//   return (days +
-//     " days and " +
-//     hours +
-//     ":" +
-//     minutes +
-//     ":" +
-//     seconds) as string;
-// }
-
 const statToScoreString = (gameMove: GameMove | undefined): string => {
   if (!gameMove?.stats) return "";
-  // let scoreCharacter = "";
-  // let skipFlag = true;
-  // gameMove.inputs.forEach((input) => {
-  //   if (skipFlag) {
-  //     skipFlag = false;
-  //     return;
-  //   }
-  //   if (input.completed) {
-  //     scoreCharacter += "🟢";
-  //     return;
-  //   }
-  //   let char = "⬛";
-  //   for (const character of input.characters) {
-  //     if (character.status === "green") {
-  //       char = "🟩";
-  //       break;
-  //     }
-  //     if (character.status === "yellow") {
-  //       char = "🟨";
-  //       break;
-  //     }
-  //   }
-  //   scoreCharacter += char;
-  // });
-  // return "\n" + scoreCharacter;
   if (gameMove.stats.hitWords >= 2) {
     return "✨";
   }
@@ -100,6 +65,7 @@ const WinDialog: NextPage<WinDialogProps> = ({
   const numberOfGuesse = gameStack.length - 1;
   const nextGameUTC = new Date(gameStack[0].nextGameDate).getTime();
   const [millisToNextGame, setMillisToNextGame] = useState(0);
+  const globalPosition = 4;
 
   useEffect(() => {
     setInterval(() => {
@@ -133,12 +99,22 @@ const WinDialog: NextPage<WinDialogProps> = ({
         <h1 className={styles.title}>🎉 You Won 🎉</h1>
         <div className={styles.dialogContent}>
           <div className={styles.chunk}>
-            Congratulations on completing today&apos;s multiwordle
-          </div>
-          <div className={styles.chunk}>
             Number of Guesses: {numberOfGuesse}
           </div>
-          <div className={styles.chunk}>History: {scoreString}</div>
+          <div className={styles.chunk}>
+            {`You were the ${globalPosition}${
+              positionToSufix[globalPosition] ?? "th"
+            } person to finish today`}
+          </div>
+          <div className={styles.chunk}>
+            <Tooltip
+              title={
+                "A summary of each move in your game. ✨: 2+ words completed. ⭐: 1 word completed. 🟩: 1+ green letters. 🟨 1+ yellow letters. ⬛: no letters completed. Share your score with the share button."
+              }
+            >
+              <div>History: {scoreString}</div>
+            </Tooltip>
+          </div>
           {millisToNextGame > 0 ? (
             <div className={styles.chunk}>
               <DateDisplay millis={millisToNextGame} />

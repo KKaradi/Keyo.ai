@@ -1,0 +1,28 @@
+.fadingTutorialDiv,
+.tutorialDiv {
+  transform: translate(10%, -100%);
+  position: absolute;
+  background-color: transparent;
+  z-index: 2;
+}
+
+.fadingTutorialDiv {
+  animation: fade 1s;
+}
+
+@keyframes fade {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.tutorialText {
+  font-weight: bold;
+  transform: translate(20px, 0%);
+  border-radius: 8px;
+  padding: 8px;
+  background-color: rgb(255, 255, 255);
+}
