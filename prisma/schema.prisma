@@ -57,7 +57,7 @@ model Guess {
 // Below is the new proposed schema
 
 model Account {
-  id      String      @id @default(cuid())
+  id      String      @id @default(cuid()) // this can either be the uid, the email or the address:ens combo depending on the account type
   type    AccountType
   Session Session[]
 }
@@ -74,7 +74,8 @@ model Session {
 model GuessV2 {
   id        String  @id @default(cuid())
   session   Session @relation(fields: [sessionId], references: [id])
-  text      String
+  text      String //the text within the guess
+  index     Int //the order in which the guess was submitted. The first guess wouuld have index 0 and the second guess index 1.
   sessionId Int
 }
 
