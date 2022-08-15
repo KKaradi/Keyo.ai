@@ -28,7 +28,7 @@ type HowToPlayDialogProps = {
 //             Do you see that gif down there. That&apos;s a ai generating an image
 //             from the prompt &quot;__&quot;.
 //             <br />
-const HowToPlayDialogue: NextPage<HowToPlayDialogProps> = ({
+const HowToPlayDialog: NextPage<HowToPlayDialogProps> = ({
   children,
   isOpen,
   setIsOpen,
@@ -134,4 +134,4 @@ const HowToPlayDialogue: NextPage<HowToPlayDialogProps> = ({
   );
 };
 
-export default HowToPlayDialogue;
+export default HowToPlayDialog;

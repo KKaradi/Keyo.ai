@@ -4,7 +4,6 @@ import styles from "../../styles/components/multiwordle/Tutorial.module.css";
 type TutorialProps = { children: ReactElement; inTutorial: boolean };
 
 const Tutorial: NextPage<TutorialProps> = ({ children, inTutorial }) => {
-  console.log(inTutorial);
   return (
     <div>
       {inTutorial ? <div className={styles.cover}></div> : <div></div>}

@@ -1,6 +1,6 @@
 import ToolTip from "../misc/ToolTip";
 import { NextPage } from "next";
-import HowToPlayDialogue from "../dialogs/HowToPlayDialog";
+import HowToPlayDialog from "../dialogs/HowToPlayDialog";
 import styles from "../../styles/components/header/Header.module.css";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import InfoIcon from "@mui/icons-material/Info";
@@ -35,11 +35,11 @@ const Header: NextPage<HeaderProps> = ({ signIn, account, disconnect }) => {
         </ToolTip>
       </a>
 
-      <HowToPlayDialogue isOpen={infoOpen} setIsOpen={setInfoOpen}>
+      <HowToPlayDialog isOpen={infoOpen} setIsOpen={setInfoOpen}>
         <ToolTip title="How To Play">
           <InfoIcon fontSize="large" />
         </ToolTip>
-      </HowToPlayDialogue>
+      </HowToPlayDialog>
 
       <div onClick={onLoginClick}>
         <ToolTip title="My Profile" placement={loginAnchor ? "top" : undefined}>

@@ -10,7 +10,6 @@ import {
   GameMoveSchema,
   Account,
   AccountType,
-  GameMovesSchema,
 } from "../schemas";
 import InputField from "../components/multiwordle/InputField";
 import ImageFrame from "../components/misc/ImageFrame";
@@ -26,8 +25,8 @@ import { useAccount } from "wagmi";
 import { AnimationKeys } from "../constants/animationModes";
 import WinDialog from "../components/dialogs/WinDialog";
 import PopUp from "../components/misc/PopUp";
-import TutorialProps from "../components/multiwordle/Tutorial";
 import Tutorial from "../components/multiwordle/Tutorial";
+import nookies from "nookies";
 
 function getNewInputs(input: string, gameState: GameMove): Word[] {
   if (gameState.inputs === undefined) return [];
@@ -65,7 +64,7 @@ function gameStackToSlides(gameStates: GameMove[]): Character[][][] {
         }
       }
 
-      slides[inputIndex][gameStateIndex].push(...characters);
+      slides[inputIndex][gameStateIndex]?.push(...characters);
     });
   });
 
@@ -79,7 +78,6 @@ function getColorMap(gameStates: GameMove[], activeSlide: number) {
       ({ character, status }) => {
         if (keyMap[character] === undefined) {
           keyMap[character] = colors[status];
-          return;
         }
         if (status === "green") {
           keyMap[character] = colors[status];
@@ -107,49 +105,39 @@ export type SignIn = (id: string, type: AccountType) => Promise<void>;
 
 type MultiWordleProps = {
   initialGameState: GameMove;
+  initialHistory?: GameMove[];
 };
 
-const MultiWordlePage: NextPage<MultiWordleProps> = ({ initialGameState }) => {
-  const [history, setHistory] = useState<GameMove[]>([initialGameState]);
+const MultiWordlePage: NextPage<MultiWordleProps> = (ctx) => {
+  const { initialGameState, initialHistory } = ctx;
+
+  console.log(initialHistory);
+
+  const [history, setHistory] = useState(
+    initialHistory ? initialHistory : [initialGameState]
+  );
+  const [gameState, setGameState] = useState(initialGameState);
+
   const [error, setError] = useState(false);
   const [won, setWon] = useState(false);
-  const [gameState, setGameState] = useState(initialGameState);
   const [activeSlide, setActiveSlide] = useState(0);
   const [displayBest, setDisplayBest] = useState(true);
   const [warning, setWarning] = useState<string | undefined>();
-  const [openWinDialogue, setOpenWinDialogue] = useState(false);
+  const [openWinDialog, setOpenWinDialog] = useState(false);
   const [account, setAccount] = useState<Account | undefined>();
   const [animationMode, setAnimationMode] = useState<AnimationKeys>("none");
   const [openPopUp, setOpenPopUp] = useState(false);
-  const maxLength = Math.max(...gameState.summary);
-  const [inTutorial, setInTutorial] = useState(true);
-  const fadeTutorialDialogue = useState(false);
 
-  //local storage calls should be wrapped in use effect
-  //
+  const [inTutorial, setInTutorial] = useState(true);
+  const fadeTutorialDialog = useState(false);
+
+  // local storage calls should be wrapped in use effect
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      //https://stackoverflow.com/questions/52474208/react-localstorage-is-not-defined-error-showing
-      setInTutorial(localStorage.getItem("completedTutorial") !== "true");
-    }
+    if (window === undefined) return;
+    setInTutorial(localStorage.getItem("completedTutorial") !== "true");
   }, []);
 
-  const signIn: SignIn = useCallback(
-    async (id, type) => {
-      setAccount({ id, type });
-      const response = await get(
-        `api/get/account/${id}/${initialGameState.gameId}`
-      );
-      if (response.status === 200) {
-        const res = GameMovesSchema.safeParse(await response.json());
-        if (!res.success) return;
-        setHistory([...res.data, initialGameState]);
-        setGameState(res.data[0] ?? initialGameState);
-        setDisplayBest(true);
-      }
-    },
-    [initialGameState]
-  );
+  const signIn: SignIn = useCallback(async (id, type) => undefined, []);
 
   const disconnect = () => {
     setAccount(undefined);
@@ -163,6 +151,7 @@ const MultiWordlePage: NextPage<MultiWordleProps> = ({ initialGameState }) => {
   }, [address, signIn]);
 
   if (initialGameState.gameId === undefined || error) return <ErrorPage />;
+  const maxLength = Math.max(...gameState.summary);
 
   const onPress = (userInput: string) => {
     const inputs = getNewInputs(userInput, gameState);
@@ -173,24 +162,25 @@ const MultiWordlePage: NextPage<MultiWordleProps> = ({ initialGameState }) => {
 
   const onSubmit = async (userInput: string) => {
     if (won) {
-      setOpenWinDialogue(true);
+      setOpenWinDialog(true);
       return false;
     }
+
     if (!(DICTIONARY as string[]).includes(userInput)) {
       setAnimationMode("error");
       setOpenPopUp(true);
       return false;
     }
+
     if (inTutorial) {
       setInTutorial(false);
-      fadeTutorialDialogue[1](true);
+      fadeTutorialDialog[1](true);
       localStorage.setItem("completedTutorial", "true");
     }
 
-    const res = await post<GameMove>("api/post/multiwordle", {
-      ...gameState,
-      account,
-    });
+    const move = { ...gameState, text: userInput };
+    const res = await post<GameMove>("api/post/multiwordle", move);
+
     if (res.status === 200) {
       const parsedResponse = GameMoveSchema.safeParse(await res.json());
       if (parsedResponse.success) {
@@ -202,7 +192,7 @@ const MultiWordlePage: NextPage<MultiWordleProps> = ({ initialGameState }) => {
         setAnimationMode("input");
         if (newGameMove.gameStatus === "finished") {
           setWon(true);
-          setOpenWinDialogue(true);
+          setOpenWinDialog(true);
         }
         return true;
       }
@@ -213,12 +203,13 @@ const MultiWordlePage: NextPage<MultiWordleProps> = ({ initialGameState }) => {
 
   const slides = gameStackToSlides([gameState, ...history]);
   const colorMap = getColorMap(history, activeSlide);
+
   return (
     <Tutorial inTutorial={inTutorial}>
       <div className={styles.container}>
         <WinDialog
-          setIsOpen={setOpenWinDialogue}
-          isOpen={openWinDialogue}
+          setIsOpen={setOpenWinDialog}
+          isOpen={openWinDialog}
           gameStack={history}
         />
         <PopUp
@@ -235,7 +226,7 @@ const MultiWordlePage: NextPage<MultiWordleProps> = ({ initialGameState }) => {
         <div className={styles.left}>
           <ImageFrame path={gameState.imagePath} />
           <InputField
-            fadeTutorialDialogue={fadeTutorialDialogue}
+            fadeTutorialDialog={fadeTutorialDialog}
             inTutorial={inTutorial}
             gameState={displayBest ? history[0] : gameState}
             activeSlide={activeSlide}
@@ -265,20 +256,37 @@ const MultiWordlePage: NextPage<MultiWordleProps> = ({ initialGameState }) => {
   );
 };
 
-export const getServerSideProps = async ({
-  req,
-}: NextPageContext): Promise<{ props: MultiWordleProps }> => {
+export const getServerSideProps = async (
+  ctx: NextPageContext
+): Promise<{ props: MultiWordleProps }> => {
   const url = new URL(
     "api/post/multiwordle",
-    `http://${req?.headers.host}`
+    `http://${ctx.req?.headers.host}`
   ).toString();
 
-  const response = await post<Request>(url, { gameStatus: "new" });
+  const { userId } = nookies.get(ctx) as { [key: string]: string | undefined };
+
+  const response = await post<Request>(url, { gameStatus: "new", userId });
+  const json = await response.json();
 
   if (response.status === 200) {
-    const parsedResponse = GameMoveSchema.safeParse(await response.json());
+    if (Array.isArray(json)) {
+      // add zod check
+      // if this response is a gameStack, then inject it as props
+      return {
+        props: {
+          initialGameState: json[0],
+          initialHistory: json.reverse(),
+        },
+      };
+    }
+
+    const parsedResponse = GameMoveSchema.safeParse(json);
     if (parsedResponse.success) {
-      return { props: { initialGameState: parsedResponse.data } };
+      const { data } = parsedResponse;
+
+      nookies.set(ctx, "userId", parsedResponse.data.account.id);
+      return { props: { initialGameState: data } };
     }
   }
 

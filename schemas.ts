@@ -41,10 +41,13 @@ export const AccountTypeSchema = z.union([
 
 export const AccountSchema = z.object({
   id: z.string(),
-  type: AccountTypeSchema,
+  address: z.union([z.string(), z.undefined()]),
+  email: z.union([z.string(), z.undefined()]),
 });
 
 export const GameMoveSchema = z.object({
+  text: z.string(),
+  attempt: z.number(),
   gameId: z.number(),
   summary: z.array(z.number()),
   inputs: z.array(WordSchema),
@@ -52,13 +55,14 @@ export const GameMoveSchema = z.object({
   gameStatus: GameStatusSchema,
   stats: z.union([StatsSchema, z.undefined()]),
   nextGameDate: z.string(),
-  account: z.union([AccountSchema, z.undefined()]),
+  account: AccountSchema,
 });
 
 export const GameMovesSchema = z.array(GameMoveSchema);
 
 export const GameStartSchema = z.object({
   gameStatus: z.literal("new"),
+  userId: z.union([z.string(), z.undefined()]),
 });
 
 export const GameDataSchema = z.object({

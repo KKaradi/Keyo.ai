@@ -10,13 +10,14 @@ import {
   GameStartSchema,
   Stats,
   Word,
+  Account,
 } from "../../../schemas";
 import { z } from "zod";
 import prisma from "../../../lib/prisma";
-import { Color } from "@prisma/client";
+import { Session } from "@prisma/client";
 
 export type ErrorMessage = { message: string };
-export type Response = GameMove | ErrorMessage;
+export type Response = GameMove | GameMove[] | ErrorMessage;
 
 function pullPrompt(): GameData | undefined {
   const now = Date.now();
@@ -43,39 +44,40 @@ function splitToEmptys(promptSplits: string): Word {
   } as Word;
 }
 
-export function generateNewGame(
+export async function generateNewGame(
+  account: Account,
   gameId: number,
   imagePath: string,
   promptSplits: string[],
   nextGameDate: string
-): GameMove {
+): Promise<GameMove> {
+  await prisma.session.create({
+    data: { completed: false, accountId: account.id, gameId },
+  });
+
   return {
     gameId,
+    text: "",
     gameStatus: "started",
     inputs: promptSplits.map(splitToEmptys),
     summary: promptSplits.map((split) => split.length),
     imagePath: imagePath,
     stats: undefined,
     nextGameDate,
+    account,
+    attempt: 0,
   };
 }
 
 function processStartedGame(
   gameMove: GameMove,
-  res: NextApiResponse<Response>,
   gameId: number,
   promptSplits: string[]
-): boolean {
-  if (gameMove.gameId === undefined) {
-    res.status(400).json({ message: "GameId is undefined" });
-    return false;
-  }
+): string | true {
+  if (gameMove.gameId === undefined) return "Game ID is undefined";
 
   if (gameMove.gameId != gameId) {
-    if (!schedule[gameMove.gameId]) {
-      res.status(400).json({ message: "Invalid GameId" });
-      return false;
-    }
+    if (!schedule[gameMove.gameId]) return "Invalid GameId";
     promptSplits = schedule[gameMove.gameId].prompt.split(" ");
   }
 
@@ -84,19 +86,10 @@ function processStartedGame(
   }
 
   const { inputs } = gameMove;
-  if (!inputs) {
-    res.status(400).json({ message: "Game inputs undefined" });
-    return false;
-  }
+  if (!inputs) return "Game inputs undefined";
+
   if (inputs.length != promptSplits.length) {
-    res.status(400).json({
-      message:
-        "Number of inputted words is incorrect: Expected " +
-        promptSplits.length +
-        " but got " +
-        inputs.length,
-    });
-    return false;
+    return `Number of inputted words is incorrect: Expected ${promptSplits.length} but got ${inputs.length}`;
   }
 
   const stats: Stats = {
@@ -110,14 +103,15 @@ function processStartedGame(
 
   gameMove["stats"] = stats;
   for (let indx = 0; indx < inputs.length; indx++) {
-    if (!processSingleWord(inputs[indx], promptSplits[indx], res, stats)) {
-      return false;
-    }
+    const message = processSingleWord(inputs[indx], promptSplits[indx], stats);
+    if (typeof message === "string") return message;
   }
 
   if (inputs.every((input) => input.completed)) {
     gameMove.gameStatus = "finished";
   }
+
+  gameMove.attempt += 1;
 
   return true;
 }
@@ -125,39 +119,24 @@ function processStartedGame(
 function processSingleWord(
   word: Word,
   promptSplit: string,
-  res: NextApiResponse<Response>,
   stats: Stats
-): boolean {
+): string | true {
   const { characters, completed } = word;
-  if (!characters) {
-    res.status(400).json({ message: "Word characters are undefined" });
-    return false;
-  }
-  if (completed === undefined) {
-    res.status(400).json({ message: "Word completion is undefined" });
-    return false;
-  }
+  if (!characters) return "Word characters are undefined";
+  if (completed === undefined) return "Word completion is undefined";
+
   if (characters.length != promptSplit.length) {
-    res.status(400).json({
-      message:
-        "Number of inputted characters is incorrect: Expected " +
-        promptSplit.length +
-        " but got " +
-        characters.length,
-    });
-    return false;
+    return `Number of inputted characters is incorrect: Expected ${promptSplit.length}" but got ${characters.length}`;
   }
-  if (completed) {
-    return true;
-  }
+
+  if (completed) return true;
+
   for (const character of characters) {
     if (character.character === undefined || character.character.length != 1) {
-      res.status(400).json({
-        message: "Character is undefined or not a single character.",
-      });
-      return false;
+      return "Character is undefined or not a single character.";
     }
   }
+
   if (handleWordle(characters as Character[], promptSplit, stats)) {
     word.completed = true;
     stats.hitWords++;
@@ -213,57 +192,139 @@ function handleWordle(
   return completed;
 }
 
-const addGuessToDatabase = async (gameMove: GameMove, prompt: string) => {
-  const colors: Color[] = [];
-  const letters: string[] = [];
-
-  gameMove.inputs.forEach((input) =>
-    input.characters.forEach(({ status, character }) => {
-      colors.push(status);
-      letters.push(character);
-    })
-  );
-
-  const { account, gameId, gameStatus, nextGameDate, imagePath } = gameMove;
-  const game = { colors, letters, gameId, gameStatus, prompt, imagePath };
-
-  const address = account?.type === "wallet" ? account.id : undefined;
-  const email = account?.type === "gmail" ? account.id : undefined;
-
-  await prisma.guess.create({
-    data: { address, email, nextGameDate, ...game },
+const addGuessToDatabase = async (
+  { text, account, attempt }: GameMove,
+  gameId: number
+) => {
+  const { id } = await prisma.session.findFirstOrThrow({
+    where: { gameId, accountId: account.id },
   });
+
+  await prisma.guess.create({ data: { text, sessionId: id, attempt } });
+};
+
+const createAccount = async (): Promise<Account> => {
+  const { id } = await prisma.account.create({ data: {} });
+  return { id, address: undefined, email: undefined };
+};
+
+const getAccount = async (id: string) => {
+  const res = await prisma.account.findUniqueOrThrow({
+    where: { id },
+    include: { sessions: true },
+  });
+
+  const address = res.address ?? undefined;
+  const email = res.email ?? undefined;
+  const sessions = res.sessions;
+
+  return { id, address, email, sessions };
 };
 
 export const RequestSchema = z.union([GameMoveSchema, GameStartSchema]);
 export type Request = z.infer<typeof RequestSchema>;
 
-export default function handler(
+const sessionToGameStack = async (
+  id: string,
+  account: Account,
+  gameData: GameData
+): Promise<GameMove[]> => {
+  const { guesses, gameId } = await prisma.session.findUniqueOrThrow({
+    where: { id },
+    include: { guesses: true },
+  }); // necessary to include guesses
+
+  const splits = gameData.prompt.split(" ");
+
+  const texts: string[] = [];
+
+  const moves = guesses.map((guess) => {
+    texts.push(guess.text);
+
+    const move: GameMove = {
+      account,
+      gameStatus: "started",
+      nextGameDate: gameData.nextGameDate,
+      gameId: gameData.gameId,
+      imagePath: gameData.imagePath,
+      summary: splits.map((split) => split.length),
+      inputs: texts.map((text) => {
+        return {
+          completed: false,
+          characters: text.split("").map((character) => {
+            return { character, status: "empty" };
+          }),
+        };
+      }),
+      attempt: guess.attempt,
+      text: guess.text,
+    };
+
+    processStartedGame(move, gameId, splits);
+    const processed = JSON.parse(JSON.stringify(move)) as GameMove;
+
+    processed.inputs.map(({ characters }) => {
+      return characters.map((character) => {
+        character;
+      });
+    });
+
+    return processed;
+  });
+
+  return moves;
+};
+
+export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Response>
 ) {
   if (req.method !== "POST") return response(res, "onlyPost");
   if (!authenticate(req)) return response(res, "authError");
 
-  const parsedBody = RequestSchema.safeParse(req.body);
-  if (!parsedBody.success) return response(res, "incorrectParams");
-
   const parsedPromptData = GameDataSchema.safeParse(pullPrompt());
   if (!parsedPromptData.success) return response(res, "internalError");
 
-  const gameMove = parsedBody.data;
   const { prompt, gameId, imagePath, nextGameDate } = parsedPromptData.data;
-
   const splits = prompt.split(" ");
 
-  if (gameMove.gameStatus === "new") {
-    const newGame = generateNewGame(gameId, imagePath, splits, nextGameDate);
-    return res.status(200).json(newGame);
-  } else if (gameMove.gameStatus === "started") {
-    if (processStartedGame(gameMove, res, gameId, splits)) {
-      addGuessToDatabase(gameMove, prompt);
-      return res.status(200).json(gameMove);
+  const parsedGameStart = GameStartSchema.safeParse(req.body);
+
+  // if new game
+  if (parsedGameStart.success) {
+    const { userId } = parsedGameStart.data;
+
+    // if cookies stored a user id
+    if (userId) {
+      const account = await getAccount(userId);
+
+      const pred = (session: Session) => session.gameId === gameId;
+      const session = account.sessions.find(pred);
+
+      // if the user actually has a session with the current game
+      if (session) {
+        const gameData = parsedPromptData.data;
+        const moves = await sessionToGameStack(session.id, account, gameData);
+        return res.status(200).json(moves);
+      }
     }
+
+    const account = await createAccount();
+    const args = [account, gameId, imagePath, splits, nextGameDate] as const;
+    const newGame = await generateNewGame(...args);
+
+    return res.status(200).json(newGame);
+  }
+
+  const parsedGameMove = GameMoveSchema.safeParse(req.body);
+  if (!parsedGameMove.success) return response(res, "incorrectParams");
+  const gameMove = parsedGameMove.data;
+
+  if (gameMove.gameStatus === "started") {
+    const message = processStartedGame(gameMove, gameId, splits);
+    if (typeof message === "string") return res.status(400).json({ message });
+    addGuessToDatabase(gameMove, gameId);
+    return res.status(200).json(gameMove);
   } else if (gameMove.gameStatus === "finished") {
     return res.status(400).json({ message: "Game is already finished." });
   }

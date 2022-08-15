@@ -10,77 +10,34 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Wallet {
-  address String  @unique
-  ens     String?
-  Guess   Guess[]
-}
-
-model Gmail {
-  email String  @unique
-  Guess Guess[]
-}
-
-enum Color {
-  green
-  yellow
-  gray
-  empty
-}
-
-enum GameStatus {
-  new
-  started
-  finished
-}
-
-model Guess {
-  id   String   @id @default(cuid())
-  time DateTime @default(now())
-
-  letters String[]
-  colors  Color[]
-
-  gameId       Int
-  imagePath    String
-  nextGameDate String
-  gameStatus   GameStatus
-  prompt       String
-
-  wallet  Wallet? @relation(fields: [address], references: [address], onDelete: Cascade)
-  address String?
-
-  gmail Gmail?  @relation(fields: [email], references: [email], onDelete: Cascade)
-  email String?
-}
-
-// Below is the new proposed schema
-
 model Account {
-  id      String      @id @default(cuid()) // this can either be the uid, the email or the address:ens combo depending on the account type
-  type    AccountType
-  Session Session[]
+  id String @id @default(cuid())
+
+  address String? @unique
+  email   String? @unique
+
+  sessions Session[]
 }
 
 model Session {
-  id            Int       @id @default(autoincrement())
-  account       Account   @relation(fields: [accountId], references: [id], onDelete: Cascade)
-  accountId     String
+  id String @id @default(cuid())
+
+  gameId Int
+
+  account   Account? @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  accountId String
+
   completed     Boolean
-  timeCompleted DateTime
-  GuessV2       GuessV2[]
+  timeCompleted DateTime?
+  guesses       Guess[]
 }
 
-model GuessV2 {
-  id        String  @id @default(cuid())
-  session   Session @relation(fields: [sessionId], references: [id])
-  text      String //the text within the guess
-  index     Int //the order in which the guess was submitted. The first guess wouuld have index 0 and the second guess index 1.
-  sessionId Int
-}
+model Guess {
+  id   String @id @default(cuid())
+  text String
 
-enum AccountType {
-  google
-  wallet
-  uid
+  attempt Int
+
+  session   Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  sessionId String
 }

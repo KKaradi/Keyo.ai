@@ -5,7 +5,7 @@ import { GameMove } from "../../schemas";
 import styles from "../../styles/components/multiwordle/InputField.module.css";
 import Square from "../misc/Square";
 
-import TutorialDialogue from "../dialogs/TutorialDialogue";
+import TutorialDialog from "../dialogs/TutorialDialog";
 
 type InputFieldProps = {
   gameState: GameMove;
@@ -14,7 +14,7 @@ type InputFieldProps = {
   inTutorial: boolean;
   animationMode: AnimationKeys;
   setAnimationMode: Dispatch<SetStateAction<AnimationKeys>>;
-  fadeTutorialDialogue: [boolean, Dispatch<SetStateAction<boolean>>];
+  fadeTutorialDialog: [boolean, Dispatch<SetStateAction<boolean>>];
 };
 
 const InputField: NextPage<InputFieldProps> = ({
@@ -24,7 +24,7 @@ const InputField: NextPage<InputFieldProps> = ({
   inTutorial,
   animationMode,
   setAnimationMode,
-  fadeTutorialDialogue,
+  fadeTutorialDialog,
 }) => {
   return (
     <div className={styles.body}>
@@ -34,9 +34,9 @@ const InputField: NextPage<InputFieldProps> = ({
         return (
           <div key={inputIndex}>
             {active ? (
-              <TutorialDialogue
+              <TutorialDialog
                 inTutorial={inTutorial}
-                fadeTutorialDialogue={fadeTutorialDialogue}
+                fadeTutorialDialog={fadeTutorialDialog}
               />
             ) : (
               <></>
