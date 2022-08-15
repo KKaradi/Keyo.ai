@@ -1,10 +1,10 @@
 import { NextPage } from "next";
 import { Dispatch, SetStateAction, useState } from "react";
 import { AnimationKeys } from "../../constants/animationModes";
-import { GameMove, Word } from "../../schemas";
+import { GameMove } from "../../schemas";
 import styles from "../../styles/components/multiwordle/InputField.module.css";
 import Square from "../misc/Square";
-import CallReceivedIcon from "@mui/icons-material/CallReceived";
+
 import TutorialDialogue from "../dialogs/TutorialDialogue";
 
 type InputFieldProps = {

@@ -14,7 +14,17 @@ const TutorialDialogue: NextPage<TutorialDialogueProps> = ({
 }) => {
   let component: ReactElement;
   if (fadeTutorialDialogue[0]) {
-    component = <></>;
+    component = (
+      <div
+        className={styles.fadingTutorialDiv}
+        onAnimationEnd={() => fadeTutorialDialogue[1](false)}
+      >
+        <div className={styles.tutorialText}>
+          Try typing a word that you think was used to generate this image
+        </div>
+        <CallReceivedIcon />
+      </div>
+    );
   } else if (inTutorial) {
     component = (
       <div
@@ -28,17 +38,7 @@ const TutorialDialogue: NextPage<TutorialDialogueProps> = ({
       </div>
     );
   } else {
-    component = (
-      <div
-        className={styles.fadingTutorialDiv}
-        onAnimationEnd={() => fadeTutorialDialogue[1](true)}
-      >
-        <div className={styles.tutorialText}>
-          Try typing a word that you think was used to generate this image
-        </div>
-        <CallReceivedIcon />
-      </div>
-    );
+    component = <></>;
   }
 
   return component;

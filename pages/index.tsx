@@ -125,6 +125,15 @@ const MultiWordlePage: NextPage<MultiWordleProps> = ({ initialGameState }) => {
   const [inTutorial, setInTutorial] = useState(true);
   const fadeTutorialDialogue = useState(false);
 
+  //local storage calls should be wrapped in use effect
+  //
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      //https://stackoverflow.com/questions/52474208/react-localstorage-is-not-defined-error-showing
+      setInTutorial(localStorage.getItem("completedTutorial") !== "true");
+    }
+  }, []);
+
   const signIn: SignIn = useCallback(
     async (id, type) => {
       setAccount({ id, type });
@@ -174,6 +183,8 @@ const MultiWordlePage: NextPage<MultiWordleProps> = ({ initialGameState }) => {
     }
     if (inTutorial) {
       setInTutorial(false);
+      fadeTutorialDialogue[1](true);
+      localStorage.setItem("completedTutorial", "true");
     }
 
     const res = await post<GameMove>("api/post/multiwordle", {

@@ -38,8 +38,8 @@ model Guess {
   id   String   @id @default(cuid())
   time DateTime @default(now())
 
-  letters    String[]
-  colors     Color[]
+  letters String[]
+  colors  Color[]
 
   gameId       Int
   imagePath    String
@@ -51,5 +51,35 @@ model Guess {
   address String?
 
   gmail Gmail?  @relation(fields: [email], references: [email], onDelete: Cascade)
-  email String? 
+  email String?
+}
+
+// Below is the new proposed schema
+
+model Account {
+  id      String      @id @default(cuid())
+  type    AccountType
+  Session Session[]
+}
+
+model Session {
+  id            Int       @id @default(autoincrement())
+  account       Account   @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  accountId     String
+  completed     Boolean
+  timeCompleted DateTime
+  GuessV2       GuessV2[]
+}
+
+model GuessV2 {
+  id        String  @id @default(cuid())
+  session   Session @relation(fields: [sessionId], references: [id])
+  text      String
+  sessionId Int
+}
+
+enum AccountType {
+  google
+  wallet
+  uid
 }
