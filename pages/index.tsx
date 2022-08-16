@@ -111,8 +111,6 @@ type MultiWordleProps = {
 const MultiWordlePage: NextPage<MultiWordleProps> = (ctx) => {
   const { initialGameState, initialHistory } = ctx;
 
-  console.log(initialHistory);
-
   const [history, setHistory] = useState(
     initialHistory ? initialHistory : [initialGameState]
   );
@@ -275,7 +273,7 @@ export const getServerSideProps = async (
       // if this response is a gameStack, then inject it as props
       return {
         props: {
-          initialGameState: json[0],
+          initialGameState: json[json.length - 1],
           initialHistory: json.reverse(),
         },
       };

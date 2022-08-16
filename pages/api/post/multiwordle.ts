@@ -227,52 +227,66 @@ export type Request = z.infer<typeof RequestSchema>;
 const sessionToGameStack = async (
   id: string,
   account: Account,
-  gameData: GameData
+  { nextGameDate, prompt, imagePath, gameId }: GameData
 ): Promise<GameMove[]> => {
-  const { guesses, gameId } = await prisma.session.findUniqueOrThrow({
-    where: { id },
-    include: { guesses: true },
-  }); // necessary to include guesses
+  const guesses = await prisma.guess.findMany({
+    where: { sessionId: id },
+    orderBy: { attempt: "asc" },
+  });
 
-  const splits = gameData.prompt.split(" ");
+  const splits = prompt.split(" ");
 
-  const texts: string[] = [];
+  const moveTemplate = {
+    account,
+    nextGameDate,
+    gameId,
+    imagePath,
+    gameStatus: "started" as const,
+    summary: splits.map((split) => split.length),
+  };
 
-  const moves = guesses.map((guess) => {
-    texts.push(guess.text);
-
+  const moves = guesses.map(({ text, attempt }) => {
     const move: GameMove = {
-      account,
-      gameStatus: "started",
-      nextGameDate: gameData.nextGameDate,
-      gameId: gameData.gameId,
-      imagePath: gameData.imagePath,
-      summary: splits.map((split) => split.length),
-      inputs: texts.map((text) => {
+      ...moveTemplate,
+      text,
+      attempt: attempt - 1,
+      inputs: splits.map((split) => {
         return {
           completed: false,
-          characters: text.split("").map((character) => {
-            return { character, status: "empty" };
-          }),
+          characters: text
+            .slice(0, split.length)
+            .padEnd(split.length, " ")
+            .split("")
+            .map((character) => {
+              return { character, status: "empty" };
+            }),
         };
       }),
-      attempt: guess.attempt,
-      text: guess.text,
     };
 
     processStartedGame(move, gameId, splits);
     const processed = JSON.parse(JSON.stringify(move)) as GameMove;
 
-    processed.inputs.map(({ characters }) => {
-      return characters.map((character) => {
-        character;
-      });
-    });
-
     return processed;
   });
 
-  return moves;
+  moves.forEach(({ inputs }) => {
+    console.log(
+      inputs.map(({ characters }) =>
+        characters.map(({ character }) => character)
+      )
+    );
+  });
+
+  const start = await generateNewGame(
+    account,
+    gameId,
+    imagePath,
+    splits,
+    nextGameDate
+  );
+
+  return [start, ...moves];
 };
 
 export default async function handler(
