@@ -234,7 +234,7 @@ const sessionToGameStack = async (
     orderBy: { attempt: "asc" },
   });
 
-  const splits = prompt.split(" ");
+  const promptSplits = prompt.split(" ");
 
   const moveTemplate = {
     account,
@@ -242,51 +242,38 @@ const sessionToGameStack = async (
     gameId,
     imagePath,
     gameStatus: "started" as const,
-    summary: splits.map((split) => split.length),
+    summary: promptSplits.map((split) => split.length),
   };
 
-  const moves = guesses.map(({ text, attempt }) => {
-    const move: GameMove = {
-      ...moveTemplate,
-      text,
-      attempt: attempt - 1,
-      inputs: splits.map((split) => {
-        return {
-          completed: false,
-          characters: text
-            .slice(0, split.length)
-            .padEnd(split.length, " ")
-            .split("")
-            .map((character) => {
-              return { character, status: "empty" };
-            }),
-        };
-      }),
-    };
-
-    processStartedGame(move, gameId, splits);
-    const processed = JSON.parse(JSON.stringify(move)) as GameMove;
-
-    return processed;
-  });
-
-  moves.forEach(({ inputs }) => {
-    console.log(
-      inputs.map(({ characters }) =>
-        characters.map(({ character }) => character)
-      )
-    );
-  });
-
-  const start = await generateNewGame(
+  let lastMove = await generateNewGame(
     account,
     gameId,
     imagePath,
-    splits,
+    promptSplits,
     nextGameDate
   );
+  const moves: GameMove[] = [lastMove];
 
-  return [start, ...moves];
+  for (const { text, attempt } of guesses) {
+    const lastMoveClone = JSON.parse(JSON.stringify(lastMove)) as GameMove;
+    lastMoveClone.text = text;
+    lastMoveClone.inputs = lastMoveClone.inputs.map((word) => {
+      if (word.completed) return word;
+      return {
+        completed: false,
+        characters: word.characters.map(({ status }, index) => {
+          const charAt = text.charAt(index);
+          const character = charAt === "" ? " " : charAt;
+          return { character, status };
+        }),
+      };
+    });
+    processStartedGame(lastMoveClone, gameId, promptSplits);
+    moves.push(lastMoveClone);
+    lastMove = lastMoveClone;
+  }
+
+  return moves;
 };
 
 export default async function handler(

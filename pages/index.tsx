@@ -110,18 +110,19 @@ type MultiWordleProps = {
 
 const MultiWordlePage: NextPage<MultiWordleProps> = (ctx) => {
   const { initialGameState, initialHistory } = ctx;
-
   const [history, setHistory] = useState(
     initialHistory ? initialHistory : [initialGameState]
   );
   const [gameState, setGameState] = useState(initialGameState);
 
   const [error, setError] = useState(false);
-  const [won, setWon] = useState(false);
+  const [won, setWon] = useState(initialGameState.gameStatus === "finished");
   const [activeSlide, setActiveSlide] = useState(0);
   const [displayBest, setDisplayBest] = useState(true);
   const [warning, setWarning] = useState<string | undefined>();
-  const [openWinDialog, setOpenWinDialog] = useState(false);
+  const [openWinDialog, setOpenWinDialog] = useState(
+    initialGameState.gameStatus === "finished"
+  );
   const [account, setAccount] = useState<Account | undefined>();
   const [animationMode, setAnimationMode] = useState<AnimationKeys>("none");
   const [openPopUp, setOpenPopUp] = useState(false);
