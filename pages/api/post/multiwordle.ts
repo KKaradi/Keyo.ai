@@ -1,6 +1,13 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { authenticate, response } from "../helpers";
 import schedule from "../../../schedule.json";
+import {
+  authenticate,
+  createAccount,
+  getAccount,
+  pullPrompt,
+  response,
+  sessionToGameStack,
+} from "../helpers";
 import {
   Character,
   GameData,
@@ -19,22 +26,6 @@ import { Session } from "@prisma/client";
 export type ErrorMessage = { message: string };
 export type Response = GameMove | GameMove[] | ErrorMessage;
 
-function pullPrompt(): GameData | undefined {
-  const now = Date.now();
-  for (let i = 0; i < schedule.length; i++) {
-    const afterStart = new Date(schedule[i].start_date).getTime() <= now;
-    const beforeEnd = now <= new Date(schedule[i].end_date).getTime();
-    if (afterStart && beforeEnd) {
-      return {
-        prompt: schedule[i].prompt,
-        imagePath: schedule[i].image_path,
-        gameId: i,
-        nextGameDate: schedule[i + 1].start_date,
-      };
-    }
-  }
-}
-
 function splitToEmptys(promptSplits: string): Word {
   return {
     completed: false,
@@ -52,10 +43,11 @@ export async function generateNewGame(
   nextGameDate: string,
   addNewSession: boolean
 ): Promise<GameMove> {
-  if (addNewSession)
+  if (addNewSession) {
     await prisma.session.create({
       data: { completed: false, accountId: account.id, gameId },
     });
+  }
 
   return {
     gameId,
@@ -71,7 +63,7 @@ export async function generateNewGame(
   };
 }
 
-async function processStartedGame(
+export async function processStartedGame(
   gameMove: GameMove,
   gameId: number,
   promptSplits: string[]
@@ -119,7 +111,7 @@ async function processStartedGame(
   return true;
 }
 
-function processSingleWord(
+export function processSingleWord(
   word: Word,
   promptSplit: string,
   stats: Stats
@@ -148,13 +140,7 @@ function processSingleWord(
   return true;
 }
 
-/**
- *
- * @param characters
- * @param promptSplit
- * @returns whether the word was completed
- */
-function handleWordle(
+export function handleWordle(
   characters: Character[],
   promptSplit: string,
   stats: Stats
@@ -213,87 +199,21 @@ const addGuessToDatabase = async (
   await prisma.guess.create({ data: { text, sessionId: session.id, attempt } });
 };
 
-const createAccount = async (): Promise<Account> => {
-  const { id } = await prisma.account.create({ data: {} });
-  return { id, address: undefined, email: undefined };
-};
-
-const getAccount = async (id: string) => {
-  const res = await prisma.account.findUniqueOrThrow({
-    where: { id },
-    include: { sessions: true },
-  });
-
-  const address = res.address ?? undefined;
-  const email = res.email ?? undefined;
-  const sessions = res.sessions;
-
-  return { id, address, email, sessions };
-};
-
 export const RequestSchema = z.union([GameMoveSchema, GameStartSchema]);
 export type Request = z.infer<typeof RequestSchema>;
 
-const sessionToGameStack = async (
-  id: string,
-  account: Account,
-  { nextGameDate, prompt, imagePath, gameId }: GameData
-): Promise<GameMove[]> => {
-  const guesses = await prisma.guess.findMany({
-    where: { sessionId: id },
-    orderBy: { attempt: "asc" },
-  });
-
-  const promptSplits = prompt.split(" ");
-
-  let lastMove = await generateNewGame(
-    account,
-    gameId,
-    imagePath,
-    promptSplits,
-    nextGameDate,
-    false
-  );
-  const moves: GameMove[] = [lastMove];
-
-  for (const { text, attempt } of guesses) {
-    const lastMoveClone = JSON.parse(JSON.stringify(lastMove)) as GameMove;
-    lastMoveClone.text = text;
-    lastMoveClone.inputs = lastMoveClone.inputs.map((word) => {
-      if (word.completed) return word;
-      return {
-        completed: false,
-        characters: word.characters.map(({ status }, index) => {
-          const charAt = text.charAt(index);
-          const character = charAt === "" ? " " : charAt;
-          return { character, status };
-        }),
-      };
-    });
-    await processStartedGame(lastMoveClone, gameId, promptSplits);
-    // console.log("gp", lastMoveClone.globalPosition);
-    moves.push(lastMoveClone);
-    lastMove = lastMoveClone;
-  }
-
-  return moves;
-};
-
 async function addGlobalRank(gameMove: GameMove) {
-  // console.log("called addGlobalRank");
   if (gameMove.gameStatus !== "finished") return;
 
-  const { timeCompleted } = await prisma.session.findFirstOrThrow({
+  const res = await prisma.session.findFirst({
     where: { gameId: gameMove.gameId, accountId: gameMove.account.id },
   });
-  if (timeCompleted === null) return;
+
+  if (!res || !res.timeCompleted) return;
   gameMove.globalPosition =
     (await prisma.session.count({
-      where: { timeCompleted: { lte: timeCompleted } },
+      where: { timeCompleted: { lte: res.timeCompleted } },
     })) + 1;
-  // console.log(gameMove.globalPosition);
-  // console.log("ranked");
-  // console.log(gameMove);
 }
 
 export default async function handler(
@@ -318,6 +238,7 @@ export default async function handler(
     // if cookies stored a user id
     if (userId) {
       const account = await getAccount(userId);
+      if (!account) return response(res, "internalError");
 
       const pred = (session: Session) => session.gameId === gameId;
       const session = account.sessions.find(pred);
