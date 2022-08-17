@@ -54,6 +54,7 @@ export const GameMoveSchema = z.object({
   imagePath: z.string(),
   gameStatus: GameStatusSchema,
   stats: z.union([StatsSchema, z.undefined()]),
+  globalPosition: z.union([z.number(), z.undefined()]),
   nextGameDate: z.string(),
   account: AccountSchema,
 });

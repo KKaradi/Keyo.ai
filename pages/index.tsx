@@ -110,6 +110,7 @@ type MultiWordleProps = {
 
 const MultiWordlePage: NextPage<MultiWordleProps> = (ctx) => {
   const { initialGameState, initialHistory } = ctx;
+  // console.log(initialGameState);
   const [history, setHistory] = useState(
     initialHistory ? initialHistory : [initialGameState]
   );
@@ -207,6 +208,7 @@ const MultiWordlePage: NextPage<MultiWordleProps> = (ctx) => {
     <Tutorial inTutorial={inTutorial}>
       <div className={styles.container}>
         <WinDialog
+          globalPosition={gameState.globalPosition}
           setIsOpen={setOpenWinDialog}
           isOpen={openWinDialog}
           gameStack={history}

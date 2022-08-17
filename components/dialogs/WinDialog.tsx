@@ -16,6 +16,7 @@ type WinDialogProps = {
   isOpen: boolean;
   setIsOpen: (value: boolean) => void;
   gameStack: GameMove[];
+  globalPosition: number | undefined;
 };
 
 const positionToSufix = {
@@ -47,15 +48,13 @@ const statToScoreString = (gameMove: GameMove | undefined): string => {
 function updateTimeToNextGame(
   setMillisToNextGame: Dispatch<SetStateAction<number>>,
   nextGameUTC: number
-) {
-  const now = Date.now();
-  setMillisToNextGame(nextGameUTC - now);
-}
+) {}
 
 const WinDialog: NextPage<WinDialogProps> = ({
   isOpen,
   setIsOpen,
   gameStack,
+  globalPosition,
 }) => {
   let scoreString = "";
   gameStack.forEach(
@@ -64,12 +63,13 @@ const WinDialog: NextPage<WinDialogProps> = ({
   const [openPopUp, setOpenPopUp] = useState(false);
   const numberOfGuesse = gameStack.length - 1;
   const nextGameUTC = new Date(gameStack[0].nextGameDate).getTime();
-  const [millisToNextGame, setMillisToNextGame] = useState(0);
-  const globalPosition = 4;
+  const [millisToNextGame, setMillisToNextGame] = useState(
+    nextGameUTC - Date.now()
+  );
 
   useEffect(() => {
     setInterval(() => {
-      updateTimeToNextGame(setMillisToNextGame, nextGameUTC);
+      setMillisToNextGame(nextGameUTC - Date.now());
     }, 1000);
   }, []);
 
@@ -103,7 +103,7 @@ const WinDialog: NextPage<WinDialogProps> = ({
           </div>
           <div className={styles.chunk}>
             {`You were the ${globalPosition}${
-              positionToSufix[globalPosition] ?? "th"
+              positionToSufix[globalPosition ?? 0] ?? "th"
             } person to finish today`}
           </div>
           <div className={styles.chunk}>

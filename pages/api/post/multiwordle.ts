@@ -49,11 +49,13 @@ export async function generateNewGame(
   gameId: number,
   imagePath: string,
   promptSplits: string[],
-  nextGameDate: string
+  nextGameDate: string,
+  addNewSession: boolean
 ): Promise<GameMove> {
-  await prisma.session.create({
-    data: { completed: false, accountId: account.id, gameId },
-  });
+  if (addNewSession)
+    await prisma.session.create({
+      data: { completed: false, accountId: account.id, gameId },
+    });
 
   return {
     gameId,
@@ -69,11 +71,11 @@ export async function generateNewGame(
   };
 }
 
-function processStartedGame(
+async function processStartedGame(
   gameMove: GameMove,
   gameId: number,
   promptSplits: string[]
-): string | true {
+): Promise<string | true> {
   if (gameMove.gameId === undefined) return "Game ID is undefined";
 
   if (gameMove.gameId != gameId) {
@@ -109,8 +111,9 @@ function processStartedGame(
 
   if (inputs.every((input) => input.completed)) {
     gameMove.gameStatus = "finished";
+    await addGlobalRank(gameMove);
   }
-
+  // console.log("in", gameMove.globalPosition);
   gameMove.attempt += 1;
 
   return true;
@@ -193,14 +196,21 @@ function handleWordle(
 }
 
 const addGuessToDatabase = async (
-  { text, account, attempt }: GameMove,
+  { text, account, attempt, gameStatus }: GameMove,
   gameId: number
 ) => {
-  const { id } = await prisma.session.findFirstOrThrow({
+  const session = await prisma.session.findFirstOrThrow({
     where: { gameId, accountId: account.id },
   });
 
-  await prisma.guess.create({ data: { text, sessionId: id, attempt } });
+  if (gameStatus === "finished") {
+    await prisma.session.update({
+      where: { id: session.id },
+      data: { completed: true, timeCompleted: new Date() },
+    });
+  }
+
+  await prisma.guess.create({ data: { text, sessionId: session.id, attempt } });
 };
 
 const createAccount = async (): Promise<Account> => {
@@ -236,21 +246,13 @@ const sessionToGameStack = async (
 
   const promptSplits = prompt.split(" ");
 
-  const moveTemplate = {
-    account,
-    nextGameDate,
-    gameId,
-    imagePath,
-    gameStatus: "started" as const,
-    summary: promptSplits.map((split) => split.length),
-  };
-
   let lastMove = await generateNewGame(
     account,
     gameId,
     imagePath,
     promptSplits,
-    nextGameDate
+    nextGameDate,
+    false
   );
   const moves: GameMove[] = [lastMove];
 
@@ -268,13 +270,31 @@ const sessionToGameStack = async (
         }),
       };
     });
-    processStartedGame(lastMoveClone, gameId, promptSplits);
+    await processStartedGame(lastMoveClone, gameId, promptSplits);
+    // console.log("gp", lastMoveClone.globalPosition);
     moves.push(lastMoveClone);
     lastMove = lastMoveClone;
   }
 
   return moves;
 };
+
+async function addGlobalRank(gameMove: GameMove) {
+  // console.log("called addGlobalRank");
+  if (gameMove.gameStatus !== "finished") return;
+
+  const { timeCompleted } = await prisma.session.findFirstOrThrow({
+    where: { gameId: gameMove.gameId, accountId: gameMove.account.id },
+  });
+  if (timeCompleted === null) return;
+  gameMove.globalPosition =
+    (await prisma.session.count({
+      where: { timeCompleted: { lte: timeCompleted } },
+    })) + 1;
+  // console.log(gameMove.globalPosition);
+  // console.log("ranked");
+  // console.log(gameMove);
+}
 
 export default async function handler(
   req: NextApiRequest,
@@ -312,7 +332,7 @@ export default async function handler(
 
     const account = await createAccount();
     const args = [account, gameId, imagePath, splits, nextGameDate] as const;
-    const newGame = await generateNewGame(...args);
+    const newGame = await generateNewGame(...args, true);
 
     return res.status(200).json(newGame);
   }
@@ -322,9 +342,9 @@ export default async function handler(
   const gameMove = parsedGameMove.data;
 
   if (gameMove.gameStatus === "started") {
-    const message = processStartedGame(gameMove, gameId, splits);
+    const message = await processStartedGame(gameMove, gameId, splits);
     if (typeof message === "string") return res.status(400).json({ message });
-    addGuessToDatabase(gameMove, gameId);
+    await addGuessToDatabase(gameMove, gameId);
     return res.status(200).json(gameMove);
   } else if (gameMove.gameStatus === "finished") {
     return res.status(400).json({ message: "Game is already finished." });
