@@ -27,6 +27,7 @@ import WinDialog from "../components/dialogs/WinDialog";
 import PopUp from "../components/misc/PopUp";
 import Tutorial from "../components/multiwordle/Tutorial";
 import nookies from "nookies";
+import { z } from "zod";
 
 function getNewInputs(input: string, gameState: GameMove): Word[] {
   if (gameState.inputs === undefined) return [];
@@ -76,24 +77,11 @@ function getColorMap(gameStates: GameMove[], activeSlide: number) {
   gameStates.forEach((gameState) => {
     gameState.inputs[activeSlide].characters.forEach(
       ({ character, status }) => {
-        if (keyMap[character] === undefined) {
+        if (
+          keyMap[character] === undefined ||
+          ["green", "yellow", "gray", "empty"].includes(status)
+        ) {
           keyMap[character] = colors[status];
-        }
-        if (status === "green") {
-          keyMap[character] = colors[status];
-          return;
-        }
-        if (status === "yellow") {
-          keyMap[character] = colors[status];
-          return;
-        }
-        if (status === "gray") {
-          keyMap[character] = colors[status];
-          return;
-        }
-        if (status === "empty") {
-          keyMap[character] = colors[status];
-          return;
         }
       }
     );
@@ -110,7 +98,8 @@ type MultiWordleProps = {
 
 const MultiWordlePage: NextPage<MultiWordleProps> = (ctx) => {
   const { initialGameState, initialHistory } = ctx;
-  // console.log(initialGameState);
+  const initialAccount = initialGameState.account;
+
   const [history, setHistory] = useState(
     initialHistory ? initialHistory : [initialGameState]
   );
@@ -124,7 +113,8 @@ const MultiWordlePage: NextPage<MultiWordleProps> = (ctx) => {
   const [openWinDialog, setOpenWinDialog] = useState(
     initialGameState.gameStatus === "finished"
   );
-  const [account, setAccount] = useState<Account | undefined>();
+
+  const [account, setAccount] = useState<Account>(initialAccount);
   const [animationMode, setAnimationMode] = useState<AnimationKeys>("none");
   const [openPopUp, setOpenPopUp] = useState(false);
 
@@ -137,11 +127,23 @@ const MultiWordlePage: NextPage<MultiWordleProps> = (ctx) => {
     setInTutorial(localStorage.getItem("completedTutorial") !== "true");
   }, []);
 
-  const signIn: SignIn = useCallback(async (id, type) => undefined, []);
+  const signIn: SignIn = useCallback(async (id, type) => {
+    if (type === "gmail") setAccount({ id: account.id, email: id });
+    if (type === "wallet") setAccount({ id: account.id, address: id });
 
-  const disconnect = () => {
-    setAccount(undefined);
-  };
+    const res = await get(`/api/get/account/${account.id}/${type}/${id}`);
+    if (res.status !== 200) return;
+
+    const json = await res.json();
+    const parsedResponse = z.array(GameMoveSchema).safeParse(json);
+    if (!parsedResponse.success) return;
+
+    const moves = parsedResponse.data;
+    setHistory(moves.reverse());
+    setGameState(moves[0]);
+  }, []);
+
+  const disconnect = () => setAccount(initialAccount);
 
   const address = useAccount().data?.address;
 
@@ -272,14 +274,16 @@ export const getServerSideProps = async (
 
   if (response.status === 200) {
     if (Array.isArray(json)) {
-      // add zod check
-      // if this response is a gameStack, then inject it as props
-      return {
-        props: {
-          initialGameState: json[json.length - 1],
-          initialHistory: json.reverse(),
-        },
-      };
+      const parsedResponse = z.array(GameMoveSchema).safeParse(json);
+      if (parsedResponse.success) {
+        const moves = parsedResponse.data;
+        return {
+          props: {
+            initialGameState: moves[moves.length - 1],
+            initialHistory: moves.reverse(),
+          },
+        };
+      }
     }
 
     const parsedResponse = GameMoveSchema.safeParse(json);

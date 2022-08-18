@@ -49,42 +49,42 @@ const Login: NextPage<LoginProps> = ({
   return (
     <ConnectButton.Custom>
       {({ openConnectModal, openAccountModal }) => {
-        const content = account ? (
-          <div className={styles.loginContainer}>
-            <div
-              className={styles.ethLogin}
-              onClick={() => {
-                const { type } = account;
-                if (type === "wallet") openAccountModal();
-                if (type === "gmail" && disconnect) disconnect();
-              }}
-            >
-              <DoNotDisturbIcon />
+        const content =
+          account?.address || account?.email ? (
+            <div className={styles.loginContainer}>
+              <div
+                className={styles.ethLogin}
+                onClick={() => {
+                  if (account.address) openAccountModal();
+                  if (account.email && disconnect) disconnect();
+                }}
+              >
+                <DoNotDisturbIcon />
+              </div>
             </div>
-          </div>
-        ) : (
-          <div className={styles.loginContainer}>
-            <div onClick={() => login()} className={styles.googleLogin}>
-              <Image
-                src={google}
-                width={30}
-                height={30}
-                alt={"Login with Google"}
-                priority
-              />
+          ) : (
+            <div className={styles.loginContainer}>
+              <div onClick={() => login()} className={styles.googleLogin}>
+                <Image
+                  src={google}
+                  width={30}
+                  height={30}
+                  alt={"Login with Google"}
+                  priority
+                />
+              </div>
+              <div className={styles.ethLogin}>
+                <Image
+                  src={ethereum}
+                  onClick={openConnectModal}
+                  width={37}
+                  height={37}
+                  alt={"Connect ETH Wallet"}
+                  priority
+                />
+              </div>
             </div>
-            <div className={styles.ethLogin}>
-              <Image
-                src={ethereum}
-                onClick={openConnectModal}
-                width={37}
-                height={37}
-                alt={"Connect ETH Wallet"}
-                priority
-              />
-            </div>
-          </div>
-        );
+          );
         return (
           <Popper open={Boolean(anchor)} anchorEl={anchor}>
             {content}
