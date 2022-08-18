@@ -109,7 +109,7 @@ const WinDialog: NextPage<WinDialogProps> = ({
           <div className={styles.chunk}>
             <Tooltip
               title={
-                "A summary of each move in your game. ✨: 2+ words completed. ⭐: 1 word completed. 🟩: 1+ green letters. 🟨 1+ yellow letters. ⬛: no letters completed. Share your score with the share button."
+                "✨: 2+ words completed in that guess. ⭐: 1 word completed. 🟩: 1+ green letters. 🟨 1+ yellow letters. ⬛: 0 letters."
               }
             >
               <div>History: {scoreString}</div>

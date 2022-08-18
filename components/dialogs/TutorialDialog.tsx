@@ -20,7 +20,8 @@ const TutorialDialog: NextPage<TutorialDialogProps> = ({
         onAnimationEnd={() => fadeTutorialDialog[1](false)}
       >
         <div className={styles.tutorialText}>
-          Try typing a word that you think was used to generate this image
+          Try typing a word that you think was used to generate this image. Then
+          hit <b>ENTER</b>.
         </div>
         <CallReceivedIcon />
       </div>
@@ -32,7 +33,8 @@ const TutorialDialog: NextPage<TutorialDialogProps> = ({
         onAnimationEnd={() => fadeTutorialDialog[1](true)}
       >
         <div className={styles.tutorialText}>
-          Try typing a word that you think was used to generate this image
+          Try typing a word that you think was used to generate this image. Then
+          hit <b>ENTER</b>.
         </div>
         <CallReceivedIcon />
       </div>
