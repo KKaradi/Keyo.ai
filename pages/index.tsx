@@ -10,6 +10,7 @@ import {
   GameMoveSchema,
   Account,
   AccountType,
+  AccountSchema,
 } from "../schemas";
 import InputField from "../components/multiwordle/InputField";
 import ImageFrame from "../components/misc/ImageFrame";
@@ -127,18 +128,21 @@ const MultiWordlePage: NextPage<MultiWordleProps> = (ctx) => {
     setInTutorial(localStorage.getItem("completedTutorial") !== "true");
   }, []);
 
-  const signIn: SignIn = useCallback(async (id, type) => {
-    if (type === "gmail") setAccount({ id: account.id, email: id });
-    if (type === "wallet") setAccount({ id: account.id, address: id });
-
-    const res = await get(`/api/get/account/${account.id}/${type}/${id}`);
+  const signIn: SignIn = useCallback(async (address, type) => {
+    const res = await get(`/api/get/account/${account.id}/${type}/${address}`);
     if (res.status !== 200) return;
 
     const json = await res.json();
-    const parsedResponse = z.array(GameMoveSchema).safeParse(json);
-    if (!parsedResponse.success) return;
 
-    const moves = parsedResponse.data;
+    const parsedId = AccountSchema.safeParse(json);
+    if (parsedId.success) {
+      return setAccount(parsedId.data);
+    }
+
+    const parsedMoves = z.array(GameMoveSchema).safeParse(json);
+    if (!parsedMoves.success) return;
+
+    const { data: moves } = parsedMoves;
     setHistory(moves.reverse());
     setGameState(moves[0]);
   }, []);
@@ -148,12 +152,11 @@ const MultiWordlePage: NextPage<MultiWordleProps> = (ctx) => {
   const address = useAccount().data?.address;
 
   useEffect(() => {
-    if (address) signIn(address, "wallet");
+    if (address) signIn(address, "WALLET");
     else disconnect();
   }, [address, signIn]);
 
   if (initialGameState.gameId === undefined || error) return <ErrorPage />;
-  console.log("wack");
   const maxLength = Math.max(...gameState.summary);
 
   const onPress = (userInput: string) => {
@@ -181,7 +184,7 @@ const MultiWordlePage: NextPage<MultiWordleProps> = (ctx) => {
       localStorage.setItem("completedTutorial", "true");
     }
 
-    const move = { ...gameState, text: userInput };
+    const move = { ...gameState, text: userInput, account };
     const res = await post<GameMove>("api/post/multiwordle", move);
 
     if (res.status === 200) {
@@ -271,13 +274,12 @@ export const getServerSideProps = async (
   const { cookieId } = nookies.get(ctx) as {
     [key: string]: string | undefined;
   };
-  console.log(cookieId);
+
   const response = await post<Request>(url, {
     gameStatus: "new",
-    type: "COOKIE",
-    address: cookieId,
+    account: { id: "", type: "COOKIE", address: cookieId },
   });
-  console.log(response);
+
   const json = await response.json();
 
   if (response.status === 200) {

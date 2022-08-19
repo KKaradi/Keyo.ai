@@ -2,18 +2,9 @@ import { z } from "zod";
 
 // zod allows us to safely deal with API responses, ensuring that the data we get is what we expect
 
-export const CharacterStatusSchema = z.union([
-  z.literal("green"),
-  z.literal("yellow"),
-  z.literal("gray"),
-  z.literal("empty"),
-]);
-
-export const GameStatusSchema = z.union([
-  z.literal("new"),
-  z.literal("started"),
-  z.literal("finished"),
-]);
+const statuses = ["green", "yellow", "gray", "empty"] as const;
+export const CharacterStatusSchema = z.enum(statuses);
+export const GameStatusSchema = z.enum(["new", "started", "finished"]);
 
 export const StatsSchema = z.object({
   totalChars: z.number(),
@@ -34,15 +25,12 @@ export const WordSchema = z.object({
   characters: z.array(CharacterSchema),
 });
 
-export const AccountTypeSchema = z.union([
-  z.literal("wallet"),
-  z.literal("gmail"),
-]);
+export const AccountTypeSchema = z.enum(["COOKIE", "WALLET", "EMAIL"]);
 
 export const AccountSchema = z.object({
   id: z.string(),
-  type: z.enum(["COOKIE", "WALLET", "EMAIL"]),
-  address: z.string(),
+  type: AccountTypeSchema,
+  address: z.union([z.string(), z.undefined()]),
 });
 
 export const GameMoveSchema = z.object({
@@ -61,12 +49,9 @@ export const GameMoveSchema = z.object({
 
 export const GameMovesSchema = z.array(GameMoveSchema);
 
-export const TypeSchema = z.enum(["COOKIE", "WALLET", "EMAIL"]);
-
 export const GameStartSchema = z.object({
   gameStatus: z.literal("new"),
-  type: TypeSchema,
-  address: z.union([z.string(), z.undefined()]),
+  account: AccountSchema,
 });
 
 export const GameDataSchema = z.object({
@@ -76,13 +61,30 @@ export const GameDataSchema = z.object({
   nextGameDate: z.string(),
 });
 
-export const GmailCredentialSchema = z.object({
+export const GmailResponseSchema = z.object({
   email: z.string(),
   email_verified: z.boolean(),
   family_name: z.string(),
   given_name: z.string(),
   locale: z.string(),
   name: z.string(),
+  picture: z.string(),
+  sub: z.string(),
+});
+
+export const GmailCredentialSchema = z.object({
+  aud: z.string(),
+  azp: z.string(),
+  email: z.string(),
+  email_verified: z.boolean(),
+  exp: z.number(),
+  family_name: z.string(),
+  given_name: z.string(),
+  iat: z.number(),
+  iss: z.string(),
+  jti: z.string(),
+  name: z.string(),
+  nbf: z.number(),
   picture: z.string(),
   sub: z.string(),
 });

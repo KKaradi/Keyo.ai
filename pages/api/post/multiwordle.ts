@@ -2,8 +2,8 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import schedule from "../../../schedule.json";
 import {
   authenticate,
-  createAccount2,
-  getAccount2,
+  createAccount,
+  getAccount,
   pullPrompt,
   response,
   sessionToGameStack,
@@ -104,9 +104,8 @@ export async function processStartedGame(
     gameMove.gameStatus = "finished";
     await addGlobalRank(gameMove);
   }
-  // console.log("in", gameMove.globalPosition);
-  gameMove.attempt += 1;
 
+  gameMove.attempt += 1;
   return true;
 }
 
@@ -184,9 +183,11 @@ const addGuessToDatabase = async (
   { text, account, attempt, gameStatus }: GameMove,
   gameId: number
 ) => {
-  const session = await prisma.session.findFirstOrThrow({
+  const session = await prisma.session.findFirst({
     where: { gameId, accountId: account.id },
   });
+
+  if (!session) return;
 
   if (gameStatus === "finished") {
     await prisma.session.update({
@@ -232,11 +233,11 @@ export default async function handler(
 
   // if new game
   if (parsedGameStart.success) {
-    const { address } = parsedGameStart.data;
+    const { address } = parsedGameStart.data.account;
 
     // if cookies stored a user id
     if (address) {
-      const account = await getAccount2("COOKIE", address);
+      const account = await getAccount(address, "COOKIE");
       if (!account) return response(res, "internalError");
 
       const pred = (session: Session) => session.gameId === gameId;
@@ -250,7 +251,7 @@ export default async function handler(
       }
     }
 
-    const account = await createAccount2();
+    const account = await createAccount();
     const args = [account, gameId, imagePath, splits, nextGameDate] as const;
     const newGame = await generateNewGame(...args, true);
 

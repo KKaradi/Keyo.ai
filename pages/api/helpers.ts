@@ -3,7 +3,7 @@ import schedule from "../../schedule.json";
 import { Account, GameData, GameMove } from "../../schemas";
 import type { NextApiResponse, NextApiRequest } from "next/types";
 import { generateNewGame, processStartedGame } from "./post/multiwordle";
-import { Type } from "@prisma/client";
+import { AccountType, Session } from "@prisma/client";
 export const responses = {
   onlyGet: { message: "Incorrect HTTP method: only use GET.", code: 405 },
   onlyPost: { message: "Incorrect HTTP method: only use POST", code: 405 },
@@ -27,72 +27,59 @@ export const authenticate = (req: NextApiRequest) => {
   return process.env.AUTH_KEY == key;
 };
 
-export const createAccount = async (): Promise<Account> => {
-  const { id } = await prisma.account.create({ data: { type: "COOKIE" } });
-  return { id, type: "COOKIE", address: id };
+const copySessions = async (sessions: Session[], accountId: string) => {
+  sessions.forEach(async ({ id, timeCompleted, completed, gameId }) => {
+    const session = await prisma.session.findUnique({
+      where: { id },
+      include: { guesses: true },
+    });
+
+    if (!session) return;
+
+    const { id: sessionId } = await prisma.session.create({
+      data: { accountId, completed, gameId, timeCompleted },
+    });
+
+    session.guesses.forEach(async ({ attempt, text }) => {
+      await prisma.guess.create({
+        data: { attempt, text, sessionId },
+      });
+    });
+  });
 };
 
-// const getAccountById = async (id: string) =>
-//   await prisma.account.findUnique({
-//     where: { id },
-//     include: { sessions: true },
-//   });
+export async function createAccount(
+  address?: string,
+  sessions?: Session[],
+  type: AccountType = "COOKIE"
+): Promise<Account> {
+  const result = await prisma.account.create({
+    data: { type, address },
+  });
 
-// const getAccountByGmail = async (email: string) =>
-//   await prisma.account.findUnique({
-//     where: { email },
-//     include: { sessions: true },
-//   });
+  const { id, type: accType } = result;
+  const data = { address: id };
 
-// const getAccountByAddress = async (id: string) =>
-//   await prisma.account.findUnique({
-//     where: { id },
-//     include: { sessions: true },
-//   });
+  if (sessions) copySessions(sessions, id);
+  if (!address) await prisma.account.update({ where: { id }, data });
 
-// export const getAccount = async (
-//   address: string,
-//   type: "cookie" | "wallet" | "gmail" = "cookie"
-// ) => {
-//   let res = undefined;
-//   if (type === "cookie") res = await getAccountById(address);
-//   if (type === "gmail") res = await getAccountByGmail(address);
-//   if (type === "wallet") res = await getAccountByAddress(address);
+  return { id, type: accType, address: address ?? id };
+}
 
-//   if (!res) return undefined;
-
-//   const walletAddress = res.address ?? undefined;
-//   const email = res.email ?? undefined;
-//   const sessions = res.sessions;
-
-//   return { address, walletAddress, email, sessions };
-// };
-
-export async function getAccount2(type: Type, address: string) {
-  const result = await prisma.account.findUnique({
-    where: { address },
+export async function getAccount(address: string, type: AccountType) {
+  const result = await prisma.account.findFirst({
+    where: { address, type },
     include: { sessions: true },
   });
 
-  if (result === null || !result.id || !result.type || !result.address)
-    return undefined;
+  if (result === null) return undefined;
 
   return {
     id: result.id,
     type: result.type,
-    address: result.address,
+    address: result.address ?? undefined,
     sessions: result.sessions,
   };
-}
-
-export async function createAccount2(): Promise<Account> {
-  const result = await prisma.account.create({ data: { type: "COOKIE" } });
-  await prisma.account.update({
-    where: { id: result.id },
-    data: { address: result.id },
-  });
-
-  return { id: result.id, type: result.type, address: result.address ?? "" };
 }
 
 export function pullPrompt(): GameData | undefined {

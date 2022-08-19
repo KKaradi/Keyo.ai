@@ -21,11 +21,6 @@ const guide =
 
 const Header: NextPage<HeaderProps> = ({ signIn, account, disconnect }) => {
   const [infoOpen, setInfoOpen] = useState(false);
-  const [loginAnchor, setLoginAnchor] = useState<null | HTMLElement>(null);
-
-  const onLoginClick = ({ currentTarget }: React.MouseEvent<HTMLElement>) => {
-    setLoginAnchor(loginAnchor ? null : currentTarget);
-  };
 
   return (
     <div className={styles.header}>
@@ -41,18 +36,7 @@ const Header: NextPage<HeaderProps> = ({ signIn, account, disconnect }) => {
         </ToolTip>
       </HowToPlayDialog>
 
-      <div onClick={onLoginClick}>
-        <ToolTip title="My Profile" placement={loginAnchor ? "top" : undefined}>
-          <AccountCircleIcon fontSize="large" />
-        </ToolTip>
-      </div>
-
-      <Login
-        signIn={signIn}
-        anchorState={[loginAnchor, setLoginAnchor]}
-        account={account}
-        disconnect={disconnect}
-      />
+      <Login signIn={signIn} account={account} disconnect={disconnect} />
     </div>
   );
 };

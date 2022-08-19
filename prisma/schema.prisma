@@ -10,7 +10,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Type {
+enum AccountType {
   COOKIE
   WALLET
   EMAIL
@@ -19,7 +19,7 @@ enum Type {
 model Account {
   id String @id @default(cuid())
 
-  type    Type
+  type    AccountType
   address String? @unique
 
   sessions Session[]
@@ -30,7 +30,7 @@ model Session {
 
   gameId Int
 
-  account   Account? @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  account   Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
   accountId String
 
   completed     Boolean
