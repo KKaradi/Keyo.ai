@@ -86,8 +86,13 @@ export async function getAccount2(type: Type, address: string) {
 }
 
 export async function createAccount2(): Promise<Account> {
-  const { id } = await prisma.account.create({ data: { type: "COOKIE" } });
-  return { id, type: "COOKIE", address: id };
+  const result = await prisma.account.create({ data: { type: "COOKIE" } });
+  await prisma.account.update({
+    where: { id: result.id },
+    data: { address: result.id },
+  });
+
+  return { id: result.id, type: result.type, address: result.address ?? "" };
 }
 
 export function pullPrompt(): GameData | undefined {

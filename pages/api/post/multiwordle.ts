@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import schedule from "../../../schedule.json";
 import {
   authenticate,
-  createAccount,
+  createAccount2,
   getAccount2,
   pullPrompt,
   response,
@@ -219,7 +219,6 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Response>
 ) {
-  console.error("here");
   if (req.method !== "POST") return response(res, "onlyPost");
   if (!authenticate(req)) return response(res, "authError");
 
@@ -251,7 +250,7 @@ export default async function handler(
       }
     }
 
-    const account = await createAccount();
+    const account = await createAccount2();
     const args = [account, gameId, imagePath, splits, nextGameDate] as const;
     const newGame = await generateNewGame(...args, true);
 

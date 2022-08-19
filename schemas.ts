@@ -61,9 +61,11 @@ export const GameMoveSchema = z.object({
 
 export const GameMovesSchema = z.array(GameMoveSchema);
 
+export const TypeSchema = z.enum(["COOKIE", "WALLET", "EMAIL"]);
+
 export const GameStartSchema = z.object({
   gameStatus: z.literal("new"),
-  type: z.string(),
+  type: TypeSchema,
   address: z.union([z.string(), z.undefined()]),
 });
 

@@ -153,6 +153,7 @@ const MultiWordlePage: NextPage<MultiWordleProps> = (ctx) => {
   }, [address, signIn]);
 
   if (initialGameState.gameId === undefined || error) return <ErrorPage />;
+  console.log("wack");
   const maxLength = Math.max(...gameState.summary);
 
   const onPress = (userInput: string) => {
@@ -267,9 +268,16 @@ export const getServerSideProps = async (
     `http://${ctx.req?.headers.host}`
   ).toString();
 
-  const { userId } = nookies.get(ctx) as { [key: string]: string | undefined };
-
-  const response = await post<Request>(url, { gameStatus: "new", userId });
+  const { cookieId } = nookies.get(ctx) as {
+    [key: string]: string | undefined;
+  };
+  console.log(cookieId);
+  const response = await post<Request>(url, {
+    gameStatus: "new",
+    type: "COOKIE",
+    address: cookieId,
+  });
+  console.log(response);
   const json = await response.json();
 
   if (response.status === 200) {
@@ -290,7 +298,7 @@ export const getServerSideProps = async (
     if (parsedResponse.success) {
       const { data } = parsedResponse;
 
-      nookies.set(ctx, "userId", parsedResponse.data.account.id);
+      nookies.set(ctx, "cookieId", parsedResponse.data.account.id);
       return { props: { initialGameState: data } };
     }
   }
