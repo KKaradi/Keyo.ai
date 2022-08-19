@@ -10,11 +10,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Type {
+  COOKIE
+  WALLET
+  EMAIL
+}
+
 model Account {
   id String @id @default(cuid())
 
+  type    Type
   address String? @unique
-  email   String? @unique
 
   sessions Session[]
 }

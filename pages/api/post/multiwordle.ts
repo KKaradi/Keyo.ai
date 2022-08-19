@@ -3,14 +3,13 @@ import schedule from "../../../schedule.json";
 import {
   authenticate,
   createAccount,
-  getAccount,
+  getAccount2,
   pullPrompt,
   response,
   sessionToGameStack,
 } from "../helpers";
 import {
   Character,
-  GameData,
   GameDataSchema,
   GameMove,
   GameMoveSchema,
@@ -220,6 +219,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Response>
 ) {
+  console.error("here");
   if (req.method !== "POST") return response(res, "onlyPost");
   if (!authenticate(req)) return response(res, "authError");
 
@@ -233,11 +233,11 @@ export default async function handler(
 
   // if new game
   if (parsedGameStart.success) {
-    const { userId } = parsedGameStart.data;
+    const { address } = parsedGameStart.data;
 
     // if cookies stored a user id
-    if (userId) {
-      const account = await getAccount(userId);
+    if (address) {
+      const account = await getAccount2("COOKIE", address);
       if (!account) return response(res, "internalError");
 
       const pred = (session: Session) => session.gameId === gameId;

@@ -41,8 +41,8 @@ export const AccountTypeSchema = z.union([
 
 export const AccountSchema = z.object({
   id: z.string(),
-  address: z.union([z.string(), z.undefined()]),
-  email: z.union([z.string(), z.undefined()]),
+  type: z.enum(["COOKIE", "WALLET", "EMAIL"]),
+  address: z.string(),
 });
 
 export const GameMoveSchema = z.object({
@@ -63,7 +63,8 @@ export const GameMovesSchema = z.array(GameMoveSchema);
 
 export const GameStartSchema = z.object({
   gameStatus: z.literal("new"),
-  userId: z.union([z.string(), z.undefined()]),
+  type: z.string(),
+  address: z.union([z.string(), z.undefined()]),
 });
 
 export const GameDataSchema = z.object({

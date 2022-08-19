@@ -10,7 +10,6 @@ import { useGoogleLogin } from "@react-oauth/google";
 import google from "../../public/logins/google.svg";
 import ethereum from "../../public/logins/ethereum.svg";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-
 type LoginProps = {
   signIn?: SignIn;
   anchorState: [HTMLElement | null, (el: null) => void];
