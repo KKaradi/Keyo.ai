@@ -2,12 +2,7 @@ import { Session } from "@prisma/client";
 import { isArray } from "lodash";
 import { NextApiRequest, NextApiResponse } from "next";
 import prisma from "../../../../../../lib/prisma";
-import {
-  Account,
-  AccountType,
-  GameDataSchema,
-  GameMove,
-} from "../../../../../../schemas";
+import { Account, GameDataSchema, GameMove } from "../../../../../../schemas";
 import {
   response,
   authenticate,
