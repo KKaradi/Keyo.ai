@@ -30,7 +30,7 @@ type GoogleResult = Omit<
 type LoginProps = {
   signIn?: SignIn;
   account?: Account;
-  disconnect?: () => void;
+  disconnect?: () => Promise<void>;
 };
 
 const parseJWT = (token: string) => {

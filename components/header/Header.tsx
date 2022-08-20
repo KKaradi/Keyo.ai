@@ -12,7 +12,7 @@ import { Account } from "../../schemas";
 
 type HeaderProps = {
   signIn?: SignIn;
-  disconnect?: () => void;
+  disconnect?: () => Promise<void>;
   account?: Account;
 };
 

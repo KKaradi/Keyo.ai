@@ -141,13 +141,26 @@ const MultiWordlePage: NextPage<MultiWordleProps> = (ctx) => {
 
     const parsedMoves = z.array(GameMoveSchema).safeParse(json);
     if (!parsedMoves.success) return;
-
+    setAccount(parsedMoves.data[0].account);
     const { data: moves } = parsedMoves;
     setHistory(moves.reverse());
     setGameState(moves[0]);
   }, []);
 
-  const disconnect = () => setAccount(initialAccount);
+  const disconnect = async () => {
+    setAccount(initialAccount);
+    const res = await get(
+      `/api/get/account/${initialAccount.id}/${initialAccount.type}/${initialAccount.address}`
+    );
+    const parsedMoves = z.array(GameMoveSchema).safeParse(await res.json());
+
+    if (!parsedMoves.success) return;
+    setAccount(parsedMoves.data[0].account);
+
+    const { data: moves } = parsedMoves;
+    setHistory(moves.reverse());
+    setGameState(moves[0]);
+  };
 
   const address = useAccount().data?.address;
 
