@@ -243,6 +243,7 @@ const MultiWordlePage: NextPage<MultiWordleProps> = (ctx) => {
           isOpen={Boolean(warning)}
           text={warning ?? ""}
         />
+
         <div className={styles.left}>
           <ImageFrame path={gameState.imagePath} />
           <InputField
@@ -255,6 +256,7 @@ const MultiWordlePage: NextPage<MultiWordleProps> = (ctx) => {
             setAnimationMode={setAnimationMode}
           />
         </div>
+
         <div className={styles.right}>
           <Header signIn={signIn} account={account} disconnect={disconnect} />
           <div className={styles.game}>

@@ -5,9 +5,9 @@ type TutorialProps = { children: ReactElement; inTutorial: boolean };
 
 const Tutorial: NextPage<TutorialProps> = ({ children, inTutorial }) => {
   return (
-    <div>
+    <div className={styles.container}>
       {inTutorial ? <div className={styles.cover}></div> : <div></div>}
-      <div>{children}</div>
+      <div className={styles.container}>{children}</div>
     </div>
   );
 };
