@@ -65,14 +65,12 @@ type CarouselProps = {
   slides: Character[][][];
   slideState: [number, (value: number) => void];
   displayBest: boolean;
-  isMobile: boolean;
 };
 
 const Carousel: NextPage<CarouselProps> = ({
   slides,
   slideState,
   displayBest,
-  isMobile,
 }) => {
   const [slide, setSlide] = slideState;
 

@@ -35,7 +35,7 @@ const InputField: NextPage<InputFieldProps> = ({
           <div key={inputIndex}>
             {active ? (
               <TutorialDialog
-                inTutorial={inTutorial}
+                inTutorial={false}
                 fadeTutorialDialog={fadeTutorialDialog}
               />
             ) : (

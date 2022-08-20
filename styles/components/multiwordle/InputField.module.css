@@ -34,3 +34,10 @@
   text-transform: uppercase;
   color: white;
 }
+
+@media only screen and (max-device-width: 480px) {
+  .cell {
+    height: 30px;
+    width: 30px;
+  }
+}

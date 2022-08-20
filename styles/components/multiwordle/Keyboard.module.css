@@ -7,6 +7,19 @@
   margin-left: 50px;
 }
 
+@media only screen and (max-device-width: 480px) {
+  .container {
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .button {
+    height: 10px;
+    width: 10px;
+  }
+}
+
 .row {
   width: 100%;
   margin: 0 auto 8px;

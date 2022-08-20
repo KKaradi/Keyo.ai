@@ -2,7 +2,7 @@ import type { NextPage, NextPageContext } from "next";
 import { useCallback, useEffect, useState } from "react";
 import { colors } from "../constants/colors";
 import DICTIONARY from "../dictionary.json";
-import { testIsMobile, get, post } from "../helpers";
+import { get, post } from "../helpers";
 import {
   GameMove,
   Word,
@@ -95,11 +95,10 @@ export type SignIn = (id: string, type: AccountType) => Promise<void>;
 type MultiWordleProps = {
   initialGameState: GameMove;
   initialHistory?: GameMove[];
-  isMobile: boolean;
 };
 
 const MultiWordlePage: NextPage<MultiWordleProps> = (props) => {
-  const { initialGameState, initialHistory, isMobile } = props;
+  const { initialGameState, initialHistory } = props;
   const initialAccount = initialGameState.account;
 
   const [history, setHistory] = useState(
@@ -224,10 +223,13 @@ const MultiWordlePage: NextPage<MultiWordleProps> = (props) => {
   const slides = gameStackToSlides([gameState, ...history]);
   const colorMap = getColorMap(history, activeSlide);
 
-  const component = !isMobile ? (
-    // Desktop
-    <Tutorial inTutorial={inTutorial}>
+  return (
+    <Tutorial inTutorial={false}>
       <div className={styles.container}>
+        <div className={styles.mobileHeader}>
+          <Header signIn={signIn} account={account} disconnect={disconnect} />
+        </div>
+
         <WinDialog
           globalPosition={gameState.globalPosition}
           setIsOpen={setOpenWinDialog}
@@ -260,81 +262,31 @@ const MultiWordlePage: NextPage<MultiWordleProps> = (props) => {
         </div>
 
         <div className={styles.right}>
-          <Header signIn={signIn} account={account} disconnect={disconnect} />
+          <div className={styles.header}>
+            <Header signIn={signIn} account={account} disconnect={disconnect} />
+          </div>
           <div className={styles.game}>
-            <Carousel
-              slides={slides}
-              slideState={[activeSlide, setActiveSlide]}
-              displayBest={displayBest}
-              isMobile={isMobile}
-            />
-            <Keyboard
-              onPress={onPress}
-              onSubmit={onSubmit}
-              colorMap={colorMap}
-              maxLength={maxLength}
-            />
+            <div className={styles.carousel}>
+              <Carousel
+                slides={slides}
+                slideState={[activeSlide, setActiveSlide]}
+                displayBest={displayBest}
+              />
+            </div>
+
+            <div className={styles.keyboard}>
+              <Keyboard
+                onPress={onPress}
+                onSubmit={onSubmit}
+                colorMap={colorMap}
+                maxLength={maxLength}
+              />
+            </div>
           </div>
         </div>
       </div>
     </Tutorial>
-  ) : (
-    //Mobile
-    // <Tutorial inTutorial={inTutorial}>
-    <div className={styles.mobileContainer}>
-      <WinDialog
-        globalPosition={gameState.globalPosition}
-        setIsOpen={setOpenWinDialog}
-        isOpen={openWinDialog}
-        gameStack={history}
-      />
-      <PopUp
-        text={"Not a valid word"}
-        alertLevel={"warning"}
-        open={openPopUp}
-        setOpen={setOpenPopUp}
-      />
-      <ErrorDialog
-        setIsOpen={() => setWarning(undefined)}
-        isOpen={Boolean(warning)}
-        text={warning ?? ""}
-      />
-
-      <div className={styles.left}>
-        <ImageFrame path={gameState.imagePath} />
-        <InputField
-          fadeTutorialDialog={fadeTutorialDialog}
-          inTutorial={inTutorial}
-          gameState={displayBest ? history[0] : gameState}
-          activeSlide={activeSlide}
-          displayBest={displayBest}
-          animationMode={animationMode}
-          setAnimationMode={setAnimationMode}
-        />
-      </div>
-
-      <div className={styles.right}>
-        {/* <Header signIn={signIn} account={account} disconnect={disconnect} /> */}
-        <div className={styles.game}>
-          <Carousel
-            slides={slides}
-            slideState={[activeSlide, setActiveSlide]}
-            displayBest={displayBest}
-            isMobile={isMobile}
-          />
-          <Keyboard
-            onPress={onPress}
-            onSubmit={onSubmit}
-            colorMap={colorMap}
-            maxLength={maxLength}
-          />
-        </div>
-      </div>
-    </div>
-    // </Tutorial>
   );
-
-  return component;
 };
 
 export const getServerSideProps = async (
@@ -353,7 +305,6 @@ export const getServerSideProps = async (
     gameStatus: "new",
     account: { id: "", type: "COOKIE", address: cookieId },
   });
-  const isMobile = testIsMobile(ctx.req);
   const json = await response.json();
 
   if (response.status === 200) {
@@ -365,7 +316,6 @@ export const getServerSideProps = async (
           props: {
             initialGameState: moves[moves.length - 1],
             initialHistory: moves.reverse(),
-            isMobile: isMobile,
           },
         };
       }
@@ -376,7 +326,7 @@ export const getServerSideProps = async (
       const { data } = parsedResponse;
 
       nookies.set(ctx, "cookieId", parsedResponse.data.account.id);
-      return { props: { initialGameState: data, isMobile: isMobile } };
+      return { props: { initialGameState: data } };
     }
   }
 
