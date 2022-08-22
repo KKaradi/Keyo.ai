@@ -29,6 +29,7 @@ import PopUp from "../components/misc/PopUp";
 import Tutorial from "../components/multiwordle/Tutorial";
 import nookies from "nookies";
 import { z } from "zod";
+import PostGame from "../components/misc/PostGame";
 
 function getNewInputs(input: string, gameState: GameMove): Word[] {
   if (gameState.inputs === undefined) return [];
@@ -251,6 +252,7 @@ const MultiWordlePage: NextPage<MultiWordleProps> = (props) => {
   return (
     <Tutorial inTutorial={inTutorial}>
       <div className={styles.container}>
+        {gameState.inPostGame ? <PostGame /> : <></>}
         <WinDialog
           globalPosition={gameState.globalPosition}
           setIsOpen={setOpenWinDialog}

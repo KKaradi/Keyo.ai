@@ -1,0 +1,27 @@
+.div {
+  background-color: #cccccc;
+  padding: 5px 30px;
+  text-align: center;
+  border-radius: 10px;
+  color: rgb(138, 138, 138);
+  position: absolute;
+  top: 1%;
+  left: 1%;
+}
+
+.text {
+  padding: 0px 0px 3px 0px;
+}
+
+.button {
+  border-radius: 25px;
+  padding: 2px 20px;
+  box-shadow: 0 5px 5px rgba(0, 0, 0, 0.15);
+  transition: box-shadow 0.3s ease-in-out;
+  color: rgb(138, 138, 138);
+  background-color: rgb(255, 255, 255);
+}
+
+.button:hover {
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
