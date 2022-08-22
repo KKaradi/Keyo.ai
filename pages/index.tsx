@@ -123,7 +123,6 @@ const MultiWordlePage: NextPage<MultiWordleProps> = (props) => {
   const [inTutorial, setInTutorial] = useState(true);
   const fadeTutorialDialog = useState(false);
 
-  // local storage calls should be wrapped in use effect
   useEffect(() => {
     if (window === undefined) return;
     setInTutorial(localStorage.getItem("completedTutorial") !== "true");
@@ -224,8 +223,7 @@ const MultiWordlePage: NextPage<MultiWordleProps> = (props) => {
   const slides = gameStackToSlides([gameState, ...history]);
   const colorMap = getColorMap(history, activeSlide);
 
-  const component = !isMobile ? (
-    // Desktop
+  return (
     <Tutorial inTutorial={inTutorial}>
       <div className={styles.container}>
         <WinDialog
@@ -278,63 +276,7 @@ const MultiWordlePage: NextPage<MultiWordleProps> = (props) => {
         </div>
       </div>
     </Tutorial>
-  ) : (
-    //Mobile
-    // <Tutorial inTutorial={inTutorial}>
-    <div className={styles.mobileContainer}>
-      <WinDialog
-        globalPosition={gameState.globalPosition}
-        setIsOpen={setOpenWinDialog}
-        isOpen={openWinDialog}
-        gameStack={history}
-      />
-      <PopUp
-        text={"Not a valid word"}
-        alertLevel={"warning"}
-        open={openPopUp}
-        setOpen={setOpenPopUp}
-      />
-      <ErrorDialog
-        setIsOpen={() => setWarning(undefined)}
-        isOpen={Boolean(warning)}
-        text={warning ?? ""}
-      />
-
-      <div className={styles.left}>
-        <ImageFrame path={gameState.imagePath} />
-        <InputField
-          fadeTutorialDialog={fadeTutorialDialog}
-          inTutorial={inTutorial}
-          gameState={displayBest ? history[0] : gameState}
-          activeSlide={activeSlide}
-          displayBest={displayBest}
-          animationMode={animationMode}
-          setAnimationMode={setAnimationMode}
-        />
-      </div>
-
-      <div className={styles.right}>
-        {/* <Header signIn={signIn} account={account} disconnect={disconnect} /> */}
-        <div className={styles.game}>
-          <Carousel
-            slides={slides}
-            slideState={[activeSlide, setActiveSlide]}
-            displayBest={displayBest}
-            isMobile={isMobile}
-          />
-          <Keyboard
-            onPress={onPress}
-            onSubmit={onSubmit}
-            colorMap={colorMap}
-            maxLength={maxLength}
-          />
-        </div>
-      </div>
-    </div>
-    // </Tutorial>
   );
-
-  return component;
 };
 
 export const getServerSideProps = async (

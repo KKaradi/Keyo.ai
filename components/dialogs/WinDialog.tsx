@@ -5,7 +5,7 @@ import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import type { NextPage } from "next/types";
 import SlideTransition from "./SlideTransition";
-import { GameMove, GameStatusSchema, Stats } from "../../schemas";
+import { GameMove } from "../../schemas";
 import { colors } from "../../constants/colors";
 import ShareIcon from "@mui/icons-material/Share";
 import PopUp from "../misc/PopUp";
@@ -44,11 +44,6 @@ const statToScoreString = (gameMove: GameMove | undefined): string => {
   }
   return "⬛";
 };
-
-function updateTimeToNextGame(
-  setMillisToNextGame: Dispatch<SetStateAction<number>>,
-  nextGameUTC: number
-) {}
 
 const WinDialog: NextPage<WinDialogProps> = ({
   isOpen,

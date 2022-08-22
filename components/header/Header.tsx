@@ -2,7 +2,6 @@ import ToolTip from "../misc/ToolTip";
 import { NextPage } from "next";
 import HowToPlayDialog from "../dialogs/HowToPlayDialog";
 import styles from "../../styles/components/header/Header.module.css";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import InfoIcon from "@mui/icons-material/Info";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
 import React, { useState } from "react";

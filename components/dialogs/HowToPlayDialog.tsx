@@ -3,14 +3,11 @@ import Button from "@mui/material/Button";
 import styles from "../../styles/components/dialogs/HowToPlayDialog.module.css";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
 import type { NextPage } from "next/types";
 import SlideTransition from "./SlideTransition";
 import { colors } from "../../constants/colors";
-import Timelapse from "../misc/Timelapse";
+
 import Square from "../misc/Square";
-import Typography from "@mui/material/Typography";
 
 type HowToPlayDialogProps = {
   children: ReactElement;
@@ -18,16 +15,6 @@ type HowToPlayDialogProps = {
   setIsOpen: (value: boolean) => void;
 };
 
-// First we started with a sentence. Then we asked an AI to draw that
-//             sentence. That&apos;s what you see on the left. Your job is guess
-//             the sentence that was use to draw the image You can enter a guess
-//             just by typing and hitting enter. Each guess applies to every word
-//             in the sentence. For each letter green means its in the correct
-//             spot, yellow means its in the wrong spot and gray means its not in
-//             the word. You can find a history of your guess by click each word.
-//             Do you see that gif down there. That&apos;s a ai generating an image
-//             from the prompt &quot;__&quot;.
-//             <br />
 const HowToPlayDialog: NextPage<HowToPlayDialogProps> = ({
   children,
   isOpen,

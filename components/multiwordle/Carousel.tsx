@@ -3,7 +3,6 @@ import {
   createRef,
   forwardRef,
   ForwardRefRenderFunction,
-  useEffect,
   useState,
 } from "react";
 import styles from "../../styles/components/multiwordle/Carousel.module.css";
