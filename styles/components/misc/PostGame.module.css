@@ -3,14 +3,19 @@
   padding: 5px 30px;
   text-align: center;
   border-radius: 10px;
-  color: rgb(138, 138, 138);
+  color: rgb(91, 91, 91);
   position: absolute;
-  top: 1%;
-  left: 1%;
+  top: 1.5%;
+  left: 1.5%;
+  font-size: 0.9rem;
 }
 
 .text {
   padding: 0px 0px 3px 0px;
+}
+
+.smallText {
+  font-size: 0.8rem;
 }
 
 .button {
@@ -18,7 +23,7 @@
   padding: 2px 20px;
   box-shadow: 0 5px 5px rgba(0, 0, 0, 0.15);
   transition: box-shadow 0.3s ease-in-out;
-  color: rgb(138, 138, 138);
+  color: rgb(91, 91, 91);
   background-color: rgb(255, 255, 255);
 }
 
