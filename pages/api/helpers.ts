@@ -11,6 +11,18 @@ export const responses = {
   incorrectParams: { message: "Incorrect parameters.", code: 400 },
   internalError: { message: "Internal Error", code: 500 },
   DBSuccess: { message: "Succesfully added to database.", code: 200 },
+  cantFindTheme: {
+    message: "Today's game theme could not be found",
+    code: 500,
+  },
+  gameMoveTypeError: {
+    message: "The type of the provided game move is incorrect.",
+    code: 400,
+  },
+  cantFindCookieAccount: {
+    message: "Cookie account could not be found.",
+    code: 404,
+  },
 };
 
 type responseCategory = keyof typeof responses;
@@ -82,18 +94,33 @@ export async function getAccount(address: string, type: AccountType) {
   };
 }
 
-export function pullPrompt(): GameData | undefined {
-  const now = Date.now();
-  for (let i = 0; i < schedule.length; i++) {
-    const afterStart = new Date(schedule[i].start_date).getTime() <= now;
-    const beforeEnd = now <= new Date(schedule[i].end_date).getTime();
-    if (afterStart && beforeEnd) {
-      return {
-        prompt: schedule[i].prompt,
-        imagePath: schedule[i].image_path,
-        gameId: i,
-        nextGameDate: schedule[i + 1].start_date,
-      };
+export function pullTheme(
+  gameId: number | undefined = undefined
+): GameData | undefined {
+  if (gameId === undefined) {
+    const now = Date.now();
+    for (let i = 0; i < schedule.length; i++) {
+      const afterStart = new Date(schedule[i].start_date).getTime() <= now;
+      const beforeEnd = now <= new Date(schedule[i].end_date).getTime();
+      if (afterStart && beforeEnd) {
+        return {
+          prompt: schedule[i].prompt,
+          imagePath: schedule[i].image_path,
+          gameId: schedule[i].game_id,
+          nextGameDate: schedule[i + 1].start_date,
+        };
+      }
+    }
+  } else {
+    for (let i = 0; i < schedule.length; i++) {
+      if (gameId === schedule[i].game_id) {
+        return {
+          prompt: schedule[i].prompt,
+          imagePath: schedule[i].image_path,
+          gameId: schedule[i].game_id,
+          nextGameDate: schedule[i + 1].start_date,
+        };
+      }
     }
   }
 }
@@ -136,7 +163,7 @@ export const sessionToGameStack = async (
       };
     });
 
-    await processStartedGame(lastMoveClone, gameId, promptSplits);
+    await processStartedGame(lastMoveClone, gameId, promptSplits, false);
     moves.push(lastMoveClone);
     lastMove = lastMoveClone;
   }

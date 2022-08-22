@@ -4,7 +4,7 @@ import {
   Account,
   AccountType,
   AccountTypeSchema,
-  GameDataSchema,
+  GameThemeSchema,
   GameMove,
   GameMoveSchema,
 } from "../../../../../../schemas";
@@ -12,11 +12,11 @@ import {
   response,
   authenticate,
   getAccount,
-  pullPrompt,
+  pullTheme,
   sessionToGameStack,
   createAccount,
 } from "../../../../helpers";
-import { ErrorMessage } from "../../../../post/multiwordle";
+import { ErrorMessage, generateNewGame } from "../../../../post/multiwordle";
 import { z } from "zod";
 
 export type Response = GameMove[] | ErrorMessage | Account;
@@ -35,31 +35,50 @@ export default async function handler(
   if (!authenticate(req)) return response(res, "authError");
 
   const parsedRequest = RequestSchema.safeParse(req.query);
-  if (!parsedRequest.success) return response(res, "incorrectParams");
+  if (!parsedRequest.success) return response(res, "cantFindTheme");
   const { cookieId, type, address } = parsedRequest.data;
 
   const account = await getAccount(address, type as AccountType);
 
   if (!account) {
-    // copy sessions into new account
-    const account = await getAccount(cookieId, "COOKIE");
-    if (!account) return response(res, "incorrectParams");
+    if (type === "COOKIE") {
+      return response(res, "cantFindCookieAccount");
+    } else {
+      // copy sessions into new account
 
-    const { id } = await createAccount(address, account?.sessions, type);
-    return res.status(200).json({ id, type, address });
+      const cookieAccount = await getAccount(cookieId, "COOKIE");
+      if (!cookieAccount) return response(res, "cantFindCookieAccount");
+
+      const { id } = await createAccount(
+        address,
+        cookieAccount?.sessions,
+        type
+      );
+      return res.status(200).json({ id, type, address });
+    }
   } else {
     // otherwise return the account's session
-    const parsedPromptData = GameDataSchema.safeParse(pullPrompt());
-    if (!parsedPromptData.success) return response(res, "internalError");
-    const gameData = parsedPromptData.data;
+    const parsedTheme = GameThemeSchema.safeParse(pullTheme());
+    if (!parsedTheme.success) return response(res, "cantFindTheme");
+    const theme = parsedTheme.data;
 
-    const pred = (session: Session) => session.gameId === gameData.gameId;
+    const pred = (session: Session) => session.gameId === theme.gameId;
     const session = account.sessions.find(pred);
 
     // if the user actually has a session with the current game
-    if (!session) return response(res, "internalError");
+    if (!session) {
+      const newGame = await generateNewGame(
+        account,
+        theme.gameId,
+        theme.imagePath,
+        theme.prompt.split(" "),
+        theme.nextGameDate,
+        true
+      );
+      return res.status(200).json([newGame]);
+    }
 
-    const moves = await sessionToGameStack(session.id, account, gameData);
+    const moves = await sessionToGameStack(session.id, account, theme);
     return res.status(200).json(moves);
   }
 }

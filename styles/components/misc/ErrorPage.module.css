@@ -4,10 +4,29 @@
 
 .errorBar {
   background-color: rgb(222, 78, 78);
-  position: relative;
+  position: absolute;
   top: 35%;
+  left: 0%;
+  width: 100%;
   transform: translateY(-50%);
   height: 50%;
+  color: white;
+  text-align: center;
+}
+
+.newPageBar {
+  background-color: rgb(230, 141, 58);
+  position: absolute;
+  top: 35%;
+  left: 0%;
+  width: 100%;
+  transform: translateY(-50%);
+  height: 50%;
+  /* position: relative; */
+  /* top: 100%; */
+  /* transform: translateY(-50%); */
+  /* height: 50%;
+  width: 100%; */
   color: white;
   text-align: center;
 }

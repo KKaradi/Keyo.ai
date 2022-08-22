@@ -4,7 +4,7 @@ import { z } from "zod";
 
 const statuses = ["green", "yellow", "gray", "empty"] as const;
 export const CharacterStatusSchema = z.enum(statuses);
-export const GameStatusSchema = z.enum(["new", "started", "finished"]);
+export const GameStatusSchema = z.enum(["started", "finished"]);
 
 export const StatsSchema = z.object({
   totalChars: z.number(),
@@ -44,6 +44,7 @@ export const GameMoveSchema = z.object({
   stats: z.union([StatsSchema, z.undefined()]),
   globalPosition: z.union([z.number(), z.undefined()]),
   nextGameDate: z.string(),
+  inPostGame: z.boolean(),
   account: AccountSchema,
 });
 
@@ -54,7 +55,7 @@ export const GameStartSchema = z.object({
   account: AccountSchema,
 });
 
-export const GameDataSchema = z.object({
+export const GameThemeSchema = z.object({
   prompt: z.string(),
   imagePath: z.string(),
   gameId: z.number(),
@@ -102,6 +103,6 @@ export type Character = z.infer<typeof CharacterSchema>;
 export type AccountType = z.infer<typeof AccountTypeSchema>;
 export type Account = z.infer<typeof AccountSchema>;
 
-export type GameData = z.infer<typeof GameDataSchema>;
+export type GameData = z.infer<typeof GameThemeSchema>;
 
 export type GmailCredential = z.infer<typeof GmailCredentialSchema>;

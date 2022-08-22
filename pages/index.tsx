@@ -106,8 +106,9 @@ const MultiWordlePage: NextPage<MultiWordleProps> = (props) => {
     initialHistory ? initialHistory : [initialGameState]
   );
   const [gameState, setGameState] = useState(initialGameState);
-
+  console.log(gameState.inPostGame, "postgame");
   const [error, setError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const [won, setWon] = useState(initialGameState.gameStatus === "finished");
   const [activeSlide, setActiveSlide] = useState(0);
   const [displayBest, setDisplayBest] = useState(true);
@@ -130,21 +131,31 @@ const MultiWordlePage: NextPage<MultiWordleProps> = (props) => {
 
   const signIn: SignIn = useCallback(async (address, type) => {
     const res = await get(`/api/get/account/${account.id}/${type}/${address}`);
-    if (res.status !== 200) return;
-
-    const json = await res.json();
-
-    const parsedId = AccountSchema.safeParse(json);
-    if (parsedId.success) {
-      return setAccount(parsedId.data);
+    if (res.status !== 200) {
+      setError(true);
+      return;
     }
 
-    const parsedMoves = z.array(GameMoveSchema).safeParse(json);
-    if (!parsedMoves.success) return;
-    setAccount(parsedMoves.data[0].account);
-    const { data: moves } = parsedMoves;
-    setHistory(moves.reverse());
-    setGameState(moves[0]);
+    const json = await res.json();
+    if (res.status === 200) {
+      const parsedId = AccountSchema.safeParse(json);
+      if (parsedId.success) {
+        return setAccount(parsedId.data);
+      }
+
+      const parsedMoves = z.array(GameMoveSchema).safeParse(json);
+      if (!parsedMoves.success) {
+        setError(true);
+        return;
+      }
+      setAccount(parsedMoves.data[0].account);
+      const { data: moves } = parsedMoves;
+      setHistory(moves.reverse());
+      setGameState(moves[0]);
+    } else {
+      setError(true);
+      setErrorMessage(json.message);
+    }
   }, []);
 
   const disconnect = async () => {
@@ -152,9 +163,19 @@ const MultiWordlePage: NextPage<MultiWordleProps> = (props) => {
     const res = await get(
       `/api/get/account/${initialAccount.id}/${initialAccount.type}/${initialAccount.address}`
     );
+
+    if (res.status !== 200) {
+      setError(true);
+      setErrorMessage((await res.json()).message);
+      return;
+    }
+
     const parsedMoves = z.array(GameMoveSchema).safeParse(await res.json());
 
-    if (!parsedMoves.success) return;
+    if (!parsedMoves.success) {
+      setError(true);
+      return;
+    }
     setAccount(parsedMoves.data[0].account);
 
     const { data: moves } = parsedMoves;
@@ -169,7 +190,9 @@ const MultiWordlePage: NextPage<MultiWordleProps> = (props) => {
     else disconnect();
   }, [address, signIn]);
 
-  if (initialGameState.gameId === undefined || error) return <ErrorPage />;
+  if (initialGameState.gameId === undefined || error)
+    return <ErrorPage errorMessage={errorMessage} />;
+
   const maxLength = Math.max(...gameState.summary);
 
   const onPress = (userInput: string) => {
@@ -216,7 +239,9 @@ const MultiWordlePage: NextPage<MultiWordleProps> = (props) => {
         return true;
       }
     }
+
     setError(true);
+    setErrorMessage((await res.json()).message);
     return true;
   };
 
@@ -296,9 +321,9 @@ export const getServerSideProps = async (
     account: { id: "", type: "COOKIE", address: cookieId },
   });
   const isMobile = testIsMobile(ctx.req);
-  const json = await response.json();
 
   if (response.status === 200) {
+    const json = await response.json();
     if (Array.isArray(json)) {
       const parsedResponse = z.array(GameMoveSchema).safeParse(json);
       if (parsedResponse.success) {
