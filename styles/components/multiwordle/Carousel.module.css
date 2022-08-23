@@ -71,19 +71,6 @@
   gap: 3px;
 }
 
-.slider > a {
-  display: inline-flex;
-  width: 1.5rem;
-  height: 1.5rem;
-  background: white;
-  text-decoration: none;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  margin: 0 0 0.5rem 0;
-  position: relative;
-}
-
 .slider > a:active {
   top: 1px;
 }
@@ -95,4 +82,29 @@
 .cell {
   width: 40px;
   height: 40px;
+}
+
+@media only screen and (max-device-width: 480px) {
+  .carousel {
+    flex-direction: column;
+  }
+
+  .carousel .arrow {
+    transform: rotate(90deg);
+  }
+
+  .slider {
+    width: 300px;
+    height: 150px;
+  }
+
+  .slide {
+    width: 280px;
+    min-height: 180px;
+  }
+
+  .cell {
+    width: 25px;
+    height: 25px;
+  }
 }

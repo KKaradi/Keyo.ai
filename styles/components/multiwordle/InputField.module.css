@@ -37,7 +37,11 @@
 
 @media only screen and (max-device-width: 480px) {
   .cell {
-    height: 30px;
-    width: 30px;
+    height: 27px;
+    width: 27px;
+  }
+
+  .body {
+    gap: 5px;
   }
 }

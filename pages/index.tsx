@@ -19,7 +19,6 @@ import Keyboard from "../components/multiwordle/Keyboard";
 import ErrorDialog from "../components/dialogs/ErrorDialog";
 import ErrorPage from "../components/misc/ErrorPage";
 import Header from "../components/header/Header";
-
 import styles from "../styles/pages/MultiWordle.module.css";
 import { Request } from "./api/post/multiwordle";
 import { useAccount } from "wagmi";
@@ -29,6 +28,7 @@ import PopUp from "../components/misc/PopUp";
 import Tutorial from "../components/multiwordle/Tutorial";
 import nookies from "nookies";
 import { z } from "zod";
+import { useMediaQuery } from "react-responsive";
 
 function getNewInputs(input: string, gameState: GameMove): Word[] {
   if (gameState.inputs === undefined) return [];
@@ -121,6 +121,8 @@ const MultiWordlePage: NextPage<MultiWordleProps> = (props) => {
 
   const [inTutorial, setInTutorial] = useState(true);
   const fadeTutorialDialog = useState(false);
+
+  const isMobile = useMediaQuery({ maxDeviceWidth: "480px" });
 
   // local storage calls should be wrapped in use effect
   useEffect(() => {
@@ -223,13 +225,35 @@ const MultiWordlePage: NextPage<MultiWordleProps> = (props) => {
   const slides = gameStackToSlides([gameState, ...history]);
   const colorMap = getColorMap(history, activeSlide);
 
+  const header = (
+    <Header signIn={signIn} account={account} disconnect={disconnect} />
+  );
+
+  const inputField = (
+    <InputField
+      fadeTutorialDialog={fadeTutorialDialog}
+      inTutorial={inTutorial}
+      gameState={displayBest ? history[0] : gameState}
+      activeSlide={activeSlide}
+      displayBest={displayBest}
+      animationMode={animationMode}
+      setAnimationMode={setAnimationMode}
+    />
+  );
+
+  const carousel = (
+    <Carousel
+      slides={slides}
+      slideState={[activeSlide, setActiveSlide]}
+      displayBest={displayBest}
+      isMobile={isMobile}
+    />
+  );
+
   return (
     <Tutorial inTutorial={false}>
       <div className={styles.container}>
-        <div className={styles.mobileHeader}>
-          <Header signIn={signIn} account={account} disconnect={disconnect} />
-        </div>
-
+        <div className={styles.mobileHeader}> {header} </div>
         <WinDialog
           globalPosition={gameState.globalPosition}
           setIsOpen={setOpenWinDialog}
@@ -250,29 +274,18 @@ const MultiWordlePage: NextPage<MultiWordleProps> = (props) => {
 
         <div className={styles.left}>
           <ImageFrame path={gameState.imagePath} />
-          <InputField
-            fadeTutorialDialog={fadeTutorialDialog}
-            inTutorial={inTutorial}
-            gameState={displayBest ? history[0] : gameState}
-            activeSlide={activeSlide}
-            displayBest={displayBest}
-            animationMode={animationMode}
-            setAnimationMode={setAnimationMode}
-          />
+          <div className={styles.mobileScrollable}>
+            <div className={styles.mobileView}>
+              {inputField}
+              <div className={styles.mobileCarousel}>{carousel}</div>
+            </div>
+          </div>
         </div>
 
         <div className={styles.right}>
-          <div className={styles.header}>
-            <Header signIn={signIn} account={account} disconnect={disconnect} />
-          </div>
+          <div className={styles.header}>{header}</div>
           <div className={styles.game}>
-            <div className={styles.carousel}>
-              <Carousel
-                slides={slides}
-                slideState={[activeSlide, setActiveSlide]}
-                displayBest={displayBest}
-              />
-            </div>
+            <div className={styles.carousel}> {carousel} </div>
 
             <div className={styles.keyboard}>
               <Keyboard

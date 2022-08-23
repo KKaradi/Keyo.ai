@@ -70,7 +70,10 @@ const Login: NextPage<LoginProps> = ({ signIn, account, disconnect }) => {
   };
 
   const login = useGoogleLogin({ onSuccess, flow: "implicit" });
-  useGoogleOneTapLogin({ onSuccess: onOneTapSuccess });
+  useGoogleOneTapLogin({
+    onSuccess: onOneTapSuccess,
+    auto_select: true,
+  } as unknown as { onSuccess: typeof onOneTapSuccess });
 
   const placement = anchor ? "top" : undefined;
 

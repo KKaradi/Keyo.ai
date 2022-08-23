@@ -3,7 +3,6 @@ import {
   createRef,
   forwardRef,
   ForwardRefRenderFunction,
-  useEffect,
   useState,
 } from "react";
 import styles from "../../styles/components/multiwordle/Carousel.module.css";
@@ -65,12 +64,14 @@ type CarouselProps = {
   slides: Character[][][];
   slideState: [number, (value: number) => void];
   displayBest: boolean;
+  isMobile?: boolean;
 };
 
 const Carousel: NextPage<CarouselProps> = ({
   slides,
   slideState,
   displayBest,
+  isMobile,
 }) => {
   const [slide, setSlide] = slideState;
 
@@ -96,10 +97,12 @@ const Carousel: NextPage<CarouselProps> = ({
 
   const left = slide === 0 ? 0 : slide - 1;
   const right = slide === slides.length - 1 ? slides.length - 1 : slide + 1;
+  const fontSize = isMobile ? "small" : "large";
+
   return (
     <div className={styles.carousel}>
-      <a href={`#slide-${left + 1}`}>
-        <KeyboardArrowLeftIcon fontSize="large" />
+      <a href={`#slide-${left + 1}`} className={styles.arrow}>
+        <KeyboardArrowLeftIcon fontSize={fontSize} />
       </a>
 
       <div className={styles.slider} ref={ref}>
@@ -115,8 +118,8 @@ const Carousel: NextPage<CarouselProps> = ({
           ))}
         </div>
       </div>
-      <a href={`#slide-${right + 1}`}>
-        <KeyboardArrowRightIcon fontSize="large" />
+      <a href={`#slide-${right + 1}`} className={styles.arrow}>
+        <KeyboardArrowRightIcon fontSize={fontSize} />
       </a>
     </div>
   );
