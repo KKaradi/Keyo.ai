@@ -1,3 +1,8 @@
+.image {
+  margin: 0 auto;
+  border-radius: 10px;
+  overflow: hidden;
+}
 .div {
   background-color: #cccccc;
   padding: 5px 30px;
@@ -10,6 +15,16 @@
   font-size: 0.9rem;
 }
 
+.caption {
+  padding: 0px 0px;
+  margin: 10px 0px;
+}
+
+.rule {
+  border: 0px solid #000000de;
+  border-top: 4px solid #000000de;
+}
+
 .text {
   padding: 0px 0px 3px 0px;
 }
@@ -20,11 +35,12 @@
 
 .button {
   border-radius: 25px;
-  padding: 2px 20px;
-  box-shadow: 0 5px 5px rgba(0, 0, 0, 0.15);
+  padding: 10px 20px;
+  margin: 0px 0 0 0;
+  box-shadow: 0 5px 5px rgba(218, 0, 0, 0);
   transition: box-shadow 0.3s ease-in-out;
-  color: rgb(91, 91, 91);
-  background-color: rgb(255, 255, 255);
+  color: rgb(255, 255, 255);
+  background-color: rgb(255, 88, 88);
 }
 
 .button:hover {

@@ -29,7 +29,8 @@ import PopUp from "../components/misc/PopUp";
 import Tutorial from "../components/multiwordle/Tutorial";
 import nookies from "nookies";
 import { z } from "zod";
-import PostGame from "../components/misc/PostGame";
+import PostGame from "../components/dialogs/PostGame";
+import BuyNFT from "../components/dialogs/BuyNFT";
 
 function getNewInputs(input: string, gameState: GameMove): Word[] {
   if (gameState.inputs === undefined) return [];
@@ -107,7 +108,6 @@ const MultiWordlePage: NextPage<MultiWordleProps> = (props) => {
     initialHistory ? initialHistory : [initialGameState]
   );
   const [gameState, setGameState] = useState(initialGameState);
-  console.log(gameState.inPostGame, "postgame");
   const [error, setError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [won, setWon] = useState(initialGameState.gameStatus === "finished");
@@ -124,6 +124,9 @@ const MultiWordlePage: NextPage<MultiWordleProps> = (props) => {
 
   const [inTutorial, setInTutorial] = useState(true);
   const fadeTutorialDialog = useState(false);
+  const postGameDialogIsOpen = useState(false);
+  const [inPostGame, setInPostGame] = useState(false);
+  const buyNFTDialogIsOpen = useState(false);
 
   useEffect(() => {
     if (window === undefined) return;
@@ -228,7 +231,9 @@ const MultiWordlePage: NextPage<MultiWordleProps> = (props) => {
       const parsedResponse = GameMoveSchema.safeParse(await res.json());
       if (parsedResponse.success) {
         const newGameMove = parsedResponse.data;
-
+        if (!inPostGame && newGameMove.inPostGame)
+          postGameDialogIsOpen[1](true);
+        setInPostGame(newGameMove.inPostGame);
         setHistory([newGameMove, ...history]);
         setGameState(newGameMove);
         setDisplayBest(true);
@@ -252,12 +257,18 @@ const MultiWordlePage: NextPage<MultiWordleProps> = (props) => {
   return (
     <Tutorial inTutorial={inTutorial}>
       <div className={styles.container}>
-        {gameState.inPostGame ? <PostGame /> : <></>}
+        <BuyNFT openState={buyNFTDialogIsOpen} gameState={gameState}></BuyNFT>
+        <PostGame
+          openState={postGameDialogIsOpen}
+          usingWallet={gameState.account.type === "WALLET"}
+        />
         <WinDialog
           globalPosition={gameState.globalPosition}
           setIsOpen={setOpenWinDialog}
           isOpen={openWinDialog}
+          usingWallet={gameState.account.type === "WALLET"}
           gameStack={history}
+          buyNFTDialogState={buyNFTDialogIsOpen}
         />
         <PopUp
           text={"Not a valid word"}

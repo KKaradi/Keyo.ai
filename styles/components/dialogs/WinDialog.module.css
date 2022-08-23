@@ -45,7 +45,8 @@
 }
 
 .chunk,
-.shareButton {
+.shareButton,
+.buyButton {
   background-color: aliceblue;
   border-radius: 25px;
   width: 90%;
@@ -61,13 +62,23 @@
 }
 
 .shareButton:hover,
-.nextGameButton:hover {
+.nextGameButton:hover,
+.buyButton:hover {
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
 .shareButton {
   background-color: #35b942;
   flex-direction: row;
+  align-items: center;
+  padding: 2px;
+  margin: 2px;
+}
+
+.buyButton {
+  background-color: #ff2a2a;
+  flex-direction: row;
+  padding: 2px;
   align-items: center;
 }
 
@@ -79,10 +90,6 @@
   background-color: rgb(255, 202, 45);
 }
 
-.rule {
-  border: 0px solid #000000de;
-  border-top: 4px solid #000000de;
-}
 .text {
   white-space: pre;
   margin: 5px;
