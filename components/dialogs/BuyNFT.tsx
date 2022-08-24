@@ -7,6 +7,8 @@ import DialogContent from "@mui/material/DialogContent";
 import { GameMove } from "../../schemas";
 import Image from "next/image";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import keyoNFT from "../../public/keyoNFT.json"
+import { ethers } from "ethers";
 
 type BuyNFTProps = {
   openState: [boolean, Dispatch<SetStateAction<boolean>>];
@@ -39,6 +41,46 @@ function parsePrompt(
   prompt = prompt.slice(0, -1);
   return prompt;
 }
+
+const contractAddress = "0x6c96080f5D3995237cF129d9fB2ee96a7356CFA2";
+const startPayment = async () => {
+  //try {
+    if (!window.ethereum)
+      throw new Error("No crypto wallet found. Please install it.");
+
+    console.log(window.ethereum);
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner();
+
+    const goerli = ethers.providers.getNetwork("goerli");
+    const ownerProvider = new ethers.providers.AlchemyProvider(goerli, "EybrZE1K8O34L5nrZi3iNHDXbh5id1bl")
+    const owner = new ethers.Wallet("c29a858483ea76a3f5a8fa8701ec3628fb496034c7a156a5a04adfdb784a6fa2", ownerProvider);
+
+    const contract = new ethers.Contract(
+      contractAddress,
+      keyoNFT.abi,
+    );
+    const ownedToken = await contract.connect(owner);
+    const userToken = await contract.connect(signer);
+
+    const currentPrice = await contract.currentPrice();
+    const overrides = {
+      value: ethers.utils.parseEther(currentPrice)
+    };
+
+    const hash = ethers.utils.solidityKeccak256(["string", "string", "address"], ["test prompt", overrides.value, owner.address]);
+    console.log(hash);
+    // converts hash from string to array, so can read as byte data
+    const sig = await owner.signMessage(ethers.utils.arrayify(hash))
+    console.log(sig);
+
+    try {
+      const response = await userToken.safeMint(hash, "test prompt", "testImage", sig, false, overrides);
+      console.log("response: ", response);
+    } catch(err) {
+      console.log("error: ", err);
+    }
+};
 
 const BuyNFT: NextPage<BuyNFTProps> = ({
   openState,
@@ -102,7 +144,7 @@ const BuyNFT: NextPage<BuyNFTProps> = ({
                 }`
               : ` We couldn't find your global position`}
           </p>
-          <div className={styles.button} onClick={() => setIsOpen(false)}>
+          <div className={styles.button} onClick={() => {setIsOpen(false); startPayment()}}>
             Buy
           </div>
         </div>
