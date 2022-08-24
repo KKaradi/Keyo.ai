@@ -45,10 +45,8 @@ const BuyNFT: NextPage<BuyNFTProps> = ({
   gameState,
   winDialogOpenState,
 }) => {
-  console.log(openState.length);
   const prompt = parsePrompt(gameState["inputs"]);
 
-  console.log(prompt, "prompt");
   const [isOpen, setIsOpen] = openState;
 
   return (

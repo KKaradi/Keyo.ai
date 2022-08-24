@@ -146,11 +146,10 @@ const WinDialog: NextPage<WinDialogProps> = ({
           >
             Share <ShareIcon />
           </div>
-          {true ? (
+          {usingWallet ? (
             <div
               className={styles.buyButton}
               onClick={() => {
-                console.log("working");
                 setIsOpen(false);
                 buyNFTDialogState[1](true);
               }}

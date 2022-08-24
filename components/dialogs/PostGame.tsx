@@ -13,7 +13,6 @@ type PostGameProps = {
 };
 
 const PostGame: NextPage<PostGameProps> = ({ openState, usingWallet }) => {
-  console.log(openState.length);
   const [isOpen, setIsOpen] = openState;
   return (
     <Dialog
