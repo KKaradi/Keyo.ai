@@ -6,9 +6,11 @@ import SlideTransition from "./SlideTransition";
 import DialogContent from "@mui/material/DialogContent";
 import { GameMove } from "../../schemas";
 import Image from "next/image";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 type BuyNFTProps = {
   openState: [boolean, Dispatch<SetStateAction<boolean>>];
+  winDialogOpenState: [boolean, Dispatch<SetStateAction<boolean>>];
   gameState: GameMove;
 };
 
@@ -38,12 +40,17 @@ function parsePrompt(
   return prompt;
 }
 
-const BuyNFT: NextPage<BuyNFTProps> = ({ openState, gameState }) => {
+const BuyNFT: NextPage<BuyNFTProps> = ({
+  openState,
+  gameState,
+  winDialogOpenState,
+}) => {
   console.log(openState.length);
   const prompt = parsePrompt(gameState["inputs"]);
 
   console.log(prompt, "prompt");
   const [isOpen, setIsOpen] = openState;
+
   return (
     <Dialog
       open={isOpen}
@@ -61,8 +68,19 @@ const BuyNFT: NextPage<BuyNFTProps> = ({ openState, gameState }) => {
       }}
     >
       <DialogContent sx={{ textAlign: "center" }}>
-        <h2>Buy NFT</h2>
-        {/* <hr className={styles.rule} />  */}
+        {/* <ArrowBackIcon /> */}
+        <div className={styles.titleDiv}>
+          <div />
+          <h2>Buy NFT</h2>
+          <div
+            onClick={() => {
+              openState[1](false);
+              winDialogOpenState[1](true);
+            }}
+          >
+            <ArrowBackIcon />
+          </div>
+        </div>
         <div>
           <div className={styles.image}>
             <Image
@@ -84,7 +102,7 @@ const BuyNFT: NextPage<BuyNFTProps> = ({ openState, gameState }) => {
               ? ` ${gameState.globalPosition}${
                   positionToSufix[gameState.globalPosition] ?? "th"
                 }`
-              : `We couldn't find your global position`}
+              : ` We couldn't find your global position`}
           </p>
           <div className={styles.button} onClick={() => setIsOpen(false)}>
             Buy

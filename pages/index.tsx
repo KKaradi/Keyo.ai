@@ -257,7 +257,11 @@ const MultiWordlePage: NextPage<MultiWordleProps> = (props) => {
   return (
     <Tutorial inTutorial={inTutorial}>
       <div className={styles.container}>
-        <BuyNFT openState={buyNFTDialogIsOpen} gameState={gameState}></BuyNFT>
+        <BuyNFT
+          openState={buyNFTDialogIsOpen}
+          gameState={gameState}
+          winDialogOpenState={[openWinDialog, setOpenWinDialog]}
+        ></BuyNFT>
         <PostGame
           openState={postGameDialogIsOpen}
           usingWallet={gameState.account.type === "WALLET"}
@@ -296,7 +300,13 @@ const MultiWordlePage: NextPage<MultiWordleProps> = (props) => {
         </div>
 
         <div className={styles.right}>
-          <Header signIn={signIn} account={account} disconnect={disconnect} />
+          <Header
+            signIn={signIn}
+            account={account}
+            disconnect={disconnect}
+            won={won}
+            setOpenWinDialog={setOpenWinDialog}
+          />
           <div className={styles.game}>
             <Carousel
               slides={slides}

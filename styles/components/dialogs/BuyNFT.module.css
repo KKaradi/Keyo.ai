@@ -3,6 +3,14 @@
   border-radius: 10px;
   overflow: hidden;
 }
+
+.titleDiv {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-direction: row;
+}
+
 .div {
   background-color: #cccccc;
   padding: 5px 30px;

@@ -7,3 +7,23 @@
   width: 100%;
   gap: 20px;
 }
+
+.tab,
+.winTab {
+  height: 100%;
+  color: black;
+  background-color: rgb(211, 211, 211);
+  text-align: center;
+  display: flex;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  padding-left: 10px;
+  padding-right: 10px;
+  border-radius: 10px;
+}
+
+.winTab {
+  background-color: #35b942;
+}
