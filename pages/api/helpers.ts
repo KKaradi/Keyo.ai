@@ -107,7 +107,7 @@ export function pullTheme(
           prompt: schedule[i].prompt,
           imagePath: schedule[i].image_path,
           gameId: schedule[i].game_id,
-          nextGameDate: schedule[i + 1].start_date,
+          nextGameDate: schedule[i + 1]?.start_date,
         };
       }
     }

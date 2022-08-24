@@ -43,7 +43,7 @@ export const GameMoveSchema = z.object({
   gameStatus: GameStatusSchema,
   stats: z.union([StatsSchema, z.undefined()]),
   globalPosition: z.union([z.number(), z.undefined()]),
-  nextGameDate: z.string(),
+  nextGameDate: z.union([z.string(), z.undefined()]),
   inPostGame: z.boolean(),
   account: AccountSchema,
 });
@@ -59,7 +59,7 @@ export const GameThemeSchema = z.object({
   prompt: z.string(),
   imagePath: z.string(),
   gameId: z.number(),
-  nextGameDate: z.string(),
+  nextGameDate: z.union([z.string(), z.undefined()]),
 });
 
 export const GmailResponseSchema = z.object({

@@ -39,7 +39,7 @@ export async function generateNewGame(
   gameId: number,
   imagePath: string,
   promptSplits: string[],
-  nextGameDate: string,
+  nextGameDate: string | undefined,
   addNewSession: boolean
 ): Promise<GameMove> {
   if (addNewSession) {
