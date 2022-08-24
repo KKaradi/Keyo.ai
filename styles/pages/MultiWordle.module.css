@@ -66,10 +66,6 @@
     margin-top: 50px;
   }
 
-  .input > div {
-    scroll-snap-align: start;
-  }
-
   .keyboard {
     width: 100%;
   }
@@ -102,6 +98,7 @@
     flex-direction: row;
 
     overflow: scroll;
+    scroll-snap-type: x mandatory;
   }
 
   .mobileView {
@@ -115,10 +112,12 @@
     margin-right: 20px;
     flex: 1;
     width: 100vw;
+    scroll-snap-align: start;
   }
 
   .mobileCarousel {
     flex: 1;
     width: 100vw;
+    scroll-snap-align: start;
   }
 }

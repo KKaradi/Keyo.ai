@@ -5,18 +5,20 @@ import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import type { NextPage } from "next/types";
 import SlideTransition from "./SlideTransition";
-import { GameMove, GameStatusSchema, Stats } from "../../schemas";
+import { GameMove } from "../../schemas";
 import { colors } from "../../constants/colors";
 import ShareIcon from "@mui/icons-material/Share";
 import PopUp from "../misc/PopUp";
 import DateDisplay from "../misc/DateDisplay";
 import Tooltip from "@mui/material/Tooltip";
-
+import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 type WinDialogProps = {
   isOpen: boolean;
   setIsOpen: (value: boolean) => void;
   gameStack: GameMove[];
   globalPosition: number | undefined;
+  usingWallet: boolean;
+  buyNFTDialogState: [boolean, Dispatch<SetStateAction<boolean>>];
 };
 
 const positionToSufix = {
@@ -45,15 +47,12 @@ const statToScoreString = (gameMove: GameMove | undefined): string => {
   return "⬛";
 };
 
-function updateTimeToNextGame(
-  setMillisToNextGame: Dispatch<SetStateAction<number>>,
-  nextGameUTC: number
-) {}
-
 const WinDialog: NextPage<WinDialogProps> = ({
   isOpen,
   setIsOpen,
+  usingWallet,
   gameStack,
+  buyNFTDialogState,
   globalPosition,
 }) => {
   let scoreString = "";
@@ -85,7 +84,7 @@ const WinDialog: NextPage<WinDialogProps> = ({
           boxShadow: "none",
           width: "100%",
           textAlign: "center",
-          borderRadius: "25px",
+          borderRadius: "10px",
         },
       }}
     >
@@ -102,9 +101,11 @@ const WinDialog: NextPage<WinDialogProps> = ({
             Number of Guesses: {numberOfGuesse}
           </div>
           <div className={styles.chunk}>
-            {`You were the ${globalPosition}${
-              positionToSufix[globalPosition ?? 0] ?? "th"
-            } person to finish today`}
+            {globalPosition
+              ? `You were the ${globalPosition}${
+                  positionToSufix[globalPosition] ?? "th"
+                } person to finish today`
+              : `We couldn't find your global position`}
           </div>
           <div className={styles.chunk}>
             <Tooltip
@@ -132,7 +133,6 @@ const WinDialog: NextPage<WinDialogProps> = ({
               </div>
             </div>
           )}
-
           <div
             className={styles.shareButton}
             onClick={() => {
@@ -146,6 +146,19 @@ const WinDialog: NextPage<WinDialogProps> = ({
           >
             Share <ShareIcon />
           </div>
+          {usingWallet ? (
+            <div
+              className={styles.buyButton}
+              onClick={() => {
+                setIsOpen(false);
+                buyNFTDialogState[1](true);
+              }}
+            >
+              Purchase NFT <AccountBalanceWalletIcon />
+            </div>
+          ) : (
+            <></>
+          )}
         </div>
       </DialogContent>
     </Dialog>

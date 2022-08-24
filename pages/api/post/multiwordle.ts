@@ -4,13 +4,13 @@ import {
   authenticate,
   createAccount,
   getAccount,
-  pullPrompt,
+  pullTheme,
   response,
   sessionToGameStack,
 } from "../helpers";
 import {
   Character,
-  GameDataSchema,
+  GameThemeSchema,
   GameMove,
   GameMoveSchema,
   GameStartSchema,
@@ -59,20 +59,24 @@ export async function generateNewGame(
     nextGameDate,
     account,
     attempt: 0,
+    inPostGame: false,
   };
 }
 
 export async function processStartedGame(
   gameMove: GameMove,
   gameId: number,
-  promptSplits: string[]
+  promptSplits: string[],
+  inPostGame: boolean
 ): Promise<string | true> {
   if (gameMove.gameId === undefined) return "Game ID is undefined";
 
   if (gameMove.gameId != gameId) {
-    if (!schedule[gameMove.gameId]) return "Invalid GameId";
+    if (!schedule[gameMove.gameId]) return "Invalid Game ID";
     promptSplits = schedule[gameMove.gameId].prompt.split(" ");
   }
+
+  gameMove.inPostGame = inPostGame;
 
   if (gameMove.summary === undefined) {
     gameMove.summary = promptSplits.map((split) => split.length);
@@ -102,7 +106,6 @@ export async function processStartedGame(
 
   if (inputs.every((input) => input.completed)) {
     gameMove.gameStatus = "finished";
-    await addGlobalRank(gameMove);
   }
 
   gameMove.attempt += 1;
@@ -212,7 +215,7 @@ async function addGlobalRank(gameMove: GameMove) {
   if (!res || !res.timeCompleted) return;
   gameMove.globalPosition =
     (await prisma.session.count({
-      where: { timeCompleted: { lte: res.timeCompleted } },
+      where: { timeCompleted: { lt: res.timeCompleted } },
     })) + 1;
 }
 
@@ -223,51 +226,74 @@ export default async function handler(
   if (req.method !== "POST") return response(res, "onlyPost");
   if (!authenticate(req)) return response(res, "authError");
 
-  const parsedPromptData = GameDataSchema.safeParse(pullPrompt());
-  if (!parsedPromptData.success) return response(res, "internalError");
+  let parsedTheme = GameThemeSchema.safeParse(pullTheme());
+  if (!parsedTheme.success) return response(res, "cantFindTheme");
 
-  const { prompt, gameId, imagePath, nextGameDate } = parsedPromptData.data;
+  const {
+    prompt,
+    gameId: currentGameId,
+    imagePath,
+    nextGameDate,
+  } = parsedTheme.data;
+
   const splits = prompt.split(" ");
 
   const parsedGameStart = GameStartSchema.safeParse(req.body);
-
-  // if new game
   if (parsedGameStart.success) {
     const { address } = parsedGameStart.data.account;
-
-    // if cookies stored a user id
-    if (address) {
-      const account = await getAccount(address, "COOKIE");
-      if (!account) return response(res, "internalError");
-
-      const pred = (session: Session) => session.gameId === gameId;
+    let account = address ? await getAccount(address, "COOKIE") : undefined;
+    if (account) {
+      const pred = (session: Session) => session.gameId === currentGameId;
       const session = account.sessions.find(pred);
-
-      // if the user actually has a session with the current game
       if (session) {
-        const gameData = parsedPromptData.data;
+        const gameData = parsedTheme.data;
         const moves = await sessionToGameStack(session.id, account, gameData);
         return res.status(200).json(moves);
+      } else {
+        const newGame = await generateNewGame(
+          account,
+          currentGameId,
+          imagePath,
+          splits,
+          nextGameDate,
+          true
+        );
+        return res.status(200).json(newGame);
       }
+    } else {
+      const newGame = await generateNewGame(
+        await createAccount(),
+        currentGameId,
+        imagePath,
+        splits,
+        nextGameDate,
+        true
+      );
+      return res.status(200).json(newGame);
     }
-
-    const account = await createAccount();
-    const args = [account, gameId, imagePath, splits, nextGameDate] as const;
-    const newGame = await generateNewGame(...args, true);
-
-    return res.status(200).json(newGame);
   }
 
   const parsedGameMove = GameMoveSchema.safeParse(req.body);
-  if (!parsedGameMove.success) return response(res, "incorrectParams");
+  if (!parsedGameMove.success) return response(res, "gameMoveTypeError");
   const gameMove = parsedGameMove.data;
 
   if (gameMove.gameStatus === "started") {
-    const message = await processStartedGame(gameMove, gameId, splits);
+    parsedTheme = GameThemeSchema.safeParse(pullTheme(gameMove.gameId));
+
+    if (!parsedTheme.success) return response(res, "cantFindTheme");
+
+    const message = await processStartedGame(
+      gameMove,
+      parsedTheme.data.gameId,
+      parsedTheme.data.prompt.split(" "),
+      parsedTheme.data.gameId !== currentGameId
+    );
+
     if (typeof message === "string") return res.status(400).json({ message });
-    await addGuessToDatabase(gameMove, gameId);
+    await addGuessToDatabase(gameMove, currentGameId);
+    await addGlobalRank(gameMove);
     return res.status(200).json(gameMove);
-  } else if (gameMove.gameStatus === "finished") {
+  } else {
     return res.status(400).json({ message: "Game is already finished." });
   }
 }

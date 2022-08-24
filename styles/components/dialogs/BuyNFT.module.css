@@ -1,0 +1,60 @@
+.image {
+  margin: 0 auto;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.titleDiv {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-direction: row;
+}
+
+.div {
+  background-color: #cccccc;
+  padding: 5px 30px;
+  text-align: center;
+  border-radius: 10px;
+  color: rgb(91, 91, 91);
+  position: absolute;
+  top: 1.5%;
+  left: 1.5%;
+  font-size: 0.9rem;
+}
+
+.backButton {
+  cursor: pointer;
+}
+
+.caption {
+  padding: 0px 0px;
+  margin: 10px 0px;
+}
+
+.rule {
+  border: 0px solid #000000de;
+  border-top: 4px solid #000000de;
+}
+
+.text {
+  padding: 0px 0px 3px 0px;
+}
+
+.smallText {
+  font-size: 0.8rem;
+}
+
+.button {
+  border-radius: 25px;
+  padding: 10px 20px;
+  margin: 0px 0 0 0;
+  box-shadow: 0 5px 5px rgba(218, 0, 0, 0);
+  transition: box-shadow 0.3s ease-in-out;
+  color: rgb(255, 255, 255);
+  background-color: rgb(255, 88, 88);
+}
+
+.button:hover {
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}

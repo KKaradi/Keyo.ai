@@ -64,7 +64,7 @@ type CarouselProps = {
   slides: Character[][][];
   slideState: [number, (value: number) => void];
   displayBest: boolean;
-  isMobile?: boolean;
+  isMobile: boolean;
 };
 
 const Carousel: NextPage<CarouselProps> = ({
@@ -77,8 +77,6 @@ const Carousel: NextPage<CarouselProps> = ({
 
   const ref = createRef<HTMLDivElement>();
   const refs = slides.map(() => createRef<HTMLDivElement>());
-
-  const [waiting, setWaiting] = useState(true);
 
   const onScroll = () => {
     if (!ref.current) return;

@@ -2,10 +2,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
-
   height: 100%;
   width: 100%;
-
   border-radius: 20%;
   box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
 }
@@ -14,10 +12,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
-
   height: 100%;
   width: 100%;
-
   border-radius: 20%;
   box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
   animation: jump-shaking 0.5s 1;
@@ -27,10 +23,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
-
   height: 100%;
   width: 100%;
-
   border-radius: 20%;
   box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
   animation: vertical-jump 0.4s 1;

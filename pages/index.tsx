@@ -29,6 +29,8 @@ import Tutorial from "../components/multiwordle/Tutorial";
 import nookies from "nookies";
 import { z } from "zod";
 import { useMediaQuery } from "react-responsive";
+import PostGame from "../components/dialogs/PostGame";
+import BuyNFT from "../components/dialogs/BuyNFT";
 
 function getNewInputs(input: string, gameState: GameMove): Word[] {
   if (gameState.inputs === undefined) return [];
@@ -105,8 +107,8 @@ const MultiWordlePage: NextPage<MultiWordleProps> = (props) => {
     initialHistory ? initialHistory : [initialGameState]
   );
   const [gameState, setGameState] = useState(initialGameState);
-
   const [error, setError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const [won, setWon] = useState(initialGameState.gameStatus === "finished");
   const [activeSlide, setActiveSlide] = useState(0);
   const [displayBest, setDisplayBest] = useState(true);
@@ -121,6 +123,9 @@ const MultiWordlePage: NextPage<MultiWordleProps> = (props) => {
 
   const [inTutorial, setInTutorial] = useState(true);
   const fadeTutorialDialog = useState(false);
+  const postGameDialogIsOpen = useState(false);
+  const [inPostGame, setInPostGame] = useState(false);
+  const buyNFTDialogIsOpen = useState(false);
 
   const isMobile = useMediaQuery({ maxDeviceWidth: "480px" });
 
@@ -132,21 +137,31 @@ const MultiWordlePage: NextPage<MultiWordleProps> = (props) => {
 
   const signIn: SignIn = useCallback(async (address, type) => {
     const res = await get(`/api/get/account/${account.id}/${type}/${address}`);
-    if (res.status !== 200) return;
-
-    const json = await res.json();
-
-    const parsedId = AccountSchema.safeParse(json);
-    if (parsedId.success) {
-      return setAccount(parsedId.data);
+    if (res.status !== 200) {
+      setError(true);
+      return;
     }
 
-    const parsedMoves = z.array(GameMoveSchema).safeParse(json);
-    if (!parsedMoves.success) return;
-    setAccount(parsedMoves.data[0].account);
-    const { data: moves } = parsedMoves;
-    setHistory(moves.reverse());
-    setGameState(moves[0]);
+    const json = await res.json();
+    if (res.status === 200) {
+      const parsedId = AccountSchema.safeParse(json);
+      if (parsedId.success) {
+        return setAccount(parsedId.data);
+      }
+
+      const parsedMoves = z.array(GameMoveSchema).safeParse(json);
+      if (!parsedMoves.success) {
+        setError(true);
+        return;
+      }
+      setAccount(parsedMoves.data[0].account);
+      const { data: moves } = parsedMoves;
+      setHistory(moves.reverse());
+      setGameState(moves[0]);
+    } else {
+      setError(true);
+      setErrorMessage(json.message);
+    }
   }, []);
 
   const disconnect = async () => {
@@ -154,9 +169,19 @@ const MultiWordlePage: NextPage<MultiWordleProps> = (props) => {
     const res = await get(
       `/api/get/account/${initialAccount.id}/${initialAccount.type}/${initialAccount.address}`
     );
+
+    if (res.status !== 200) {
+      setError(true);
+      setErrorMessage((await res.json()).message);
+      return;
+    }
+
     const parsedMoves = z.array(GameMoveSchema).safeParse(await res.json());
 
-    if (!parsedMoves.success) return;
+    if (!parsedMoves.success) {
+      setError(true);
+      return;
+    }
     setAccount(parsedMoves.data[0].account);
 
     const { data: moves } = parsedMoves;
@@ -171,7 +196,9 @@ const MultiWordlePage: NextPage<MultiWordleProps> = (props) => {
     else disconnect();
   }, [address, signIn]);
 
-  if (initialGameState.gameId === undefined || error) return <ErrorPage />;
+  if (initialGameState.gameId === undefined || error)
+    return <ErrorPage errorMessage={errorMessage} />;
+
   const maxLength = Math.max(...gameState.summary);
 
   const onPress = (userInput: string) => {
@@ -206,7 +233,9 @@ const MultiWordlePage: NextPage<MultiWordleProps> = (props) => {
       const parsedResponse = GameMoveSchema.safeParse(await res.json());
       if (parsedResponse.success) {
         const newGameMove = parsedResponse.data;
-
+        if (!inPostGame && newGameMove.inPostGame)
+          postGameDialogIsOpen[1](true);
+        setInPostGame(newGameMove.inPostGame);
         setHistory([newGameMove, ...history]);
         setGameState(newGameMove);
         setDisplayBest(true);
@@ -218,7 +247,9 @@ const MultiWordlePage: NextPage<MultiWordleProps> = (props) => {
         return true;
       }
     }
+
     setError(true);
+    setErrorMessage((await res.json()).message);
     return true;
   };
 
@@ -226,7 +257,13 @@ const MultiWordlePage: NextPage<MultiWordleProps> = (props) => {
   const colorMap = getColorMap(history, activeSlide);
 
   const header = (
-    <Header signIn={signIn} account={account} disconnect={disconnect} />
+    <Header
+      signIn={signIn}
+      account={account}
+      disconnect={disconnect}
+      won={won}
+      setOpenWinDialog={setOpenWinDialog}
+    />
   );
 
   const inputField = (
@@ -251,14 +288,24 @@ const MultiWordlePage: NextPage<MultiWordleProps> = (props) => {
   );
 
   return (
-    <Tutorial inTutorial={false}>
+    <Tutorial inTutorial={inTutorial}>
       <div className={styles.container}>
-        <div className={styles.mobileHeader}> {header} </div>
+        <BuyNFT
+          openState={buyNFTDialogIsOpen}
+          gameState={gameState}
+          winDialogOpenState={[openWinDialog, setOpenWinDialog]}
+        />
+        <PostGame
+          openState={postGameDialogIsOpen}
+          usingWallet={gameState.account.type === "WALLET"}
+        />
         <WinDialog
           globalPosition={gameState.globalPosition}
           setIsOpen={setOpenWinDialog}
           isOpen={openWinDialog}
+          usingWallet={gameState.account.type === "WALLET"}
           gameStack={history}
+          buyNFTDialogState={buyNFTDialogIsOpen}
         />
         <PopUp
           text={"Not a valid word"}
@@ -272,11 +319,13 @@ const MultiWordlePage: NextPage<MultiWordleProps> = (props) => {
           text={warning ?? ""}
         />
 
+        <div className={styles.mobileHeader}> {header} </div>
+
         <div className={styles.left}>
           <ImageFrame path={gameState.imagePath} />
           <div className={styles.mobileScrollable}>
             <div className={styles.mobileView}>
-              {inputField}
+              <div className={styles.inputField}>{inputField} </div>
               <div className={styles.mobileCarousel}>{carousel}</div>
             </div>
           </div>
@@ -318,6 +367,7 @@ export const getServerSideProps = async (
     gameStatus: "new",
     account: { id: "", type: "COOKIE", address: cookieId },
   });
+
   const json = await response.json();
 
   if (response.status === 200) {

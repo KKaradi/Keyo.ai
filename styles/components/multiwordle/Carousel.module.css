@@ -18,34 +18,27 @@
   width: 100%;
   display: flex;
   overflow-y: hidden;
-  overflow-x: hidden;
+  overflow-x: scroll;
   scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch;
 }
 
 .slide {
   scroll-snap-align: start;
   flex-shrink: 0;
-
   width: 550px;
-
   min-height: 400px;
-
   overflow-y: hidden;
   padding-top: 20px;
   padding-bottom: 20px;
   margin-right: 50px;
   border-radius: 10px;
-
   margin-bottom: 40px;
   margin-top: 40px;
-
   transform-origin: center center;
   transform: scale(1);
   transition: transform 0.5s;
   position: relative;
-
   display: flex;
   flex-direction: column;
   justify-content: center;
