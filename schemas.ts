@@ -35,6 +35,7 @@ export const AccountSchema = z.object({
 
 export const GameMoveSchema = z.object({
   text: z.string(),
+  imageCID: z.string(),
   attempt: z.number(),
   gameId: z.number(),
   summary: z.array(z.number()),

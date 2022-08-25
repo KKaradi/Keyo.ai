@@ -120,6 +120,7 @@ export function pullTheme(
           prompt: schedule[i].prompt,
           imagePath: schedule[i].image_path,
           gameId: schedule[i].game_id,
+          imageCID: schedule[i].image_CID,
           nextGameDate: schedule[i + 1]?.start_date,
         };
       }
@@ -130,7 +131,7 @@ export function pullTheme(
 export const sessionToGameStack = async (
   id: string,
   account: Account,
-  { nextGameDate, prompt, imagePath, gameId }: GameData
+  { nextGameDate, prompt, imagePath, imageCID, gameId }: GameData
 ): Promise<GameMove[]> => {
   const guesses = await prisma.guess.findMany({
     where: { sessionId: id },
@@ -143,6 +144,7 @@ export const sessionToGameStack = async (
     account,
     gameId,
     imagePath,
+    imageCID,
     promptSplits,
     nextGameDate,
     false
