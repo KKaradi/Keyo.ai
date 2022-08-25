@@ -58,6 +58,7 @@ export const GameStartSchema = z.object({
 export const GameThemeSchema = z.object({
   prompt: z.string(),
   imagePath: z.string(),
+  imageCID: z.string(),
   gameId: z.number(),
   nextGameDate: z.union([z.string(), z.undefined()]),
 });

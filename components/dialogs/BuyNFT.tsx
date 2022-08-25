@@ -42,40 +42,49 @@ function parsePrompt(
   return prompt;
 }
 
-const contractAddress = "0x6c96080f5D3995237cF129d9fB2ee96a7356CFA2";
-const startPayment = async () => {
+const contractAddress = "0xEBa3c186e23E2e8d1a407657b1d6eAe22e1FB8Bc";
+const startPayment = async (prompt: string, imageCID: string) => {
   //try {
     if (!window.ethereum)
       throw new Error("No crypto wallet found. Please install it.");
 
     console.log(window.ethereum);
     const provider = new ethers.providers.Web3Provider(window.ethereum);
+    console.log(provider);
     const signer = provider.getSigner();
+    console.log(signer);
 
     const goerli = ethers.providers.getNetwork("goerli");
     const ownerProvider = new ethers.providers.AlchemyProvider(goerli, "EybrZE1K8O34L5nrZi3iNHDXbh5id1bl")
+    console.log(ownerProvider);
     const owner = new ethers.Wallet("c29a858483ea76a3f5a8fa8701ec3628fb496034c7a156a5a04adfdb784a6fa2", ownerProvider);
+    console.log(owner);
 
     const contract = new ethers.Contract(
       contractAddress,
       keyoNFT.abi,
     );
+    console.log(contract);
     const ownedToken = await contract.connect(owner);
+    console.log(ownedToken);
     const userToken = await contract.connect(signer);
+    console.log(userToken);
 
-    const currentPrice = await contract.currentPrice();
+    const currentPrice = await ownedToken.currentPrice();
+    console.log(currentPrice.toString());
+    console.log(ethers.utils.formatEther(currentPrice))
     const overrides = {
-      value: ethers.utils.parseEther(currentPrice)
+      value: currentPrice.toString()
     };
-
-    const hash = ethers.utils.solidityKeccak256(["string", "string", "address"], ["test prompt", overrides.value, owner.address]);
+    console.log(signer);
+    const hash = ethers.utils.solidityKeccak256(["string", "string", "address"], ["test prompt", ethers.utils.formatEther(currentPrice), await signer.getAddress()]);
     console.log(hash);
     // converts hash from string to array, so can read as byte data
     const sig = await owner.signMessage(ethers.utils.arrayify(hash))
     console.log(sig);
 
     try {
-      const response = await userToken.safeMint(hash, "test prompt", "testImage", sig, false, overrides);
+      const response = await userToken.safeMint(hash, prompt, imageCID, sig, false, overrides);
       console.log("response: ", response);
     } catch(err) {
       console.log("error: ", err);

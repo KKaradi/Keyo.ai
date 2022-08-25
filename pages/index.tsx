@@ -326,9 +326,7 @@ const MultiWordlePage: NextPage<MultiWordleProps> = (props) => {
           <div className={styles.mobileScrollable}>
             <div className={styles.mobileView}>
               <div className={styles.inputField}>{inputField} </div>
-              {isMobile ? (
-                <div className={styles.mobileCarousel}>{carousel}</div>
-              ) : null}
+              <div className={styles.mobileCarousel}>{carousel}</div>
             </div>
           </div>
         </div>
@@ -336,9 +334,7 @@ const MultiWordlePage: NextPage<MultiWordleProps> = (props) => {
         <div className={styles.right}>
           <div className={styles.header}>{header}</div>
           <div className={styles.game}>
-            {isMobile ? null : (
-              <div className={styles.carousel}> {carousel} </div>
-            )}
+            <div className={styles.carousel}> {carousel} </div>
 
             <div className={styles.keyboard}>
               <Keyboard

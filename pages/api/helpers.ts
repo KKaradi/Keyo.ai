@@ -106,6 +106,7 @@ export function pullTheme(
         return {
           prompt: schedule[i].prompt,
           imagePath: schedule[i].image_path,
+          imageCID: schedule[i].image_CID,
           gameId: schedule[i].game_id,
           nextGameDate: schedule[i + 1]?.start_date,
         };
