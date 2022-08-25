@@ -28,6 +28,7 @@ const positionToSufix = {
 } as { [key: number]: string };
 
 //🟥🟧🟨🟩🟦🟪🟫⬛⬜💠🔳🔲
+const levelToSquare = ["💠", "🟩", "⬜", "◻️", "◽"];
 
 const statToScoreString = (gameMove: GameMove | undefined): string => {
   if (!gameMove?.stats) return "";
@@ -60,16 +61,18 @@ const WinDialog: NextPage<WinDialogProps> = ({
   );
   const [openPopUp, setOpenPopUp] = useState(false);
   const numberOfGuesse = gameStack.length - 1;
-
-  const nextGame = gameStack[0].nextGameDate ?? Date.now();
-  const nextGameUTC = new Date(nextGame).getTime();
+  const nextGameUTC =
+    gameStack[0].nextGameDate === undefined
+      ? undefined
+      : new Date(gameStack[0].nextGameDate).getTime();
   const [millisToNextGame, setMillisToNextGame] = useState(
-    nextGameUTC - Date.now()
+    nextGameUTC === undefined ? undefined : nextGameUTC - Date.now()
   );
 
   useEffect(() => {
     setInterval(() => {
-      setMillisToNextGame(nextGameUTC - Date.now());
+      if (nextGameUTC !== undefined)
+        setMillisToNextGame(nextGameUTC - Date.now());
     }, 1000);
   }, []);
 
@@ -117,14 +120,14 @@ const WinDialog: NextPage<WinDialogProps> = ({
               <div>History: {scoreString}</div>
             </Tooltip>
           </div>
-          {millisToNextGame > 0 ? (
+          {millisToNextGame ?? 1 > 0 ? (
             <div className={styles.chunk}>
               <DateDisplay millis={millisToNextGame} />
             </div>
           ) : (
             <div className={styles.chunk}>
               <DateDisplay
-                millis={millisToNextGame > 0 ? millisToNextGame : 0}
+                millis={(millisToNextGame ?? 0) > 0 ? millisToNextGame : 0}
               />
               <div
                 className={styles.nextGameButton}
@@ -139,9 +142,9 @@ const WinDialog: NextPage<WinDialogProps> = ({
             onClick={() => {
               setOpenPopUp(true);
               navigator.clipboard.writeText(
-                `Keyo #${gameStack[0].gameId} ${
+                `Keyo #${gameStack[0].gameId} Guesses: ${
                   gameStack.length - 1
-                } guesses (#${globalPosition})\n` + scoreString
+                }\n` + scoreString
               );
             }}
           >

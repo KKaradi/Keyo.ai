@@ -7,7 +7,7 @@ import type { NextPage } from "next";
 import { ReactElement } from "react";
 
 const { chains, provider } = configureChains(
-  [chain.mainnet, chain.polygon, chain.optimism, chain.arbitrum],
+  [chain.goerli, chain.mainnet, chain.polygon, chain.optimism, chain.arbitrum],
   [alchemyProvider({ alchemyId: process.env.ALCHEMY_ID }), publicProvider()]
 );
 
@@ -29,7 +29,7 @@ type RainbowKitProps = {
 const RainbowKit: NextPage<RainbowKitProps> = ({ children }) => {
   return (
     <WagmiConfig client={wagmiClient}>
-      <RainbowKitProvider chains={chains}>{children}</RainbowKitProvider>
+      <RainbowKitProvider chains={chains} initialChain={chain.goerli}>{children}</RainbowKitProvider>
     </WagmiConfig>
   );
 };

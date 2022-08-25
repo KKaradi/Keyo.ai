@@ -38,6 +38,7 @@ export async function generateNewGame(
   account: Account,
   gameId: number,
   imagePath: string,
+  imageCID: string,
   promptSplits: string[],
   nextGameDate: string | undefined,
   addNewSession: boolean
@@ -50,6 +51,7 @@ export async function generateNewGame(
 
   return {
     gameId,
+    imageCID,
     text: "",
     gameStatus: "started",
     inputs: promptSplits.map(splitToEmptys),
@@ -205,7 +207,7 @@ const addGuessToDatabase = async (
 export const RequestSchema = z.union([GameMoveSchema, GameStartSchema]);
 export type Request = z.infer<typeof RequestSchema>;
 
-async function addGlobalRank(gameMove: GameMove) {
+export async function addGlobalRank(gameMove: GameMove) {
   if (gameMove.gameStatus !== "finished") return;
 
   const res = await prisma.session.findFirst({
@@ -233,6 +235,7 @@ export default async function handler(
     prompt,
     gameId: currentGameId,
     imagePath,
+    imageCID,
     nextGameDate,
   } = parsedTheme.data;
 
@@ -246,14 +249,15 @@ export default async function handler(
       const pred = (session: Session) => session.gameId === currentGameId;
       const session = account.sessions.find(pred);
       if (session) {
-        const gameData = parsedTheme.data;
-        const moves = await sessionToGameStack(session.id, account, gameData);
+        const theme = parsedTheme.data;
+        const moves = await sessionToGameStack(session.id, account, theme);
         return res.status(200).json(moves);
       } else {
         const newGame = await generateNewGame(
           account,
           currentGameId,
           imagePath,
+          imageCID,
           splits,
           nextGameDate,
           true
@@ -265,6 +269,7 @@ export default async function handler(
         await createAccount(),
         currentGameId,
         imagePath,
+        imageCID,
         splits,
         nextGameDate,
         true

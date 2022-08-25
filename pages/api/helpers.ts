@@ -4,6 +4,7 @@ import { Account, GameData, GameMove } from "../../schemas";
 import type { NextApiResponse, NextApiRequest } from "next/types";
 import { generateNewGame, processStartedGame } from "./post/multiwordle";
 import { AccountType, Session } from "@prisma/client";
+import { addGlobalRank } from "./post/multiwordle";
 export const responses = {
   onlyGet: { message: "Incorrect HTTP method: only use GET.", code: 405 },
   onlyPost: { message: "Incorrect HTTP method: only use POST", code: 405 },
@@ -106,6 +107,7 @@ export function pullTheme(
         return {
           prompt: schedule[i].prompt,
           imagePath: schedule[i].image_path,
+          imageCID: schedule[i].image_CID,
           gameId: schedule[i].game_id,
           nextGameDate: schedule[i + 1]?.start_date,
         };
@@ -118,7 +120,8 @@ export function pullTheme(
           prompt: schedule[i].prompt,
           imagePath: schedule[i].image_path,
           gameId: schedule[i].game_id,
-          nextGameDate: schedule[i + 1].start_date,
+          imageCID: schedule[i].image_CID,
+          nextGameDate: schedule[i + 1]?.start_date,
         };
       }
     }
@@ -128,7 +131,7 @@ export function pullTheme(
 export const sessionToGameStack = async (
   id: string,
   account: Account,
-  { nextGameDate, prompt, imagePath, gameId }: GameData
+  { nextGameDate, prompt, imagePath, imageCID, gameId }: GameData
 ): Promise<GameMove[]> => {
   const guesses = await prisma.guess.findMany({
     where: { sessionId: id },
@@ -141,6 +144,7 @@ export const sessionToGameStack = async (
     account,
     gameId,
     imagePath,
+    imageCID,
     promptSplits,
     nextGameDate,
     false
@@ -164,6 +168,7 @@ export const sessionToGameStack = async (
     });
 
     await processStartedGame(lastMoveClone, gameId, promptSplits, false);
+    await addGlobalRank(lastMoveClone);
     moves.push(lastMoveClone);
     lastMove = lastMoveClone;
   }
