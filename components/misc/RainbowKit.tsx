@@ -29,7 +29,7 @@ type RainbowKitProps = {
 const RainbowKit: NextPage<RainbowKitProps> = ({ children }) => {
   return (
     <WagmiConfig client={wagmiClient}>
-      <RainbowKitProvider chains={chains} initialChain={chain.goerli}>{children}</RainbowKitProvider>
+      <RainbowKitProvider chains={chains}>{children}</RainbowKitProvider>
     </WagmiConfig>
   );
 };
