@@ -1,0 +1,98 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  border-radius: 20%;
+  box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
+}
+
+.containerErrorAnimation {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  border-radius: 20%;
+  box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
+  animation: jump-shaking 0.5s 1;
+}
+
+.containerInputAnimation {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  border-radius: 20%;
+  box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
+  animation: vertical-jump 0.4s 1;
+}
+
+.character {
+  font-size: 90%;
+  user-select: none;
+  color: white;
+}
+
+@keyframes tilt-n-move-shaking {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  25% {
+    transform: translate(5px, 5px) rotate(5deg);
+  }
+  50% {
+    transform: translate(0, 0) rotate(0eg);
+  }
+  75% {
+    transform: translate(-5px, 5px) rotate(-5deg);
+  }
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+}
+
+@keyframes vertical-jump {
+  0% {
+    transform: translateY(0);
+  }
+  10% {
+    transform: scaleX(110%) translateY(0);
+  }
+  20% {
+    transform: scale(100%) translateY(-2);
+  }
+  70% {
+    transform: translateY(-10px);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes jump-shaking {
+  0% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateY(-9px);
+  }
+  35% {
+    transform: translateY(-9px) rotate(17deg);
+  }
+  55% {
+    transform: translateY(-9px) rotate(-17deg);
+  }
+  65% {
+    transform: translateY(-9px) rotate(17deg);
+  }
+  75% {
+    transform: translateY(-9px) rotate(-17deg);
+  }
+  100% {
+    transform: translateY(0) rotate(0);
+  }
+}

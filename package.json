@@ -1,0 +1,50 @@
+{
+  "name": "nonfungibleai",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.9.3",
+    "@emotion/styled": "^11.9.3",
+    "@mui/icons-material": "^5.8.4",
+    "@mui/material": "^5.8.5",
+    "@popperjs/core": "^2.11.5",
+    "@prisma/client": "^4.0.0",
+    "@rainbow-me/rainbowkit": "^0.3.4",
+    "@react-oauth/google": "^0.2.6",
+    "eth-icon": "^1.0.1",
+    "ethers": "^5.6.9",
+    "lodash": "^4.17.21",
+    "next": "12.1.6",
+    "nookies": "^2.5.2",
+    "react": "^17.0.0",
+    "react-device-detect": "^2.2.2",
+    "react-dom": "^17.0.0",
+    "react-responsive": "^9.0.0-beta.10",
+    "react-tinder-card": "^1.4.5",
+    "ua-parser-js": "^1.0.2",
+    "wagmi": "^0.4.12",
+    "zod": "^3.17.10",
+    "zustand": "^4.0.0-rc.1"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.14.182",
+    "@types/node": "18.0.0",
+    "@types/react": "18.0.14",
+    "@types/react-dom": "18.0.5",
+    "@types/ua-parser-js": "^0.7.36",
+    "@typescript-eslint/eslint-plugin": "^5.29.0",
+    "@typescript-eslint/parser": "^5.29.0",
+    "eslint": "^8.18.0",
+    "eslint-config-next": "12.1.6",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "prettier": "^2.7.1",
+    "prisma": "^4.0.0",
+    "typescript": "4.7.4"
+  }
+}

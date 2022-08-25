@@ -1,0 +1,36 @@
+html,
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  --safe-area-inset-top: env(safe-area-inset-top);
+  --safe-area-inset-bottom: env(safe-area-inset-bottom);
+  height: calc(
+    100% + (var(--safe-area-inset-top) + var(--safe-area-inset-bottom))
+  );
+  width: 100vw;
+}
+
+@font-face {
+  font-family: "main";
+  src: url("../fonts/main/main-bold.ttf");
+  font-weight: normal;
+  font-style: normal;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+* {
+  box-sizing: border-box;
+  user-select: none;
+}
+
+#__next,
+#__next > div,
+#__next > div > div {
+  height: 100%;
+  width: 100%;
+}

@@ -1,0 +1,26 @@
+.loginContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 20;
+  margin-top: 20;
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: 2px 2px 5px rgb(159, 159, 159);
+}
+
+.googleLogin {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  padding: 0 0 10px 0;
+}
+
+.ethLogin {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  padding: 10px 0 0 0;
+}

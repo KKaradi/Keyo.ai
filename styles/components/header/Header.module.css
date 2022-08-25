@@ -1,0 +1,26 @@
+.header {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+  margin-right: 100px;
+  width: 100%;
+  gap: 20px;
+}
+
+.tab,
+.winTab {
+  height: 100%;
+  color: black;
+  background-color: rgb(211, 211, 211);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-left: 10px;
+  padding-right: 10px;
+  border-radius: 10px;
+}
+
+.winTab {
+  background-color: #35b942;
+}

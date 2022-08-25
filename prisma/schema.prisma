@@ -1,0 +1,49 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AccountType {
+  COOKIE
+  WALLET
+  EMAIL
+}
+
+model Account {
+  id String @id @default(cuid())
+
+  type    AccountType
+  address String? @unique
+
+  sessions Session[]
+}
+
+model Session {
+  id String @id @default(cuid())
+
+  gameId Int
+
+  account   Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  accountId String
+
+  completed     Boolean
+  timeCompleted DateTime?
+  guesses       Guess[]
+}
+
+model Guess {
+  id   String @id @default(cuid())
+  text String
+
+  attempt Int
+
+  session   Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  sessionId String
+}

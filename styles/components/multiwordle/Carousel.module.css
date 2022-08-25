@@ -1,0 +1,103 @@
+.carousel {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.slider {
+  width: 568px;
+  height: 400px;
+  text-align: center;
+  overflow: auto;
+  border-radius: 25px;
+  background: rgb(220, 220, 220);
+}
+
+.slides {
+  width: 100%;
+  display: flex;
+  overflow-y: hidden;
+  overflow-x: scroll;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+}
+
+.slide {
+  scroll-snap-align: start;
+  flex-shrink: 0;
+  width: 550px;
+  min-height: 400px;
+  overflow-y: hidden;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  margin-right: 50px;
+  border-radius: 10px;
+  margin-bottom: 40px;
+  margin-top: 40px;
+  transform-origin: center center;
+  transform: scale(1);
+  transition: transform 0.5s;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.slider::-webkit-scrollbar-thumb {
+  background: #818384;
+  border-radius: 10px;
+}
+
+.slider::-webkit-scrollbar {
+  width: 10px;
+  background-color: #f5f5f5;
+}
+
+.word {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 3px;
+}
+
+.slider > a:active {
+  top: 1px;
+}
+
+.slider > a:focus {
+  background: #000;
+}
+
+.cell {
+  width: 40px;
+  height: 40px;
+}
+
+@media only screen and (max-device-width: 480px) {
+  .carousel {
+    flex-direction: column;
+  }
+
+  .carousel .arrow {
+    transform: rotate(90deg);
+  }
+
+  .slider {
+    width: 300px;
+    height: 150px;
+  }
+
+  .slide {
+    width: 280px;
+    min-height: 180px;
+  }
+
+  .cell {
+    width: 25px;
+    height: 25px;
+  }
+}

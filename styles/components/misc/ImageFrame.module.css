@@ -1,0 +1,11 @@
+.image {
+  margin: 0 auto;
+  border-radius: 10px;
+  overflow: hidden;
+  width: 65%;
+}
+
+.frame {
+  padding-top: 20px;
+  padding-bottom: 10px;
+}
