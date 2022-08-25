@@ -61,14 +61,18 @@ const WinDialog: NextPage<WinDialogProps> = ({
   );
   const [openPopUp, setOpenPopUp] = useState(false);
   const numberOfGuesse = gameStack.length - 1;
-  const nextGameUTC = new Date(gameStack[0].nextGameDate).getTime();
+  const nextGameUTC =
+    gameStack[0].nextGameDate === undefined
+      ? undefined
+      : new Date(gameStack[0].nextGameDate).getTime();
   const [millisToNextGame, setMillisToNextGame] = useState(
-    nextGameUTC - Date.now()
+    nextGameUTC === undefined ? undefined : nextGameUTC - Date.now()
   );
 
   useEffect(() => {
     setInterval(() => {
-      setMillisToNextGame(nextGameUTC - Date.now());
+      if (nextGameUTC !== undefined)
+        setMillisToNextGame(nextGameUTC - Date.now());
     }, 1000);
   }, []);
 
@@ -116,14 +120,14 @@ const WinDialog: NextPage<WinDialogProps> = ({
               <div>History: {scoreString}</div>
             </Tooltip>
           </div>
-          {millisToNextGame > 0 ? (
+          {millisToNextGame ?? 1 > 0 ? (
             <div className={styles.chunk}>
               <DateDisplay millis={millisToNextGame} />
             </div>
           ) : (
             <div className={styles.chunk}>
               <DateDisplay
-                millis={millisToNextGame > 0 ? millisToNextGame : 0}
+                millis={(millisToNextGame ?? 0) > 0 ? millisToNextGame : 0}
               />
               <div
                 className={styles.nextGameButton}

@@ -205,7 +205,7 @@ const addGuessToDatabase = async (
 export const RequestSchema = z.union([GameMoveSchema, GameStartSchema]);
 export type Request = z.infer<typeof RequestSchema>;
 
-async function addGlobalRank(gameMove: GameMove) {
+export async function addGlobalRank(gameMove: GameMove) {
   if (gameMove.gameStatus !== "finished") return;
 
   const res = await prisma.session.findFirst({
