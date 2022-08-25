@@ -1,18 +1,18 @@
 [
   {
     "game_id": 0,
-    "prompt": "a night",
-    "image_path": "/multiwordle/1.png",
-    "image_CID": "QmYeNm1JfDdD5u9ecaTzpEec8YJZiCz3zBMHjsTM2J96ok",
+    "prompt": "film still of a hamster working for mission control at nasa",
+    "image_path": "/multiwordle/5.png",
+    "image_CID": "QmVqzND19yJXZhX6nTtF8ocUS6WGvrFnFeCCdNJgwVvEwP",
     "start_date": "2022-01-01T00:00:00+00:00",
-    "end_date": "2023-01-01T00:00:00+00:00"
+    "end_date": "2022-08-27T00:00:00+00:00"
   },
   {
     "game_id": 1,
-    "prompt": "a nighttime cityscape of tokyo harbor chillwave style",
-    "image_path": "/multiwordle/1.png",
-    "image_CID": "QmYeNm1JfDdD5u9ecaTzpEec8YJZiCz3zBMHjsTM2J96ok",
-    "start_date": "2023-01-01T00:00:00+00:00",
+    "prompt": "kitten living inside a bread hyper detailed",
+    "image_path": "/multiwordle/6.png",
+    "image_CID": "QmQmn8iUeSdP1wKPor5zkR68Havb5Uct82ttRorStCEsVZ",
+    "start_date": "2022-08-27T00:00:00+00:00",
     "end_date": "2024-01-01T00:00:00+00:00"
   }
 ]
