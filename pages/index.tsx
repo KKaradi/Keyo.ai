@@ -252,7 +252,6 @@ const MultiWordlePage: NextPage<MultiWordleProps> = (props) => {
     setErrorMessage((await res.json()).message);
     return true;
   };
-  console.log(gameState);
 
   const slides = gameStackToSlides([gameState, ...history]);
   const colorMap = getColorMap(history, activeSlide);
