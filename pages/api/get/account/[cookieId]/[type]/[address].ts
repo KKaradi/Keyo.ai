@@ -71,6 +71,7 @@ export default async function handler(
         account,
         theme.gameId,
         theme.imagePath,
+        theme.imageCID,
         theme.prompt.split(" "),
         theme.nextGameDate,
         true
