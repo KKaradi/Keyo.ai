@@ -7,10 +7,10 @@
     "end_date": "2023-01-01T00:00:00+00:00"
   },
   {
-    "game_id": 0,
-    "prompt": "a night",
+    "game_id": 1,
+    "prompt": "a nighttime cityscape of tokyo harbor chillwave style",
     "image_path": "/multiwordle/1.png",
     "start_date": "2023-01-01T00:00:00+00:00",
-    "end_date": "2023-01-01T00:00:00+00:00"
+    "end_date": "2024-01-01T00:00:00+00:00"
   }
 ]
