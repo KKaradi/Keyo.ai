@@ -4,6 +4,7 @@ import { Account, GameData, GameMove } from "../../schemas";
 import type { NextApiResponse, NextApiRequest } from "next/types";
 import { generateNewGame, processStartedGame } from "./post/multiwordle";
 import { AccountType, Session } from "@prisma/client";
+import { addGlobalRank } from "./post/multiwordle";
 export const responses = {
   onlyGet: { message: "Incorrect HTTP method: only use GET.", code: 405 },
   onlyPost: { message: "Incorrect HTTP method: only use POST", code: 405 },
@@ -118,7 +119,7 @@ export function pullTheme(
           prompt: schedule[i].prompt,
           imagePath: schedule[i].image_path,
           gameId: schedule[i].game_id,
-          nextGameDate: schedule[i + 1].start_date,
+          nextGameDate: schedule[i + 1]?.start_date,
         };
       }
     }
@@ -164,6 +165,7 @@ export const sessionToGameStack = async (
     });
 
     await processStartedGame(lastMoveClone, gameId, promptSplits, false);
+    await addGlobalRank(lastMoveClone);
     moves.push(lastMoveClone);
     lastMove = lastMoveClone;
   }

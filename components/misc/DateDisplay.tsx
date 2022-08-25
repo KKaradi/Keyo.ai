@@ -3,7 +3,7 @@ import styles from "../../styles/components/misc/DateDisplay.module.css";
 import { Dispatch, ReactElement, SetStateAction } from "react";
 
 type DateDisplayProps = {
-  millis: number;
+  millis: number | undefined;
 };
 
 function convertMiliseconds(miliseconds: number) {
@@ -20,6 +20,9 @@ function convertMiliseconds(miliseconds: number) {
 }
 
 const DateDisplay: NextPage<DateDisplayProps> = ({ millis }) => {
+  if (millis === undefined) {
+    return <div>We couldn&apos;t find the next game</div>;
+  }
   const date = convertMiliseconds(millis);
 
   return (
