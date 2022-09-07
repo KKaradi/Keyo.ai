@@ -28,9 +28,10 @@ import PopUp from "../components/misc/PopUp";
 import Tutorial from "../components/multiwordle/Tutorial";
 import nookies from "nookies";
 import { z } from "zod";
-import { useMediaQuery } from "react-responsive";
 import PostGame from "../components/dialogs/PostGame";
 import BuyNFT from "../components/dialogs/BuyNFT";
+import Head from "next/head";
+import { useMediaQuery } from "@mui/material";
 
 function getNewInputs(input: string, gameState: GameMove): Word[] {
   if (gameState.inputs === undefined) return [];
@@ -127,7 +128,7 @@ const MultiWordlePage: NextPage<MultiWordleProps> = (props) => {
   const [inPostGame, setInPostGame] = useState(false);
   const buyNFTDialogIsOpen = useState(false);
 
-  const isMobile = useMediaQuery({ maxDeviceWidth: "480px" });
+  const isMobile = useMediaQuery("(max-device-width: 480px)");
 
   // local storage calls should be wrapped in use effect
   useEffect(() => {
@@ -269,7 +270,7 @@ const MultiWordlePage: NextPage<MultiWordleProps> = (props) => {
   const inputField = (
     <InputField
       fadeTutorialDialog={fadeTutorialDialog}
-      inTutorial={inTutorial}
+      inTutorial={isMobile ? false : inTutorial}
       gameState={displayBest ? history[0] : gameState}
       activeSlide={activeSlide}
       displayBest={displayBest}
@@ -287,9 +288,15 @@ const MultiWordlePage: NextPage<MultiWordleProps> = (props) => {
     />
   );
 
+  console.log(isMobile);
+
   return (
-    <Tutorial inTutorial={inTutorial}>
+    <Tutorial inTutorial={isMobile ? false : inTutorial}>
       <div className={styles.container}>
+        <Head>
+          <title>Keyo</title>
+          <link rel="icon" href="/icon.jpeg" />
+        </Head>
         <BuyNFT
           openState={buyNFTDialogIsOpen}
           gameState={gameState}
@@ -326,7 +333,9 @@ const MultiWordlePage: NextPage<MultiWordleProps> = (props) => {
           <div className={styles.mobileScrollable}>
             <div className={styles.mobileView}>
               <div className={styles.inputField}>{inputField} </div>
-              <div className={styles.mobileCarousel}>{carousel}</div>
+              {isMobile ? (
+                <div className={styles.mobileCarousel}>{carousel}</div>
+              ) : null}
             </div>
           </div>
         </div>
@@ -334,8 +343,9 @@ const MultiWordlePage: NextPage<MultiWordleProps> = (props) => {
         <div className={styles.right}>
           <div className={styles.header}>{header}</div>
           <div className={styles.game}>
-            <div className={styles.carousel}> {carousel} </div>
-
+            {isMobile ? null : (
+              <div className={styles.carousel}> {carousel} </div>
+            )}
             <div className={styles.keyboard}>
               <Keyboard
                 onPress={onPress}

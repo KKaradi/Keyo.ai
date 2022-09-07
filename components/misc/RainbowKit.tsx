@@ -7,7 +7,7 @@ import type { NextPage } from "next";
 import { ReactElement } from "react";
 
 const { chains, provider } = configureChains(
-  [chain.goerli, chain.mainnet, chain.polygon, chain.optimism, chain.arbitrum],
+  [chain.mainnet],
   [alchemyProvider({ alchemyId: process.env.ALCHEMY_ID }), publicProvider()]
 );
 

@@ -83,6 +83,12 @@
     margin-right: 20px;
   }
 
+  .keyboard {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
   .header,
   .carousel {
     display: none;
@@ -107,9 +113,6 @@
   }
 
   .inputField {
-    margin: 0;
-    margin-left: 20px;
-    margin-right: 20px;
     flex: 1;
     width: 100vw;
     scroll-snap-align: start;
