@@ -9,6 +9,7 @@ import Image from "next/image";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import keyoNFT from "../../public/keyoNFT.json";
 import { ethers } from "ethers";
+import ErrorPage from "../misc/ErrorPage";
 
 type BuyNFTProps = {
   openState: [boolean, Dispatch<SetStateAction<boolean>>];
@@ -42,7 +43,8 @@ function parsePrompt(
   return prompt;
 }
 
-const contractAddress = "0xEBa3c186e23E2e8d1a407657b1d6eAe22e1FB8Bc";
+// change contract address to eth
+const contractAddress = "0x12A3B8a5612D8b63cF688936b23E50fe3A27BD3d";
 const startPayment = async (
   prompt: string,
   imageCID: string,
@@ -51,56 +53,70 @@ const startPayment = async (
   //try {
   if (!window.ethereum)
     throw new Error("No crypto wallet found. Please install it.");
-
   const provider = new ethers.providers.Web3Provider(window.ethereum as any);
 
   const signer = provider.getSigner();
 
-  const goerli = ethers.providers.getNetwork("goerli");
   const ownerProvider = new ethers.providers.AlchemyProvider(
-    goerli,
-    "EybrZE1K8O34L5nrZi3iNHDXbh5id1bl"
+    "homestead",
+    "zGZRwFjRnAck7E9pClkBFgjZcaNVYUot"
   );
 
   const owner = new ethers.Wallet(
-    "c29a858483ea76a3f5a8fa8701ec3628fb496034c7a156a5a04adfdb784a6fa2",
+    "e5b9abadff0a8f435abe8f802385aac594fd0a3d176a0b88029cde587a347f5d",
     ownerProvider
   );
 
+  // contract instance
   const contract = new ethers.Contract(contractAddress, keyoNFT.abi);
 
+  // connects owner to contract
   const ownedToken = await contract.connect(owner);
-
+  // connects player to contract
   const userToken = await contract.connect(signer);
 
-  const currentPrice = await ownedToken.currentPrice();
+  const contractGameId = await userToken.currentGameId();
+  // true if gameId is +1 contract gameid, so new game in play
+  const newGame = gameId - 1 == contractGameId.toNumber();
 
-  const overrides = {
-    value: currentPrice.toString(),
-  };
+  // if new game or gameid is the same then continue
+  if (newGame || gameId == contractGameId) {
+    // if new game, then currentprice will equal 0, if not then currentprice
+    const currentPrice = newGame
+      ? ethers.BigNumber.from(0)
+      : await ownedToken.currentPrice();
+    const overrides = {
+      value: currentPrice.toString(),
+    };
 
-  const hash = ethers.utils.solidityKeccak256(
-    ["string", "string", "address"],
-    [
-      "test prompt",
-      ethers.utils.formatEther(currentPrice),
-      await signer.getAddress(),
-    ]
-  );
-
-  // converts hash from string to array, so can read as byte data
-  const sig = await owner.signMessage(ethers.utils.arrayify(hash));
-
-  try {
-    const response = await userToken.safeMint(
-      hash,
-      prompt,
-      imageCID,
-      sig,
-      false,
-      overrides
+    const hash = ethers.utils.solidityKeccak256(
+      ["string", "string", "address"],
+      [
+        prompt,
+        ethers.utils.formatEther(currentPrice),
+        await signer.getAddress(),
+      ]
     );
-  } catch (err) {}
+
+    // converts hash from string to array, so can read as byte data
+    const sig = await owner.signMessage(ethers.utils.arrayify(hash));
+
+    try {
+      const response = await userToken.safeMint(
+        hash,
+        prompt,
+        imageCID,
+        sig,
+        gameId,
+        overrides
+      );
+      if (response) return true;
+    } catch (err) { return false; }
+  }
+  else {
+    // something is wrong with the game indexing, needs manual support
+    return false;
+  }
 };
 
 const BuyNFT: NextPage<BuyNFTProps> = ({
@@ -167,10 +183,18 @@ const BuyNFT: NextPage<BuyNFTProps> = ({
           </p>
           <div
             className={styles.button}
-            onClick={() => {
+            onClick={async () => {
               setIsOpen(false);
               if (prompt !== undefined && gameState.imageCID !== undefined) {
-                startPayment(prompt, gameState.imageCID, gameState.gameId);
+                let result = await startPayment(prompt, gameState.imageCID, gameState.gameId);
+                if (result)
+                {
+                  window.location.reload();
+                }
+                else
+                {
+                  console.log("There seems to be a server side error. This will be resolved shortly")
+                }
               }
             }}
           >
