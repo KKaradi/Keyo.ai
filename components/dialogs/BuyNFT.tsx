@@ -43,7 +43,11 @@ function parsePrompt(
 }
 
 const contractAddress = "0xEBa3c186e23E2e8d1a407657b1d6eAe22e1FB8Bc";
-const startPayment = async (prompt: string, imageCID: string) => {
+const startPayment = async (
+  prompt: string,
+  imageCID: string,
+  gameId: number
+) => {
   //try {
   if (!window.ethereum)
     throw new Error("No crypto wallet found. Please install it.");
@@ -57,6 +61,7 @@ const startPayment = async (prompt: string, imageCID: string) => {
     goerli,
     "EybrZE1K8O34L5nrZi3iNHDXbh5id1bl"
   );
+
   const owner = new ethers.Wallet(
     "c29a858483ea76a3f5a8fa8701ec3628fb496034c7a156a5a04adfdb784a6fa2",
     ownerProvider
@@ -165,7 +170,7 @@ const BuyNFT: NextPage<BuyNFTProps> = ({
             onClick={() => {
               setIsOpen(false);
               if (prompt !== undefined && gameState.imageCID !== undefined) {
-                startPayment(prompt, gameState.imageCID);
+                startPayment(prompt, gameState.imageCID, gameState.gameId);
               }
             }}
           >

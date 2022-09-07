@@ -10,13 +10,14 @@
 @media only screen and (max-device-width: 480px) {
   .container {
     width: calc(100vw - 27px);
+    height: initial;
     margin-left: 0;
     margin-right: 0;
   }
 
   .button {
-    height: 10px;
-    width: 10px;
+    height: 40px !important;
+    width: 40px !important;
   }
 }
 
