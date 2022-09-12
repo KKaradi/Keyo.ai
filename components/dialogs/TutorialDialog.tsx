@@ -1,5 +1,5 @@
 import type { NextPage } from "next/types";
-import { Dispatch, ReactElement, SetStateAction, useState } from "react";
+import { Dispatch, ReactElement, SetStateAction } from "react";
 import styles from "../../styles/components/dialogs/TutorialDialog.module.css";
 import CallReceivedIcon from "@mui/icons-material/CallReceived";
 
@@ -20,8 +20,8 @@ const TutorialDialog: NextPage<TutorialDialogProps> = ({
         onAnimationEnd={() => fadeTutorialDialog[1](false)}
       >
         <div className={styles.tutorialText}>
-          Try typing a word that you think was used to generate this image. Then
-          hit <b>ENTER</b>.
+          Try typing a word that you think was used to generate this image.
+          <br /> Then hit <b>ENTER</b>.
         </div>
         <CallReceivedIcon />
       </div>

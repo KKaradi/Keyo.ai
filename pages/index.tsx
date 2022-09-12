@@ -270,7 +270,7 @@ const MultiWordlePage: NextPage<MultiWordleProps> = (props) => {
   const inputField = (
     <InputField
       fadeTutorialDialog={fadeTutorialDialog}
-      inTutorial={isMobile ? false : inTutorial}
+      inTutorial={inTutorial}
       gameState={displayBest ? history[0] : gameState}
       activeSlide={activeSlide}
       displayBest={displayBest}
@@ -288,10 +288,8 @@ const MultiWordlePage: NextPage<MultiWordleProps> = (props) => {
     />
   );
 
-  console.log(isMobile);
-
   return (
-    <Tutorial inTutorial={isMobile ? false : inTutorial}>
+    <Tutorial inTutorial={inTutorial} setInTutorial={setInTutorial}>
       <div className={styles.container}>
         <Head>
           <title>Keyo</title>
