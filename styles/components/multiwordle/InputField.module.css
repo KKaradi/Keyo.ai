@@ -33,12 +33,9 @@
 }
 
 @media only screen and (max-device-width: 480px) {
-  .body {
-    margin-left: 10px;
-  }
   .cell {
-    height: 30px;
-    width: 30px;
+    height: 27px;
+    width: 27px;
   }
 
   .body {

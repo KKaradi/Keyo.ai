@@ -33,6 +33,12 @@ type LoginProps = {
   disconnect?: () => Promise<void>;
 };
 
+const parseJWT = (token: string) => {
+  const raw = Buffer.from(token.split(".")[1], "base64").toString();
+  const parsed = GmailCredentialSchema.safeParse(JSON.parse(raw));
+  return parsed.success ? parsed.data : null;
+};
+
 const Login: NextPage<LoginProps> = ({ signIn, account, disconnect }) => {
   const [anchor, setAnchor] = useState<null | HTMLElement>(null);
 
@@ -52,6 +58,22 @@ const Login: NextPage<LoginProps> = ({ signIn, account, disconnect }) => {
       setAnchor(null);
     }
   };
+
+  const onOneTapSuccess = async ({ credential }: CredentialResponse) => {
+    if (!credential) return;
+
+    const parsedJWT = parseJWT(credential);
+    if (parsedJWT && signIn) {
+      signIn(parsedJWT.email, "EMAIL");
+      setAnchor(null);
+    }
+  };
+
+  const login = useGoogleLogin({ onSuccess, flow: "implicit" });
+  useGoogleOneTapLogin({
+    onSuccess: onOneTapSuccess,
+    auto_select: true,
+  } as unknown as { onSuccess: typeof onOneTapSuccess });
 
   const placement = anchor ? "top" : undefined;
 
@@ -78,6 +100,15 @@ const Login: NextPage<LoginProps> = ({ signIn, account, disconnect }) => {
                 </div>
               ) : (
                 <div className={styles.loginContainer}>
+                  <div onClick={() => login()} className={styles.googleLogin}>
+                    <Image
+                      src={google}
+                      width={30}
+                      height={30}
+                      alt={"Login with Google"}
+                      priority
+                    />
+                  </div>
                   <div className={styles.ethLogin}>
                     <Image
                       src={ethereum}

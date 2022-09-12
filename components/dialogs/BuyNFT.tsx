@@ -43,7 +43,8 @@ function parsePrompt(
   return prompt;
 }
 
-const contractAddress = "0x6b77c67919127249df85285136EB1649A584e74B";
+// change contract address to eth
+const contractAddress = "0x12A3B8a5612D8b63cF688936b23E50fe3A27BD3d";
 const startPayment = async (
   prompt: string,
   imageCID: string,

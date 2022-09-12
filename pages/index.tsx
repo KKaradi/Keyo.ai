@@ -137,6 +137,7 @@ const MultiWordlePage: NextPage<MultiWordleProps> = (props) => {
   }, []);
 
   const signIn: SignIn = useCallback(async (address, type) => {
+
     const res = await get(`/api/get/account/${account.id}/${type}/${address}`);
     if (res.status !== 200) {
       setError(true);
@@ -146,7 +147,10 @@ const MultiWordlePage: NextPage<MultiWordleProps> = (props) => {
     const json = await res.json();
     if (res.status === 200) {
       const parsedId = AccountSchema.safeParse(json);
+
+      
       if (parsedId.success) {
+
         return setAccount(parsedId.data);
       }
 
@@ -270,7 +274,7 @@ const MultiWordlePage: NextPage<MultiWordleProps> = (props) => {
   const inputField = (
     <InputField
       fadeTutorialDialog={fadeTutorialDialog}
-      inTutorial={inTutorial}
+      inTutorial={isMobile ? false : inTutorial}
       gameState={displayBest ? history[0] : gameState}
       activeSlide={activeSlide}
       displayBest={displayBest}
@@ -288,8 +292,10 @@ const MultiWordlePage: NextPage<MultiWordleProps> = (props) => {
     />
   );
 
+  console.log(isMobile);
+
   return (
-    <Tutorial inTutorial={inTutorial} setInTutorial={setInTutorial}>
+    <Tutorial inTutorial={isMobile ? false : inTutorial}>
       <div className={styles.container}>
         <Head>
           <title>Keyo</title>
@@ -308,7 +314,7 @@ const MultiWordlePage: NextPage<MultiWordleProps> = (props) => {
           globalPosition={gameState.globalPosition}
           setIsOpen={setOpenWinDialog}
           isOpen={openWinDialog}
-          usingWallet={gameState.account.type === "WALLET"}
+          usingWallet={account.type === "WALLET"}
           gameStack={history}
           buyNFTDialogState={buyNFTDialogIsOpen}
         />
