@@ -80,38 +80,39 @@ const startPayment = async (
   const newGame = gameId > contractGameId.toNumber();
 
   // if new game or gameid is the same then continue
+  // -- commented out this if condition for now (game indexing problems) --
   //if (newGame || gameId == contractGameId) {
     // if new game, then currentprice will equal 0, if not then currentprice
-    const currentPrice = newGame
-      ? ethers.BigNumber.from(0)
-      : await ownedToken.currentPrice();
-    const overrides = {
-      value: currentPrice.toString(),
-    };
+  const currentPrice = newGame
+    ? ethers.BigNumber.from(0)
+    : await ownedToken.currentPrice();
+  const overrides = {
+    value: currentPrice.toString(),
+  };
 
-    const hash = ethers.utils.solidityKeccak256(
-      ["string", "string", "address"],
-      [
-        prompt,
-        ethers.utils.formatEther(currentPrice),
-        await signer.getAddress(),
-      ]
+  const hash = ethers.utils.solidityKeccak256(
+    ["string", "string", "address"],
+    [
+      prompt,
+      ethers.utils.formatEther(currentPrice),
+      await signer.getAddress(),
+    ]
+  );
+
+  // converts hash from string to array, so can read as byte data
+  const sig = await owner.signMessage(ethers.utils.arrayify(hash));
+
+  try {
+    const response = await userToken.safeMint(
+      hash,
+      prompt,
+      imageCID,
+      sig,
+      gameId,
+      overrides
     );
-
-    // converts hash from string to array, so can read as byte data
-    const sig = await owner.signMessage(ethers.utils.arrayify(hash));
-
-    try {
-      const response = await userToken.safeMint(
-        hash,
-        prompt,
-        imageCID,
-        sig,
-        gameId,
-        overrides
-      );
-      if (response) return true;
-    } catch (err) { return false; }
+    if (response) return true;
+  } catch (err) { return false; }
   //}
   /*else {
     // something is wrong with the game indexing, needs manual support
