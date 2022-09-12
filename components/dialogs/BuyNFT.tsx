@@ -77,10 +77,10 @@ const startPayment = async (
 
   const contractGameId = await userToken.currentGameId();
   // true if gameId is +1 contract gameid, so new game in play
-  const newGame = gameId - 1 == contractGameId.toNumber();
+  const newGame = gameId > contractGameId.toNumber();
 
   // if new game or gameid is the same then continue
-  if (newGame || gameId == contractGameId) {
+  //if (newGame || gameId == contractGameId) {
     // if new game, then currentprice will equal 0, if not then currentprice
     const currentPrice = newGame
       ? ethers.BigNumber.from(0)
@@ -112,11 +112,11 @@ const startPayment = async (
       );
       if (response) return true;
     } catch (err) { return false; }
-  }
-  else {
+  //}
+  /*else {
     // something is wrong with the game indexing, needs manual support
     return false;
-  }
+  }*/
 };
 
 const BuyNFT: NextPage<BuyNFTProps> = ({
