@@ -136,8 +136,7 @@ const MultiWordlePage: NextPage<MultiWordleProps> = (props) => {
   }, []);
 
   const signIn: SignIn = useCallback(async (address, type) => {
-    console.log(account);
-    console.log(initialAccount);
+
     const res = await get(`/api/get/account/${account.id}/${type}/${address}`);
     if (res.status !== 200) {
       setError(true);
@@ -150,7 +149,7 @@ const MultiWordlePage: NextPage<MultiWordleProps> = (props) => {
 
       
       if (parsedId.success) {
-        console.log(parsedId);
+
         return setAccount(parsedId.data);
       }
 
@@ -291,7 +290,7 @@ const MultiWordlePage: NextPage<MultiWordleProps> = (props) => {
       isMobile={isMobile}
     />
   );
-    console.log(gameState.account.type);
+
   return (
     <Tutorial inTutorial={inTutorial}>
       <div className={styles.container}>
@@ -375,7 +374,6 @@ export const getServerSideProps = async (
 
   const json = await response.json();
 
-  console.log(json);
   if (response.status === 200) {
     if (Array.isArray(json)) {
       const parsedResponse = z.array(GameMoveSchema).safeParse(json);
