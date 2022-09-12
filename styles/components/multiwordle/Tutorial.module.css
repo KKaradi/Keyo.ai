@@ -8,6 +8,12 @@
   z-index: 1;
 }
 
+@media only screen and (max-device-width: 480px) {
+  .cover {
+    display: none;
+  }
+}
+
 .container {
   height: 100%;
   width: 100%;

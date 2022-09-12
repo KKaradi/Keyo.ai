@@ -1,9 +1,10 @@
 .header {
+  padding-top: 10px;
+  padding-right: 10px;
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
   align-items: center;
-  margin-right: 100px;
   width: 100%;
   gap: 20px;
 }
