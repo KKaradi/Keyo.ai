@@ -44,7 +44,7 @@ function parsePrompt(
 }
 
 // change contract address to eth
-const contractAddress = "0x12A3B8a5612D8b63cF688936b23E50fe3A27BD3d";
+const contractAddress = "0x6b77c67919127249df85285136EB1649A584e74B";
 const startPayment = async (
   prompt: string,
   imageCID: string,
@@ -75,48 +75,50 @@ const startPayment = async (
   // connects player to contract
   const userToken = await contract.connect(signer);
 
+  // bugged bc if ganme indexing goes wrong, its going to display free mint forever 
   const contractGameId = await userToken.currentGameId();
   // true if gameId is +1 contract gameid, so new game in play
-  const newGame = gameId - 1 == contractGameId.toNumber();
+  const newGame = gameId > contractGameId.toNumber();
 
   // if new game or gameid is the same then continue
-  if (newGame || gameId == contractGameId) {
+  // -- commented out this if condition for now (game indexing problems) --
+  //if (newGame || gameId == contractGameId) {
     // if new game, then currentprice will equal 0, if not then currentprice
-    const currentPrice = newGame
-      ? ethers.BigNumber.from(0)
-      : await ownedToken.currentPrice();
-    const overrides = {
-      value: currentPrice.toString(),
-    };
+  const currentPrice = newGame
+    ? ethers.BigNumber.from(0)
+    : await ownedToken.currentPrice();
+  const overrides = {
+    value: currentPrice.toString(),
+  };
 
-    const hash = ethers.utils.solidityKeccak256(
-      ["string", "string", "address"],
-      [
-        prompt,
-        ethers.utils.formatEther(currentPrice),
-        await signer.getAddress(),
-      ]
+  const hash = ethers.utils.solidityKeccak256(
+    ["string", "string", "address"],
+    [
+      prompt,
+      ethers.utils.formatEther(currentPrice),
+      await signer.getAddress(),
+    ]
+  );
+
+  // converts hash from string to array, so can read as byte data
+  const sig = await owner.signMessage(ethers.utils.arrayify(hash));
+
+  try {
+    const response = await userToken.safeMint(
+      hash,
+      prompt,
+      imageCID,
+      sig,
+      gameId,
+      overrides
     );
-
-    // converts hash from string to array, so can read as byte data
-    const sig = await owner.signMessage(ethers.utils.arrayify(hash));
-
-    try {
-      const response = await userToken.safeMint(
-        hash,
-        prompt,
-        imageCID,
-        sig,
-        gameId,
-        overrides
-      );
-      if (response) return true;
-    } catch (err) { return false; }
-  }
-  else {
+    if (response) return true;
+  } catch (err) { return false; }
+  //}
+  /*else {
     // something is wrong with the game indexing, needs manual support
     return false;
-  }
+  }*/
 };
 
 const BuyNFT: NextPage<BuyNFTProps> = ({
