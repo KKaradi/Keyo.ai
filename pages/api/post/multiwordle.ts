@@ -217,7 +217,10 @@ export async function addGlobalRank(gameMove: GameMove) {
   if (!res || !res.timeCompleted) return;
   gameMove.globalPosition =
     (await prisma.session.count({
-      where: { timeCompleted: { lt: res.timeCompleted }, gameId: {equals: gameMove.gameId} },
+      where: {
+        timeCompleted: { lt: res.timeCompleted },
+        gameId: { equals: gameMove.gameId },
+      },
     })) + 1;
 }
 

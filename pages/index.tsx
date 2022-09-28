@@ -137,7 +137,6 @@ const MultiWordlePage: NextPage<MultiWordleProps> = (props) => {
   }, []);
 
   const signIn: SignIn = useCallback(async (address, type) => {
-
     const res = await get(`/api/get/account/${account.id}/${type}/${address}`);
     if (res.status !== 200) {
       setError(true);
@@ -148,9 +147,7 @@ const MultiWordlePage: NextPage<MultiWordleProps> = (props) => {
     if (res.status === 200) {
       const parsedId = AccountSchema.safeParse(json);
 
-      
       if (parsedId.success) {
-
         return setAccount(parsedId.data);
       }
 
@@ -291,8 +288,6 @@ const MultiWordlePage: NextPage<MultiWordleProps> = (props) => {
       isMobile={isMobile}
     />
   );
-
-  console.log(isMobile);
 
   return (
     <Tutorial inTutorial={isMobile ? false : inTutorial}>

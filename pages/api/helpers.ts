@@ -103,6 +103,7 @@ export function pullTheme(
     for (let i = 0; i < schedule.length; i++) {
       const afterStart = new Date(schedule[i].start_date).getTime() <= now;
       const beforeEnd = now <= new Date(schedule[i].end_date).getTime();
+
       if (afterStart && beforeEnd) {
         return {
           prompt: schedule[i].prompt,
